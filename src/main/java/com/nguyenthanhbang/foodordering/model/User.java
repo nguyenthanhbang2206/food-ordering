@@ -21,6 +21,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String email;
+    @JsonIgnore
     private String password;
     private String fullName;
     private String avatar;
@@ -32,8 +33,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-//    @ElementCollection
-//    private List<RestaurantFavourite> favourites = new ArrayList<>();
     @ManyToMany
     @JoinTable(
             name = "user_favourites",

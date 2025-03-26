@@ -1,6 +1,7 @@
 package com.nguyenthanhbang.foodordering.controller.auth;
 
 import com.nguyenthanhbang.foodordering.dto.request.LoginRequest;
+import com.nguyenthanhbang.foodordering.dto.response.ApiResponse;
 import com.nguyenthanhbang.foodordering.dto.response.AuthenticationResponse;
 import com.nguyenthanhbang.foodordering.model.User;
 import com.nguyenthanhbang.foodordering.repository.UserRepository;
@@ -30,7 +31,7 @@ public class AuthController {
     private final SecurityUtil securityUtil;
     private final UserService userService;
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> login(@RequestBody LoginRequest request) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(usernamePasswordAuthenticationToken);
         AuthenticationResponse response = new AuthenticationResponse();
@@ -54,10 +55,15 @@ public class AuthController {
                 .maxAge(jwtRefreshExpiration)
                 .build();
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, springCookie.toString()).body(response);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Login Successful")
+                .data(response)
+                .build();
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, springCookie.toString()).body(apiResponse);
     }
     @PostMapping("/refresh")
-    public ResponseEntity<AuthenticationResponse> refresh(@CookieValue(name = "refreshToken", defaultValue = "default") String refreshToken) throws Exception {
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> refresh(@CookieValue(name = "refreshToken", defaultValue = "default") String refreshToken) throws Exception {
         if(refreshToken.equals("default")) {
             throw new Exception("Chưa truyền refresh token, không có refresh token ở cookie");
         }
@@ -78,32 +84,47 @@ public class AuthController {
         loginResponse.setAccessToken(accessToken);
         String refresh_token = securityUtil.createRefreshToken(email, loginResponse);
         userService.updateTokenOfUser(refresh_token, email);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Login Successful")
+                .data(loginResponse)
+                .build();
         ResponseCookie springCookie = ResponseCookie.from("refreshToken", refresh_token)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
                 .maxAge(jwtRefreshExpiration)
                 .build();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, springCookie.toString()).body(loginResponse);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, springCookie.toString()).body(apiResponse);
     }
-    @PostMapping("/auth/logout")
-    public ResponseEntity<Void> logout() throws Exception {
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout() throws Exception {
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
         if(email.equals("")) {
             throw new Exception("refresh token không hợp lệ");
         }
         userService.updateTokenOfUser(null, email);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Logout Successful")
+                .data(null)
+                .build();
         ResponseCookie springCookie = ResponseCookie.from("refreshToken", null)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
                 .maxAge(0)
                 .build();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, springCookie.toString()).body(null);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, springCookie.toString()).body(apiResponse);
     }
     @PostMapping("/register")
-    public ResponseEntity<User> create(@RequestBody User user) throws Exception {
+    public ResponseEntity<ApiResponse<User>> create(@RequestBody User user) throws Exception {
         User savedUser = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Register Successful")
+                .data(savedUser)
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 }

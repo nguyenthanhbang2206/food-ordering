@@ -9,6 +9,7 @@ import com.nguyenthanhbang.foodordering.repository.RestaurantRepository;
 import com.nguyenthanhbang.foodordering.repository.UserRepository;
 import com.nguyenthanhbang.foodordering.service.RestaurantService;
 import com.nguyenthanhbang.foodordering.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     private final UserRepository userRepository;
 
     @Override
-    public Restaurant createRestaurant(RestaurantRequest request) throws Exception {
+    public Restaurant createRestaurant(RestaurantRequest request){
         User user = userService.getUserLogin();
         Address address = addressRepositoy.save(request.getAddress());
         Restaurant restaurant = new Restaurant();
@@ -40,11 +41,8 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Restaurant updateRestaurant(Long restaurantId, RestaurantRequest request) throws Exception {
-        Restaurant restaurant = this.getRestaurantById(restaurantId);
-        if(restaurant == null){
-            throw new Exception("Restaurant with ID = " + restaurantId + " not found");
-        }
+    public Restaurant updateRestaurant(RestaurantRequest request) {
+        Restaurant restaurant = this.getRestaurantOfUser();
         Address address = addressRepositoy.save(request.getAddress());
         restaurant.setName(request.getName());
         restaurant.setAddress(request.getAddress());
@@ -68,26 +66,30 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Restaurant getRestaurantById(Long restaurantId) throws Exception {
-        Restaurant restaurant = restaurantRepository.findById(restaurantId).orElseThrow(() -> new Exception("Restaurant with ID = " + restaurantId + " not found"));
+    public Restaurant getRestaurantById(Long restaurantId)  {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId).orElseThrow(() -> new EntityNotFoundException("Restaurant with ID = " + restaurantId + " not found"));
         return restaurant;
     }
 
     @Override
-    public Restaurant getRestaurantOfUser() throws Exception {
+    public Restaurant getRestaurantOfUser() {
         User user = userService.getUserLogin();
-        return restaurantRepository.findByOwner(user);
+        Restaurant restaurant = restaurantRepository.findByOwner(user).orElseThrow(() -> new EntityNotFoundException("Restaurant not found"));
+        return restaurant;
     }
 
     @Override
-    public Restaurant updateStatusOfRestaurant() throws Exception {
+    public Restaurant updateStatusOfRestaurant()  {
         Restaurant restaurant = this.getRestaurantOfUser();
+        if(restaurant == null){
+            throw new EntityNotFoundException("Restaurant not found");
+        }
         restaurant.setOpen(!restaurant.isOpen());
         return restaurantRepository.save(restaurant);
     }
 
     @Override
-    public Restaurant addRestaurantToFavourites(Long restaurantId) throws Exception {
+    public Restaurant addRestaurantToFavourites(Long restaurantId) {
         Restaurant restaurant = this.getRestaurantById(restaurantId);
         User user = userService.getUserLogin();
         if(user.getFavourites().contains(restaurant)){
@@ -100,7 +102,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public List<Restaurant> getFavouriteRestaurants() throws Exception {
+    public List<Restaurant> getFavouriteRestaurants() {
         User user = userService.getUserLogin();
         return user.getFavourites();
     }

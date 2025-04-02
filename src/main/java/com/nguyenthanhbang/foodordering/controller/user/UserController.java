@@ -16,7 +16,7 @@ public class UserController {
     private final UserService userService;
 
     @PutMapping("/users/profile")
-    public ResponseEntity<ApiResponse<User>> updateProfile(@RequestBody UpdateUserRequest request) throws Exception {
+    public ResponseEntity<ApiResponse<User>> updateProfile(@RequestBody UpdateUserRequest request) {
         User user = userService.updateProfile(request);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
@@ -26,7 +26,7 @@ public class UserController {
         return ResponseEntity.ok(apiResponse);
     }
     @GetMapping("/users/profile")
-    public ResponseEntity<ApiResponse<User>> getProfile() throws Exception {
+    public ResponseEntity<ApiResponse<User>> getProfile() {
         User user = userService.getUserLogin();
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())

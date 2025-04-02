@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -26,9 +25,9 @@ public class AdminRestaurantController {
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
-    @PutMapping("/restaurants/{restaurantId}")
-    public ResponseEntity<ApiResponse<Restaurant>> updateRestaurant(@PathVariable Long restaurantId, @RequestBody RestaurantRequest request) throws Exception {
-        Restaurant updateRestaurant = restaurantService.updateRestaurant(restaurantId, request);
+    @PutMapping("/restaurants")
+    public ResponseEntity<ApiResponse<Restaurant>> updateRestaurant(@RequestBody RestaurantRequest request) throws Exception {
+        Restaurant updateRestaurant = restaurantService.updateRestaurant(request);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Restaurant updated")

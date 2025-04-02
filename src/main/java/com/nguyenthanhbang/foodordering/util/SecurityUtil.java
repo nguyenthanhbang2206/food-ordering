@@ -50,26 +50,28 @@ public class SecurityUtil {
     }
     public String createAccessToken(String email, AuthenticationResponse authenticationResponse) {
         AuthenticationResponse.UserToken userToken = new AuthenticationResponse.UserToken(authenticationResponse.getUser().getId(), authenticationResponse.getUser().getEmail(), authenticationResponse.getUser().getFullName());
+        String role = "ROLE_" + authenticationResponse.getUser().getRole().name();
         Instant now = Instant.now();
         Instant validity = now.plus(this.jwtAccessExpiration, ChronoUnit.SECONDS);
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(email)
-                .claim("user", userToken)
+                .claim("role", role)
                 .build();
         JwsHeader jwsHeader = JwsHeader.with(MacAlgorithm.HS512).build();
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
     public String createRefreshToken(String email, AuthenticationResponse authenticationResponse){
         AuthenticationResponse.UserToken userToken = new AuthenticationResponse.UserToken(authenticationResponse.getUser().getId(), authenticationResponse.getUser().getEmail(), authenticationResponse.getUser().getFullName());
+        String role = "ROLE_" + authenticationResponse.getUser().getRole().name();
         Instant now = Instant.now();
         Instant validity = now.plus(this.jwtAccessExpiration, ChronoUnit.SECONDS);
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(email)
-                .claim("user", userToken)
+                .claim("role", role)
                 .build();
         JwsHeader jwsHeader = JwsHeader.with(MacAlgorithm.HS512).build();
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();

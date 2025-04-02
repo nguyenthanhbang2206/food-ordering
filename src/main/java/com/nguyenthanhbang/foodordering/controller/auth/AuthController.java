@@ -1,9 +1,12 @@
 package com.nguyenthanhbang.foodordering.controller.auth;
 
+import com.nguyenthanhbang.foodordering.dto.request.CreateUserRequest;
 import com.nguyenthanhbang.foodordering.dto.request.LoginRequest;
 import com.nguyenthanhbang.foodordering.dto.response.ApiResponse;
 import com.nguyenthanhbang.foodordering.dto.response.AuthenticationResponse;
+import com.nguyenthanhbang.foodordering.model.InvalidToken;
 import com.nguyenthanhbang.foodordering.model.User;
+import com.nguyenthanhbang.foodordering.repository.InvalidTokenRepository;
 import com.nguyenthanhbang.foodordering.repository.UserRepository;
 import com.nguyenthanhbang.foodordering.service.UserService;
 import com.nguyenthanhbang.foodordering.util.SecurityUtil;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
+    private final InvalidTokenRepository invalidTokenRepository;
     @Value("${jwt.refresh-token-validity-in-seconds}")
     private long jwtRefreshExpiration;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -63,15 +67,15 @@ public class AuthController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, springCookie.toString()).body(apiResponse);
     }
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<AuthenticationResponse>> refresh(@CookieValue(name = "refreshToken", defaultValue = "default") String refreshToken) throws Exception {
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> refresh(@CookieValue(name = "refreshToken", defaultValue = "default") String refreshToken) {
         if(refreshToken.equals("default")) {
-            throw new Exception("Chưa truyền refresh token, không có refresh token ở cookie");
+            throw new IllegalArgumentException("Chưa truyền refresh token, không có refresh token ở cookie");
         }
         Jwt decodedToken = securityUtil.checkValidToken(refreshToken);
         String email = decodedToken.getSubject();
         User currentUser = userService.getUserByRefreshTokenAndEmail(refreshToken, email);
         if(currentUser == null) {
-            throw new Exception("refresh token không hợp lệ");
+            throw new IllegalArgumentException("refresh token không hợp lệ");
         }
         AuthenticationResponse loginResponse = new AuthenticationResponse();
         AuthenticationResponse.UserLogin userLogin = new AuthenticationResponse.UserLogin();
@@ -98,12 +102,22 @@ public class AuthController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, springCookie.toString()).body(apiResponse);
     }
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout() throws Exception {
+    public ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Không có token hợp lệ");
+        }
+
+        String token = authHeader.substring(7);
+        InvalidToken invalidToken = InvalidToken.builder()
+                .token(token)
+                .build();
+        invalidTokenRepository.save(invalidToken);
         String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
         if(email.equals("")) {
-            throw new Exception("refresh token không hợp lệ");
+            throw new IllegalArgumentException("User not found");
         }
-        userService.updateTokenOfUser(null, email);
+        userService.updateTokenOfUser(email, null);
+        SecurityContextHolder.clearContext();
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Logout Successful")
@@ -118,8 +132,8 @@ public class AuthController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, springCookie.toString()).body(apiResponse);
     }
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<User>> create(@RequestBody User user) throws Exception {
-        User savedUser = userService.createUser(user);
+    public ResponseEntity<ApiResponse<User>> create(@RequestBody CreateUserRequest request) {
+        User savedUser = userService.createUser(request);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Register Successful")

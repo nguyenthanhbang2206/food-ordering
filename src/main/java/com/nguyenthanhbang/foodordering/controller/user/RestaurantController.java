@@ -50,7 +50,7 @@ public class RestaurantController {
         List<Restaurant> restaurants = restaurantService.getFavouriteRestaurants();
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
-                .message("Get favourite rstaurants")
+                .message("Get favourite restaurants")
                 .data(restaurants)
                 .build();
         return ResponseEntity.ok(apiResponse);

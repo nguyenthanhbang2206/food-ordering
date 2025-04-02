@@ -7,13 +7,13 @@ import com.nguyenthanhbang.foodordering.model.User;
 import java.util.List;
 
 public interface RestaurantService {
-    Restaurant createRestaurant(RestaurantRequest request) throws Exception;
-    Restaurant updateRestaurant(Long restaurantId, RestaurantRequest request) throws Exception;
+    Restaurant createRestaurant(RestaurantRequest request);
+    Restaurant updateRestaurant(RestaurantRequest request);
     void deleteRestaurant(Long restaurantId);
     List<Restaurant> getAllRestaurants();
-    Restaurant getRestaurantById(Long restaurantId) throws Exception;
-    Restaurant getRestaurantOfUser() throws Exception;
-    Restaurant updateStatusOfRestaurant() throws Exception;
-    Restaurant addRestaurantToFavourites(Long restaurantId) throws Exception;
-    List<Restaurant> getFavouriteRestaurants() throws Exception;
+    Restaurant getRestaurantById(Long restaurantId);
+    Restaurant getRestaurantOfUser();
+    Restaurant updateStatusOfRestaurant();
+    Restaurant addRestaurantToFavourites(Long restaurantId);
+    List<Restaurant> getFavouriteRestaurants();
 }

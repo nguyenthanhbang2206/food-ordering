@@ -1,11 +1,14 @@
 package com.nguyenthanhbang.foodordering.service.impl;
 
+import com.nguyenthanhbang.foodordering.dto.request.CreateUserRequest;
 import com.nguyenthanhbang.foodordering.dto.request.UpdateUserRequest;
 import com.nguyenthanhbang.foodordering.model.User;
 import com.nguyenthanhbang.foodordering.repository.UserRepository;
 import com.nguyenthanhbang.foodordering.service.UserService;
 import com.nguyenthanhbang.foodordering.util.SecurityUtil;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,43 +29,47 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createUser(User user) throws Exception {
-        User currentUser = userRepository.findByEmail(user.getEmail());
+    public User createUser(CreateUserRequest request) {
+        User currentUser = userRepository.findByEmail(request.getEmail());
         if(currentUser != null) {
-            throw new Exception("Email exist");
+            throw new IllegalArgumentException("Email already exists");
         }
-        user.setRole(user.getRole());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        currentUser = new User();
+        currentUser.setEmail(request.getEmail());
+        currentUser.setFullName(request.getFullName());
+        currentUser.setRole(request.getRole());
+        currentUser.setPassword(passwordEncoder.encode(request.getPassword()));
+        return userRepository.save(currentUser);
     }
 
+
     @Override
-    public User getUserByRefreshTokenAndEmail(String refreshToken, String email) throws Exception {
+    public User getUserByRefreshTokenAndEmail(String refreshToken, String email)  {
         User user = userRepository.findByRefreshTokenAndEmail(refreshToken, email);
         if(user == null) {
-            throw new Exception("User not found");
+            throw new EntityNotFoundException("User not found");
         }
         return user;
     }
 
     @Override
-    public User getUserByEmail(String email) throws Exception {
+    public User getUserByEmail(String email) {
         User user = userRepository.findByEmail(email);
         if(user == null) {
-            throw new Exception("User not found");
+            throw new UsernameNotFoundException("User not found");
         }
         return user;
     }
 
     @Override
-    public User getUserLogin() throws Exception {
-        String email = SecurityUtil.getCurrentUserLogin().orElseThrow(() -> new Exception("User not found"));
+    public User getUserLogin() {
+        String email = SecurityUtil.getCurrentUserLogin().orElseThrow(() -> new EntityNotFoundException("User not found"));
         User user = this.getUserByEmail(email);
         return user;
     }
 
     @Override
-    public User updateProfile(UpdateUserRequest request) throws Exception {
+    public User updateProfile(UpdateUserRequest request) {
         User user = this.getUserLogin();
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());

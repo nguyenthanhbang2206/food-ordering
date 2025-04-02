@@ -21,6 +21,7 @@ public class Ingredient {
     private String name;
 
     @ManyToMany(mappedBy = "ingredients")
+    @JsonIgnore
     private List<Food> foods = new ArrayList<>();
 
     @ManyToOne

@@ -29,6 +29,7 @@ public class Restaurant {
     private List<String> images;
 
     @OneToOne
+    @JsonIgnore
     private User owner;
 
     @OneToOne

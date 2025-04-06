@@ -56,7 +56,7 @@ public class AdminFoodController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
-    @PutMapping("/restaurants/foods/{foodId}")
+    @PutMapping("/restaurants/foods/{foodId}/availability")
     public ResponseEntity<ApiResponse<Food>> updateAvailability(@PathVariable Long foodId) throws Exception {
         Food food = foodService.updateAvailability(foodId);
         ApiResponse apiResponse = ApiResponse.builder()

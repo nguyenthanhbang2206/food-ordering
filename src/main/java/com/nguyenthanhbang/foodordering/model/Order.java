@@ -21,7 +21,7 @@ public class Order {
     private Long id;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-    private long totalItems;
+    private int totalItems;
     private long totalPrice;
     @ManyToOne
     private User customer;

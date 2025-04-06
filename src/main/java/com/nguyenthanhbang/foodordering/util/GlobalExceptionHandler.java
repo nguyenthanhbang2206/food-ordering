@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.Instant;
 
@@ -36,7 +37,7 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
     }
-    @ExceptionHandler(value = {EntityNotFoundException.class, UsernameNotFoundException.class})
+    @ExceptionHandler(value = {EntityNotFoundException.class, UsernameNotFoundException.class, NoResourceFoundException.class})
     public ResponseEntity<ErrorDetails> handleNotFoundException(Exception e, HttpServletRequest request) {
         ErrorDetails errorDetails = ErrorDetails.builder()
                 .status(HttpStatus.NOT_FOUND.value())

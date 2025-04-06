@@ -1,5 +1,6 @@
 package com.nguyenthanhbang.foodordering.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +19,7 @@ public class CartItem {
     private long totalPrice;
 
     @ManyToOne
+    @JsonIgnore
     private Cart cart;
 
     @ManyToOne

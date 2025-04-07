@@ -1,5 +1,6 @@
 package com.nguyenthanhbang.foodordering.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,5 +20,6 @@ public class OrderItem {
     @ManyToOne
     private Food food;
     @ManyToOne
+    @JsonIgnore
     private Order order;
 }

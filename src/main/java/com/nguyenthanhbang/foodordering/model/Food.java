@@ -22,6 +22,9 @@ public class Food {
     private String description;
     private long price;
     private boolean available;
+    private String cuisine;
+    private boolean vegetarian;
+    private boolean spicy;
     @Column(length = 1000)
     @ElementCollection
     private List<String> images;

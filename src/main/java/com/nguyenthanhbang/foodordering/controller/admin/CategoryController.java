@@ -6,6 +6,7 @@ import com.nguyenthanhbang.foodordering.dto.response.ApiResponse;
 import com.nguyenthanhbang.foodordering.model.Category;
 import com.nguyenthanhbang.foodordering.model.Ingredient;
 import com.nguyenthanhbang.foodordering.service.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
     @PostMapping("/restaurants/categories")
-    public ResponseEntity<ApiResponse<Category>> createCategory(@RequestBody CategoryRequest request) throws Exception {
+    public ResponseEntity<ApiResponse<Category>> createCategory(@Valid @RequestBody CategoryRequest request) {
         Category category = categoryService.createCategory(request);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.CREATED.value())
@@ -29,7 +30,7 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
     @PutMapping("/restaurants/categories/{categoryId}")
-    public ResponseEntity<ApiResponse<Category>> updateCategory(@PathVariable Long categoryId, @RequestBody CategoryRequest request) throws Exception {
+    public ResponseEntity<ApiResponse<Category>> updateCategory(@PathVariable Long categoryId,@Valid @RequestBody CategoryRequest request) {
         Category category = categoryService.updateCategory(categoryId, request);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
@@ -39,7 +40,7 @@ public class CategoryController {
         return ResponseEntity.ok(apiResponse);
     }
     @GetMapping("/restaurants/categories")
-    public ResponseEntity<ApiResponse<List<Category>>> getCategoriesByRestaurant() throws Exception {
+    public ResponseEntity<ApiResponse<List<Category>>> getCategoriesByRestaurant()  {
         List<Category> categories = categoryService.getCategoriesByRestaurant();
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
@@ -49,7 +50,7 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
     @DeleteMapping("/restaurants/categories/{categoryId}")
-    public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long categoryId) throws Exception {
+    public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long categoryId)  {
         categoryService.deleteCategory(categoryId);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.NO_CONTENT.value())

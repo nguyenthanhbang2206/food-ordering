@@ -1,6 +1,7 @@
 package com.nguyenthanhbang.foodordering.service.impl;
 
 import com.nguyenthanhbang.foodordering.dto.request.RestaurantRequest;
+import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
 import com.nguyenthanhbang.foodordering.model.Address;
 import com.nguyenthanhbang.foodordering.model.Restaurant;
 import com.nguyenthanhbang.foodordering.model.User;
@@ -11,6 +12,8 @@ import com.nguyenthanhbang.foodordering.service.RestaurantService;
 import com.nguyenthanhbang.foodordering.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -60,9 +63,19 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public List<Restaurant> getAllRestaurants() {
-        List<Restaurant> restaurants = restaurantRepository.findAll();
-        return restaurants;
+    public PaginationResponse getAllRestaurants(Pageable pageable) {
+        Page<Restaurant> restaurantPage = restaurantRepository.findAll(pageable);
+        PaginationResponse.Pagination pagination = PaginationResponse.Pagination.builder()
+                .page(pageable.getPageNumber() + 1)
+                .size(pageable.getPageSize())
+                .totalPages(restaurantPage.getTotalPages())
+                .totalItems(restaurantPage.getTotalElements())
+                .build();
+        PaginationResponse paginationResponse = PaginationResponse.builder()
+                .pagination(pagination)
+                .items(restaurantPage.getContent())
+                .build();
+        return paginationResponse;
     }
 
     @Override

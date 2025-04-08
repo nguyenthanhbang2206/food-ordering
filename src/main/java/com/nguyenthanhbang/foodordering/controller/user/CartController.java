@@ -6,6 +6,7 @@ import com.nguyenthanhbang.foodordering.dto.response.ApiResponse;
 import com.nguyenthanhbang.foodordering.model.Cart;
 import com.nguyenthanhbang.foodordering.model.CartItem;
 import com.nguyenthanhbang.foodordering.service.CartService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class CartController {
     private final CartService cartService;
     @PostMapping("/cart/cartItems")
-    public ResponseEntity<ApiResponse<CartItem>> addCartItemToCart(@RequestBody CreateCartItemRequest request) {
+    public ResponseEntity<ApiResponse<CartItem>> addCartItemToCart(@Valid @RequestBody CreateCartItemRequest request) {
         CartItem cartItem = cartService.addCartItemToCart(request);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
@@ -27,7 +28,7 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
     @PutMapping("/cart/cartItems/{cartItemId}")
-    public ResponseEntity<ApiResponse<CartItem>> updateQuantityOfCartItem(@PathVariable Long cartItemId, @RequestBody UpdateCartItemRequest request) {
+    public ResponseEntity<ApiResponse<CartItem>> updateQuantityOfCartItem(@PathVariable Long cartItemId,@Valid @RequestBody UpdateCartItemRequest request) {
         CartItem cartItem = cartService.updateQuantityOfCartItem(cartItemId, request.getQuantity());
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())

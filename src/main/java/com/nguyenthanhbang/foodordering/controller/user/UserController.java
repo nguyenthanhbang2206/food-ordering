@@ -4,6 +4,7 @@ import com.nguyenthanhbang.foodordering.dto.request.UpdateUserRequest;
 import com.nguyenthanhbang.foodordering.dto.response.ApiResponse;
 import com.nguyenthanhbang.foodordering.model.User;
 import com.nguyenthanhbang.foodordering.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ public class UserController {
     private final UserService userService;
 
     @PutMapping("/users/profile")
-    public ResponseEntity<ApiResponse<User>> updateProfile(@RequestBody UpdateUserRequest request) {
+    public ResponseEntity<ApiResponse<User>> updateProfile(@Valid  @RequestBody UpdateUserRequest request) {
         User user = userService.updateProfile(request);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())

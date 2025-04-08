@@ -2,6 +2,7 @@ package com.nguyenthanhbang.foodordering.service.impl;
 
 import com.nguyenthanhbang.foodordering.dto.request.CreateOrderRequest;
 import com.nguyenthanhbang.foodordering.dto.request.UpdateOrderRequest;
+import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
 import com.nguyenthanhbang.foodordering.enums.OrderStatus;
 import com.nguyenthanhbang.foodordering.model.*;
 import com.nguyenthanhbang.foodordering.repository.AddressRepositoy;
@@ -14,6 +15,8 @@ import com.nguyenthanhbang.foodordering.service.RestaurantService;
 import com.nguyenthanhbang.foodordering.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -95,17 +98,36 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getAllOrdersByUserLogin() {
+    public PaginationResponse getAllOrdersByUserLogin(Pageable pageable) {
         User user = userService.getUserLogin();
-        List<Order> orders = orderRepository.findByCustomerId(user.getId());
-        return orders;
-    }
+        Page<Order> orderPage = orderRepository.findByCustomerId(user.getId(), pageable);
+        PaginationResponse.Pagination pagination = PaginationResponse.Pagination.builder()
+                .page(pageable.getPageNumber() + 1)
+                .size(pageable.getPageSize())
+                .totalPages(orderPage.getTotalPages())
+                .totalItems(orderPage.getTotalElements())
+                .build();
+        PaginationResponse paginationResponse = PaginationResponse.builder()
+                .pagination(pagination)
+                .items(orderPage.getContent())
+                .build();
+        return paginationResponse;    }
 
     @Override
-    public List<Order> getAllOrdersByRestaurant() {
+    public PaginationResponse getAllOrdersByRestaurant(Pageable pageable) {
         Restaurant restaurant = restaurantService.getRestaurantOfUser();
-        List<Order> orders = orderRepository.findByRestaurantId(restaurant.getId());
-        return orders;
+        Page<Order> orderPage = orderRepository.findByRestaurantId(restaurant.getId(), pageable);
+        PaginationResponse.Pagination pagination = PaginationResponse.Pagination.builder()
+                .page(pageable.getPageNumber() + 1)
+                .size(pageable.getPageSize())
+                .totalPages(orderPage.getTotalPages())
+                .totalItems(orderPage.getTotalElements())
+                .build();
+        PaginationResponse paginationResponse = PaginationResponse.builder()
+                .pagination(pagination)
+                .items(orderPage.getContent())
+                .build();
+        return paginationResponse;
     }
 
     @Override

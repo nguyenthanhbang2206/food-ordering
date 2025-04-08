@@ -3,11 +3,13 @@ package com.nguyenthanhbang.foodordering.controller.user;
 import com.nguyenthanhbang.foodordering.dto.request.CreateCartItemRequest;
 import com.nguyenthanhbang.foodordering.dto.request.CreateOrderRequest;
 import com.nguyenthanhbang.foodordering.dto.response.ApiResponse;
+import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
 import com.nguyenthanhbang.foodordering.model.CartItem;
 import com.nguyenthanhbang.foodordering.model.Order;
 import com.nguyenthanhbang.foodordering.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Or;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,12 +32,12 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
     @GetMapping("/orders")
-    public ResponseEntity<ApiResponse<List<Order>>> getOrderHistory() {
-        List<Order> orders = orderService.getAllOrdersByUserLogin();
+    public ResponseEntity<ApiResponse<PaginationResponse>> getOrderHistory(Pageable pageable) {
+        PaginationResponse response = orderService.getAllOrdersByUserLogin(pageable);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Get order history successfully")
-                .data(orders)
+                .data(response)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }

@@ -10,6 +10,7 @@ import com.nguyenthanhbang.foodordering.repository.InvalidTokenRepository;
 import com.nguyenthanhbang.foodordering.repository.UserRepository;
 import com.nguyenthanhbang.foodordering.service.UserService;
 import com.nguyenthanhbang.foodordering.util.SecurityUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -132,7 +133,7 @@ public class AuthController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, springCookie.toString()).body(apiResponse);
     }
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<User>> create(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<ApiResponse<User>> create(@Valid @RequestBody CreateUserRequest request) {
         User savedUser = userService.createUser(request);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())

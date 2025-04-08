@@ -1,9 +1,12 @@
 package com.nguyenthanhbang.foodordering.controller.user;
 
 import com.nguyenthanhbang.foodordering.dto.response.ApiResponse;
+import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
 import com.nguyenthanhbang.foodordering.model.Restaurant;
 import com.nguyenthanhbang.foodordering.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +19,7 @@ import java.util.List;
 public class RestaurantController {
     private final RestaurantService restaurantService;
     @GetMapping("/restaurants/{restaurantId}")
-    public ResponseEntity<ApiResponse<Restaurant>> getRestaurantById(@PathVariable Long restaurantId) throws Exception {
+    public ResponseEntity<ApiResponse<Restaurant>> getRestaurantById(@PathVariable Long restaurantId) {
         Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
@@ -26,17 +29,17 @@ public class RestaurantController {
         return ResponseEntity.ok(apiResponse);
     }
     @GetMapping("/restaurants")
-    public ResponseEntity<ApiResponse<List<Restaurant>>> getAllRestaurants() throws Exception {
-        List<Restaurant> restaurants = restaurantService.getAllRestaurants();
+    public ResponseEntity<ApiResponse<PaginationResponse>> getAllRestaurants(Pageable pageable) {
+        PaginationResponse response = restaurantService.getAllRestaurants(pageable);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Get restaurants successfully")
-                .data(restaurants)
+                .data(response)
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
     @PostMapping("/restaurants/{restaurantId}/favourites")
-    public ResponseEntity<ApiResponse<Restaurant>> addFavouriteRestaurant(@PathVariable Long restaurantId) throws Exception {
+    public ResponseEntity<ApiResponse<Restaurant>> addFavouriteRestaurant(@PathVariable Long restaurantId) {
         Restaurant restaurant = restaurantService.addRestaurantToFavourites(restaurantId);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
@@ -46,7 +49,7 @@ public class RestaurantController {
         return ResponseEntity.ok(apiResponse);
     }
     @GetMapping("/restaurants/favourites")
-    public ResponseEntity<ApiResponse<List<Restaurant>>> getFavouriteRestaurants() throws Exception {
+    public ResponseEntity<ApiResponse<List<Restaurant>>> getFavouriteRestaurants() {
         List<Restaurant> restaurants = restaurantService.getFavouriteRestaurants();
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())

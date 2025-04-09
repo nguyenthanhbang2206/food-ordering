@@ -5,7 +5,7 @@ import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
 import com.nguyenthanhbang.foodordering.model.Address;
 import com.nguyenthanhbang.foodordering.model.Restaurant;
 import com.nguyenthanhbang.foodordering.model.User;
-import com.nguyenthanhbang.foodordering.repository.AddressRepositoy;
+import com.nguyenthanhbang.foodordering.repository.AddressRepository;
 import com.nguyenthanhbang.foodordering.repository.RestaurantRepository;
 import com.nguyenthanhbang.foodordering.repository.UserRepository;
 import com.nguyenthanhbang.foodordering.service.RestaurantService;
@@ -24,13 +24,18 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     private final UserService userService;
     private final RestaurantRepository restaurantRepository;
-    private final AddressRepositoy addressRepositoy;
+    private final AddressRepository addressRepository;
     private final UserRepository userRepository;
+    @Override
+    public List<Restaurant> searchRestaurants(String keyword) {
+        return restaurantRepository.search(keyword);
+    }
+
 
     @Override
     public Restaurant createRestaurant(RestaurantRequest request){
         User user = userService.getUserLogin();
-        Address address = addressRepositoy.save(request.getAddress());
+        Address address = addressRepository.save(request.getAddress());
         Restaurant restaurant = new Restaurant();
         restaurant.setName(request.getName());
         restaurant.setImages(request.getImages());
@@ -46,7 +51,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public Restaurant updateRestaurant(RestaurantRequest request) {
         Restaurant restaurant = this.getRestaurantOfUser();
-        Address address = addressRepositoy.save(request.getAddress());
+        Address address = addressRepository.save(request.getAddress());
         restaurant.setName(request.getName());
         restaurant.setAddress(request.getAddress());
         restaurant.setImages(request.getImages());

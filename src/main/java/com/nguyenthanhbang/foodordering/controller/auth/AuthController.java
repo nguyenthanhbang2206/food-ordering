@@ -136,7 +136,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<User>> create(@Valid @RequestBody CreateUserRequest request) {
         User savedUser = userService.createUser(request);
         ApiResponse apiResponse = ApiResponse.builder()
-                .status(HttpStatus.OK.value())
+                .status(HttpStatus.CREATED.value())
                 .message("Register Successful")
                 .data(savedUser)
                 .build();

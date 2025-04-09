@@ -21,11 +21,11 @@ public class CartController {
     public ResponseEntity<ApiResponse<CartItem>> addCartItemToCart(@Valid @RequestBody CreateCartItemRequest request) {
         CartItem cartItem = cartService.addCartItemToCart(request);
         ApiResponse apiResponse = ApiResponse.builder()
-                .status(HttpStatus.OK.value())
+                .status(HttpStatus.CREATED.value())
                 .message("Add cartItem successfully")
                 .data(cartItem)
                 .build();
-        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
     @PutMapping("/cart/cartItems/{cartItemId}")
     public ResponseEntity<ApiResponse<CartItem>> updateQuantityOfCartItem(@PathVariable Long cartItemId,@Valid @RequestBody UpdateCartItemRequest request) {

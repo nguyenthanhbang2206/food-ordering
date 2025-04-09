@@ -5,7 +5,7 @@ import com.nguyenthanhbang.foodordering.dto.request.UpdateOrderRequest;
 import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
 import com.nguyenthanhbang.foodordering.enums.OrderStatus;
 import com.nguyenthanhbang.foodordering.model.*;
-import com.nguyenthanhbang.foodordering.repository.AddressRepositoy;
+import com.nguyenthanhbang.foodordering.repository.AddressRepository;
 import com.nguyenthanhbang.foodordering.repository.OrderItemRepository;
 import com.nguyenthanhbang.foodordering.repository.OrderRepository;
 import com.nguyenthanhbang.foodordering.repository.UserRepository;
@@ -31,7 +31,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserService userService;
     private final RestaurantService restaurantService;
     private final CartService cartService;
-    private final AddressRepositoy addressRepositoy;
+    private final AddressRepository addressRepository;
     private final UserRepository userRepository;
 
     @Override
@@ -65,7 +65,7 @@ public class OrderServiceImpl implements OrderService {
             user.getDeliveryAddresses().add(address);
             userRepository.save(user);
             address.setUser(user);
-            savedAddress = addressRepositoy.save(address);
+            savedAddress = addressRepository.save(address);
         }else{
             savedAddress = existingAddressOpt.get();
         }

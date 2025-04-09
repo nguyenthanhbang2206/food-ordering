@@ -58,4 +58,14 @@ public class RestaurantController {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
+    @GetMapping("/restaurants/search")
+    public ResponseEntity<ApiResponse<List<Restaurant>>> searchRestaurants(@RequestParam String keyword) {
+        List<Restaurant> restaurants = restaurantService.searchRestaurants(keyword);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Search restaurants successfully")
+                .data(restaurants)
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
 }

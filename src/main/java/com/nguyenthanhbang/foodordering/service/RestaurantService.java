@@ -19,4 +19,5 @@ public interface RestaurantService {
     Restaurant updateStatusOfRestaurant();
     Restaurant addRestaurantToFavourites(Long restaurantId);
     List<Restaurant> getFavouriteRestaurants();
+    List<Restaurant> searchRestaurants(String keyword);
 }

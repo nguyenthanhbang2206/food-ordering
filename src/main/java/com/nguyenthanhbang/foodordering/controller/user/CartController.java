@@ -41,21 +41,21 @@ public class CartController {
     public ResponseEntity<ApiResponse<Void>> deleteCartItem(@PathVariable Long cartItemId) {
         cartService.deleteCartItemFromCart(cartItemId);
         ApiResponse apiResponse = ApiResponse.builder()
-                .status(HttpStatus.NO_CONTENT.value())
+                .status(HttpStatus.OK.value())
                 .message("Delete cartItem successfully")
                 .data(null)
                 .build();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
     @DeleteMapping("/cart")
     public ResponseEntity<ApiResponse<Void>> deleteCart() {
         cartService.deleteCart();
         ApiResponse apiResponse = ApiResponse.builder()
-                .status(HttpStatus.NO_CONTENT.value())
+                .status(HttpStatus.OK.value())
                 .message("Delete cart successfully")
                 .data(null)
                 .build();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
     @GetMapping("/cart")
     public ResponseEntity<ApiResponse<Cart>> getCarByUserLogin() {

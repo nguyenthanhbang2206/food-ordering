@@ -1,8 +1,10 @@
 package com.nguyenthanhbang.foodordering.service.impl;
 
 import com.nguyenthanhbang.foodordering.dto.request.IngredientRequest;
+import com.nguyenthanhbang.foodordering.model.Food;
 import com.nguyenthanhbang.foodordering.model.Ingredient;
 import com.nguyenthanhbang.foodordering.model.Restaurant;
+import com.nguyenthanhbang.foodordering.repository.FoodRepository;
 import com.nguyenthanhbang.foodordering.repository.IngredientRepository;
 import com.nguyenthanhbang.foodordering.service.IngredientService;
 import com.nguyenthanhbang.foodordering.service.RestaurantService;
@@ -19,6 +21,8 @@ import java.util.Optional;
 public class IngredientServiceImpl implements IngredientService {
     private final IngredientRepository ingredientRepository;
     private final RestaurantService restaurantService;
+    private final FoodRepository foodRepository;
+
     @Override
     public List<Ingredient> getIngredientsByRestaurant() {
         Restaurant restaurant = restaurantService.getRestaurantOfUser();
@@ -55,6 +59,12 @@ public class IngredientServiceImpl implements IngredientService {
 
     @Override
     public void deleteIngredientById(Long ingredientId) {
+        Ingredient ingredient = this.getIngredientByIdAndRestaurantId(ingredientId);
+        List<Food> foods = foodRepository.findByIngredientsId(ingredientId);
+        for(Food food : foods) {
+            food.getIngredients().remove(ingredient);
+            foodRepository.save(food);
+        }
         ingredientRepository.deleteById(ingredientId);
     }
 

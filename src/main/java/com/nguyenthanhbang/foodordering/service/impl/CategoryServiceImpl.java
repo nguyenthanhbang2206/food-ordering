@@ -50,7 +50,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Long categoryId) {
         Category category = this.getCategoryByIdAndRestaurantId(categoryId);
-        categoryRepository.deleteById(categoryId);
+        category.setRestaurant(null);
+        categoryRepository.save(category);
     }
 
     @Override

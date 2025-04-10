@@ -117,6 +117,9 @@ public class CartServiceImpl implements CartService {
         if(cart != null){
             cart.setTotalPrice(calculateCartPrice(cart));
         }
+        else{
+            return null;
+        }
         cart = cartRepository.save(cart);
         return cart;
     }
@@ -126,9 +129,6 @@ public class CartServiceImpl implements CartService {
         Cart cart = this.getCartByUserLogin();
         if(cart == null) {
             throw new EntityNotFoundException("Cart not found");
-        }
-        for(CartItem cartItem : cart.getCartItems()){
-            cartItemRepository.delete(cartItem);
         }
         cartRepository.delete(cart);
     }

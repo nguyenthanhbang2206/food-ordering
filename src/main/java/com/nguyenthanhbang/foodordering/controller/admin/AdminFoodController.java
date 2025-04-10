@@ -43,11 +43,11 @@ public class AdminFoodController {
     public ResponseEntity<ApiResponse<Void>> deleteFood(@PathVariable Long foodId) {
         foodService.deleteFood(foodId);
         ApiResponse apiResponse = ApiResponse.builder()
-                .status(HttpStatus.NO_CONTENT.value())
+                .status(HttpStatus.OK.value())
                 .message("Delete food successfully")
                 .data(null)
                 .build();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
     @GetMapping("/restaurants/foods")
     public ResponseEntity<ApiResponse<PaginationResponse>> getFoodByRestaurant(Pageable pageable) {

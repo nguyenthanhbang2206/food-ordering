@@ -211,7 +211,10 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public void deleteFood(Long foodId) {
-        foodRepository.deleteById(foodId);
+        Restaurant restaurant = restaurantService.getRestaurantOfUser();
+        Food food = this.getFoodByIdAndRestaurantId(foodId, restaurant.getId());
+        food.setRestaurant(null);
+        foodRepository.save(food);
     }
 
     @Override

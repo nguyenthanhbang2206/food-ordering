@@ -38,7 +38,7 @@ public class RestaurantController {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
-    @PostMapping("/restaurants/{restaurantId}/favourites")
+    @PutMapping("/restaurants/{restaurantId}/favourites")
     public ResponseEntity<ApiResponse<Restaurant>> addFavouriteRestaurant(@PathVariable Long restaurantId) {
         Restaurant restaurant = restaurantService.addRestaurantToFavourites(restaurantId);
         ApiResponse apiResponse = ApiResponse.builder()

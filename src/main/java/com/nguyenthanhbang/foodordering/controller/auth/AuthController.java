@@ -91,7 +91,7 @@ public class AuthController {
         userService.updateTokenOfUser(refresh_token, email);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
-                .message("Login Successful")
+                .message("Refresh Successful")
                 .data(loginResponse)
                 .build();
         ResponseCookie springCookie = ResponseCookie.from("refreshToken", refresh_token)

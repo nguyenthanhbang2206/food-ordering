@@ -53,10 +53,10 @@ public class CategoryController {
     public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long categoryId)  {
         categoryService.deleteCategory(categoryId);
         ApiResponse apiResponse = ApiResponse.builder()
-                .status(HttpStatus.NO_CONTENT.value())
+                .status(HttpStatus.OK.value())
                 .message("Delete category successful")
                 .data(null)
                 .build();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 }

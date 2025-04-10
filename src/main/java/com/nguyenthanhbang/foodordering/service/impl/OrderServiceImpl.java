@@ -92,10 +92,6 @@ public class OrderServiceImpl implements OrderService {
         return order;
     }
 
-    @Override
-    public void deleteOrder(Long orderId) {
-
-    }
 
     @Override
     public PaginationResponse getAllOrdersByUserLogin(Pageable pageable) {
@@ -130,11 +126,6 @@ public class OrderServiceImpl implements OrderService {
         return paginationResponse;
     }
 
-    @Override
-    public Order getOrderById(Long orderId) {
-
-        return null;
-    }
 
     @Override
     public Order getOrderByIdAndRestaurantId(Long orderId) {

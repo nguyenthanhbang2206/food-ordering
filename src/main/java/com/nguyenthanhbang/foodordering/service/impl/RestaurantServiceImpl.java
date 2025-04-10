@@ -64,7 +64,15 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     public void deleteRestaurant(Long restaurantId) {
-        restaurantRepository.deleteById(restaurantId);
+        Restaurant restaurant = this.getRestaurantById(restaurantId);
+        User user = userService.getUserLogin();
+        if(user.equals(restaurant.getOwner())){
+            restaurant.setOwner(null);
+            restaurantRepository.save(restaurant);
+        }else {
+            throw new EntityNotFoundException("Restaurant not found");
+        }
+
     }
 
     @Override

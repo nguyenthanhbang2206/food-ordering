@@ -1,19 +1,11 @@
 import React from "react";
 import { ProfileNavigation } from "./ProfileNavigation";
 import { Routes, Route } from "react-router-dom";
+import { UserProfile } from "./UserProfile";
+import { Order } from "./Order";
+import { Favorite } from "./Favorite";
+import { Address } from "./Address";
 
-const UserInfo = () => (
-  <div>
-    <h2 className="text-2xl font-bold mb-4">Your Profile Information</h2>
-    <p className="text-gray-600">
-      Here you can view and update your profile details.
-    </p>
-  </div>
-);
-
-const Orders = () => <p>Your orders will be displayed here.</p>;
-const Favorites = () => <p>Your favorite items will be displayed here.</p>;
-const Address = () => <p>Your saved addresses will be displayed here.</p>;
 
 export const Profile = () => {
   return (
@@ -26,9 +18,9 @@ export const Profile = () => {
       {/* Profile Content */}
       <main className="lg:w-3/4 w-full bg-white shadow-md rounded-lg p-4">
         <Routes>
-          <Route path="/" element={<UserInfo />} />
-          <Route path="orders" element={<Orders />} />
-          <Route path="favorites" element={<Favorites />} />
+          <Route path="/" element={<UserProfile />} />
+          <Route path="orders" element={<Order />} />
+          <Route path="favorites" element={<Favorite />} />
           <Route path="address" element={<Address />} />
           <Route
             path="*"

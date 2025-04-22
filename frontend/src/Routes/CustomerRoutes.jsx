@@ -6,16 +6,20 @@ import { UserProfile } from '../components/Profile/UserProfile'
 import { Home } from '../components/Home/Home'
 import { RestaurantDetail } from '../components/Restaurant/RestaurantDetail'
 import { Cart } from '../components/Cart/Cart'
+import { Profile } from '../components/Profile/Profile'
+import {Register} from '../components/Auth/Register'
+import { Login } from '../components/Auth/Login'
 export const CustomerRoutes = () => {
   return (
     <div>
         <Navbar/>
         <Routes>
             <Route path='/' element={<Home/>} />
-            <Route path='/account/:register' element={<Home/>} />
+            <Route path='/register' element={<Register/>} />            <Route path='/register' element={<Register/>} />
+            <Route path='/login' element={<Login/>} />
             <Route path='/restaurant/:city/:title/:id' element={<RestaurantDetail/>} />
             <Route path='/cart' element={<Cart/>} />
-            <Route path='/myProfile/*' element={<Cart/>} />
+            <Route path='/myProfile/*' element={<Profile/>} />
         </Routes>
     </div>
   )

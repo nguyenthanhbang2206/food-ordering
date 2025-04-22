@@ -3,9 +3,6 @@ import "./App.css";
 import { Navbar } from "./components/navbar/Navbar";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { darkTheme } from "./Theme/DarkTheme";
-import { Home } from "./components/Home/Home";
-import { RestaurantDetail } from "./components/Restaurant/RestaurantDetail";
-import { Cart } from "./components/Cart/Cart";
 
 function App() {
   return (
@@ -14,7 +11,7 @@ function App() {
       <Navbar />
       {/* <Home /> */}
       {/* <RestaurantDetail /> */}
-      <Cart />
+      {/* <Cart /> */}
     </ThemeProvider>
   );
 }

@@ -1,12 +1,14 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { login } from "../State/Auth/Action";
 
 export const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -17,10 +19,9 @@ export const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Login Data:", formData);
-    // Thêm logic xử lý đăng nhập tại đây (ví dụ: gọi API)
+  const handleSubmit = (values) => {
+    console.log("values", values);
+    dispatch(login({ userData: values, navigate })); // Gọi action đăng nhập
   };
 
   const handleRegister = () => {

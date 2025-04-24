@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useDispatch } from "react-redux";
+import { register } from "../State/Auth/Action";
 export const Register = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -11,6 +12,7 @@ export const Register = () => {
   });
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,9 +27,10 @@ export const Register = () => {
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
+      
     }
     console.log("Register Data:", formData);
-    // Thêm logic xử lý đăng ký tại đây (ví dụ: gọi API)
+    dispatch(register({ userData: formData, navigate })); 
   };
 
   const handleLogin = () => {

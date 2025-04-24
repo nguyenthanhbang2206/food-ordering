@@ -6,6 +6,8 @@ import AddReactionIcon from "@mui/icons-material/AddReaction";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import { ShoppingBag } from "@mui/icons-material";
 import PersonIcon from "@mui/icons-material/Person";
+import { useDispatch } from "react-redux";
+import { logout } from "../State/Auth/Action";
 
 const menu = [
   {
@@ -42,11 +44,13 @@ const menu = [
 
 export const ProfileNavigation = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleNavigation = (path) => {
     if (path === "/logout") {
       // Xử lý logic logout tại đây (nếu cần)
-      console.log("User logged out");
+     dispatch(logout());
+     navigate("/login") // Giả sử bạn có một action logoutUser để xử lý đăng xuất
     }
     navigate(path);
   };

@@ -19,9 +19,9 @@ export const Login = () => {
     }));
   };
 
-  const handleSubmit = (values) => {
-    console.log("values", values);
-    dispatch(login({ userData: values, navigate })); // Gọi action đăng nhập
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Ngăn chặn hành vi mặc định của form
+    dispatch(login({ userData: formData, navigate })); // Gọi action đăng nhập
   };
 
   const handleRegister = () => {

@@ -15,7 +15,7 @@ public class RestaurantRequest {
     private String description;
     @NotBlank(message = "OpeningHours must not be blank")
     private String openingHours;
-    @NotBlank(message = "ContactInformation must not be null")
+    @NotNull(message = "ContactInformation must not be null")
     private ContactInformation contactInformation;
     @NotEmpty(message = "Images must not be empty")
     private List<String> images;

@@ -7,6 +7,7 @@ import { CustomerRoutes } from "./Routes/CustomerRoutes";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getProfile } from "./components/State/Auth/Action";
+import { Routers } from "./components/Routers/Routers";
 
 function App() {
   const dispatch = useDispatch();
@@ -22,10 +23,7 @@ function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      {/* Navbar */}
-      
-      {/* Routes */}
-      <CustomerRoutes />
+     <Routers/>
     </ThemeProvider>
   );
 }

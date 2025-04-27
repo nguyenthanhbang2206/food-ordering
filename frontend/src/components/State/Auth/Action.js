@@ -112,3 +112,27 @@ export const logout = () => (dispatch) => {
   localStorage.removeItem("user");
   dispatch({ type: LOGOUT });
 };
+
+export const createRestaurant = ({ token, restaurantData }) => async (dispatch) => {
+  try {
+    const { data } = await api.post("/admin/restaurants", restaurantData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // Hiển thị thông báo thành công
+    alert(data.message);
+
+    // Dispatch thành công nếu cần
+    // dispatch({ type: CREATE_RESTAURANT_SUCCESS, payload: data });
+  } catch (error) {
+    // Xử lý lỗi từ phản hồi API
+    const errorMessage =
+      error.response?.data?.message || "Failed to create restaurant. Please try again.";
+    alert(errorMessage);
+
+    // Dispatch lỗi nếu cần
+    // dispatch({ type: CREATE_RESTAURANT_FAILURE, payload: errorMessage });
+  }
+};

@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { register } from "../State/Auth/Action";
+import { useEffect } from "react";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 export const Register = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -13,6 +16,8 @@ export const Register = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { error, success } = useSelector((state) => state.auth); // Lấy error và success từ Redux store
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,20 +26,23 @@ export const Register = () => {
       [name]: value,
     }));
   };
+  useEffect(() => {
+    if (error) {
+      setSnackbar({ open: true, message: error, severity: "error" });
+    }
+  }, [error]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-      
-    }
     console.log("Register Data:", formData);
     dispatch(register({ userData: formData, navigate })); 
   };
 
   const handleLogin = () => {
     navigate("/login"); // Điều hướng đến trang đăng nhập
+  };
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   return (
@@ -161,6 +169,17 @@ export const Register = () => {
           </p>
         </div>
       </div>
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

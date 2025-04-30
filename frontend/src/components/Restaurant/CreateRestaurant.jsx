@@ -1,29 +1,33 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { createRestaurant } from "../State/Auth/Action";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { createRestaurant, getMyRestaurant } from "../State/Restaurant/Action";
 
 export const CreateRestaurant = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    address: {
-      street: "",
-      ward: "",
-      district: "",
-      city: "",
-    },
+    openingHours: "",
     contactInformation: {
       email: "",
       phoneNumber: "",
       facebook: "",
       instagram: "",
     },
-    openingHours: "",
     images: [],
+    address: {
+      street: "",
+      ward: "",
+      district: "",
+      city: "",
+    },
   });
 
+  const [imageFiles, setImageFiles] = useState([]);
   const dispatch = useDispatch();
-  const token = localStorage.getItem("token");
+  const { restaurant, loading, error, message } = useSelector((state) => state.restaurant);
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,16 +48,78 @@ export const CreateRestaurant = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setImageFiles(files);
+  };
+
+  const uploadImages = async () => {
+    if (imageFiles.length === 0) {
+      alert("Please select images to upload.");
+      return [];
+    }
+
+    const form = new FormData();
+    imageFiles.forEach((file) => {
+      form.append("files", file);
+    });
+    form.append("folder", "restaurants");
+
+    try {
+      const response = await axios.post("http://localhost:8080/api/v1/files", form, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      return response.data.data;
+    } catch (error) {
+      alert(`Failed to upload images: ${error.response?.data?.message || error.message}`);
+      return [];
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(createRestaurant({ token, restaurantData: formData }));
+
+    const uploadedImages = await uploadImages();
+    if (uploadedImages.length === 0) return;
+
+    const restaurantData = {
+      ...formData,
+      images: uploadedImages,
+    };
+
+    try {
+      await dispatch(createRestaurant(restaurantData));
+      setSnackbar({ open: true, message: "Restaurant created successfully!", severity: "success" });
+      dispatch(getMyRestaurant()); 
+    } catch {
+      setSnackbar({
+        open: true,
+        message: error|| "An unknown error occurred.",
+        severity: "error",
+      });
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-lg">
-        <h2 className="text-2xl font-bold mb-4 text-center">Create Restaurant</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-4xl">
+        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Create Restaurant</h2>
+
+        {message && (
+          <div
+            className={`mb-4 p-4 rounded ${
+              message.type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Name</label>
             <input
@@ -65,7 +131,9 @@ export const CreateRestaurant = () => {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
             />
           </div>
-          <div>
+
+          {/* Description */}
+          <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700">Description</label>
             <textarea
               name="description"
@@ -75,6 +143,65 @@ export const CreateRestaurant = () => {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
             />
           </div>
+
+          {/* Opening Hours */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700">Opening Hours</label>
+            <input
+              type="text"
+              name="openingHours"
+              value={formData.openingHours}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
+            />
+          </div>
+
+          {/* Contact Information */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              name="contactInformation.email"
+              value={formData.contactInformation.email}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+            <input
+              type="text"
+              name="contactInformation.phoneNumber"
+              value={formData.contactInformation.phoneNumber}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Facebook</label>
+            <input
+              type="text"
+              name="contactInformation.facebook"
+              value={formData.contactInformation.facebook}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Instagram</label>
+            <input
+              type="text"
+              name="contactInformation.instagram"
+              value={formData.contactInformation.instagram}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
+            />
+          </div>
+
+          {/* Address */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Street</label>
             <input
@@ -119,61 +246,37 @@ export const CreateRestaurant = () => {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+
+          {/* Upload Images */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700">Upload Images</label>
             <input
-              type="email"
-              name="contactInformation.email"
-              value={formData.contactInformation.email}
-              onChange={handleChange}
-              required
+              type="file"
+              multiple
+              onChange={handleImageUpload}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
             />
+            <div className="flex flex-wrap gap-4 mt-4">
+              {formData.images.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Preview ${index}`}
+                  className="w-24 h-24 object-cover rounded-lg shadow-md"
+                />
+              ))}
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-            <input
-              type="text"
-              name="contactInformation.phoneNumber"
-              value={formData.contactInformation.phoneNumber}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
-            />
+
+          {/* Submit Button */}
+          <div className="md:col-span-2">
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600"
+            >
+              Create
+            </button>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Opening Hours</label>
-            <input
-              type="text"
-              name="openingHours"
-              value={formData.openingHours}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Images (comma-separated URLs)</label>
-            <input
-              type="text"
-              name="images"
-              value={formData.images}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  images: e.target.value.split(","),
-                }))
-              }
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
-          >
-            Create
-          </button>
         </form>
       </div>
     </div>

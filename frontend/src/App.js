@@ -8,22 +8,27 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getProfile } from "./components/State/Auth/Action";
 import { Routers } from "./components/Routers/Routers";
-
+import { getMyRestaurant } from "./components/State/Restaurant/Action";
 function App() {
   const dispatch = useDispatch();
   const token = localStorage.getItem("token");
-  const { auth } = useSelector((store) => store);
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (token && !auth.user) {
-      dispatch(getProfile(token));
+    if (token && !user) {
+      dispatch(getProfile(token)); // Gọi API để lấy thông tin người dùng
     }
-  }, [dispatch, token, auth.user]);
+  }, [dispatch, token, user]);
+  // useEffect(() => {
+    
+  //     dispatch(getMyRestaurant()); // Gọi API để lấy thông tin người dùng
+    
+  // }, [user]);
 
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-     <Routers/>
+      <Routers />
     </ThemeProvider>
   );
 }

@@ -9,7 +9,12 @@ export const Orders = () => {
     const mockOrders = [
       { id: 1, customer: "John Doe", totalPrice: 120.5, status: "Pending" },
       { id: 2, customer: "Jane Smith", totalPrice: 85.0, status: "Completed" },
-      { id: 3, customer: "Alice Johnson", totalPrice: 45.75, status: "Cancelled" },
+      {
+        id: 3,
+        customer: "Alice Johnson",
+        totalPrice: 45.75,
+        status: "Cancelled",
+      },
     ];
     setOrders(mockOrders);
 
@@ -26,19 +31,35 @@ export const Orders = () => {
       <table className="min-w-full bg-white border border-gray-200">
         <thead>
           <tr>
-            <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">ID</th>
-            <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">Customer</th>
-            <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">Total Price</th>
-            <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">Status</th>
+            <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+              ID
+            </th>
+            <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+              Customer
+            </th>
+            <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+              Total Price
+            </th>
+            <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+              Status
+            </th>
           </tr>
         </thead>
         <tbody>
           {orders.map((order) => (
             <tr key={order.id} className="hover:bg-gray-100">
-              <td className="px-4 py-2 border-b text-sm text-gray-700">{order.id}</td>
-              <td className="px-4 py-2 border-b text-sm text-gray-700">{order.customer}</td>
-              <td className="px-4 py-2 border-b text-sm text-gray-700">${order.totalPrice.toFixed(2)}</td>
-              <td className="px-4 py-2 border-b text-sm text-gray-700">{order.status}</td>
+              <td className="px-4 py-2 border-b text-sm text-gray-700">
+                {order.id}
+              </td>
+              <td className="px-4 py-2 border-b text-sm text-gray-700">
+                {order.customer}
+              </td>
+              <td className="px-4 py-2 border-b text-sm text-gray-700">
+                ${order.totalPrice.toFixed(2)}
+              </td>
+              <td className="px-4 py-2 border-b text-sm text-gray-700">
+                {order.status}
+              </td>
             </tr>
           ))}
         </tbody>

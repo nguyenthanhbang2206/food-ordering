@@ -1,7 +1,7 @@
-import React from 'react';
-import { Card, Chip, IconButton } from '@mui/material';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import React from "react";
+import { Card, Chip, IconButton } from "@mui/material";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 export const RestaurantCard = () => {
   const isOpen = true;
@@ -16,8 +16,8 @@ export const RestaurantCard = () => {
           alt="Restaurant"
         />
         <Chip
-          color={isOpen ? 'success' : 'error'}
-          label={isOpen ? 'Open' : 'Closed'}
+          color={isOpen ? "success" : "error"}
+          label={isOpen ? "Open" : "Closed"}
           size="small"
           className="absolute top-2 left-2"
         />

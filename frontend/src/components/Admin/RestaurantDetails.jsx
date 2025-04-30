@@ -31,11 +31,15 @@ export const RestaurantDetails = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-4xl font-bold mb-8 text-gray-800">Restaurant Details</h1>
+      <h1 className="text-4xl font-bold mb-8 text-gray-800">
+        Restaurant Details
+      </h1>
 
       {/* Card 1 */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">General Information</h2>
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">
+          General Information
+        </h2>
         <p className="text-lg text-gray-700 flex items-center mb-4">
           <PersonIcon className="text-blue-500 mr-2" />
           <strong className="mr-2">Owner:</strong> {restaurant.owner}
@@ -46,7 +50,8 @@ export const RestaurantDetails = () => {
         </p>
         <p className="text-lg text-gray-700 flex items-center mb-4">
           <AccessTimeIcon className="text-yellow-500 mr-2" />
-          <strong className="mr-2">Opening Hours:</strong> {restaurant.openingHours}
+          <strong className="mr-2">Opening Hours:</strong>{" "}
+          {restaurant.openingHours}
         </p>
         <p className="text-lg text-gray-700 flex items-center">
           <CheckCircleIcon className="text-green-500 mr-2" />
@@ -65,7 +70,8 @@ export const RestaurantDetails = () => {
           </p>
           <p className="text-lg text-gray-700 flex items-center mb-4">
             <LocationCityIcon className="text-blue-500 mr-2" />
-            <strong className="mr-2">District:</strong> {restaurant.address.district}
+            <strong className="mr-2">District:</strong>{" "}
+            {restaurant.address.district}
           </p>
           <p className="text-lg text-gray-700 flex items-center mb-4">
             <LocationCityIcon className="text-blue-500 mr-2" />
@@ -73,28 +79,35 @@ export const RestaurantDetails = () => {
           </p>
           <p className="text-lg text-gray-700 flex items-center">
             <LocationCityIcon className="text-blue-500 mr-2" />
-            <strong className="mr-2">Street:</strong> {restaurant.address.street}
+            <strong className="mr-2">Street:</strong>{" "}
+            {restaurant.address.street}
           </p>
         </div>
 
         {/* Card 3 */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">Contact Information</h2>
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+            Contact Information
+          </h2>
           <p className="text-lg text-gray-700 flex items-center mb-4">
             <EmailIcon className="text-red-500 mr-2" />
-            <strong className="mr-2">Email:</strong> {restaurant.contactInformation.email}
+            <strong className="mr-2">Email:</strong>{" "}
+            {restaurant.contactInformation.email}
           </p>
           <p className="text-lg text-gray-700 flex items-center mb-4">
             <PhoneIcon className="text-green-500 mr-2" />
-            <strong className="mr-2">Phone Number:</strong> {restaurant.contactInformation.phoneNumber}
+            <strong className="mr-2">Phone Number:</strong>{" "}
+            {restaurant.contactInformation.phoneNumber}
           </p>
           <p className="text-lg text-gray-700 flex items-center mb-4">
             <FacebookIcon className="text-blue-600 mr-2" />
-            <strong className="mr-2">Facebook:</strong> {restaurant.contactInformation.facebook}
+            <strong className="mr-2">Facebook:</strong>{" "}
+            {restaurant.contactInformation.facebook}
           </p>
           <p className="text-lg text-gray-700 flex items-center">
             <InstagramIcon className="text-pink-500 mr-2" />
-            <strong className="mr-2">Instagram:</strong> {restaurant.contactInformation.instagram}
+            <strong className="mr-2">Instagram:</strong>{" "}
+            {restaurant.contactInformation.instagram}
           </p>
         </div>
       </div>

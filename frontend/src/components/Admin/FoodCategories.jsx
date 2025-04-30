@@ -27,15 +27,23 @@ export const FoodCategories = () => {
       <table className="min-w-full bg-white border border-gray-200">
         <thead>
           <tr>
-            <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">ID</th>
-            <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">Name</th>
+            <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+              ID
+            </th>
+            <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+              Name
+            </th>
           </tr>
         </thead>
         <tbody>
           {categories.map((category) => (
             <tr key={category.id} className="hover:bg-gray-100">
-              <td className="px-4 py-2 border-b text-sm text-gray-700">{category.id}</td>
-              <td className="px-4 py-2 border-b text-sm text-gray-700">{category.name}</td>
+              <td className="px-4 py-2 border-b text-sm text-gray-700">
+                {category.id}
+              </td>
+              <td className="px-4 py-2 border-b text-sm text-gray-700">
+                {category.name}
+              </td>
             </tr>
           ))}
         </tbody>

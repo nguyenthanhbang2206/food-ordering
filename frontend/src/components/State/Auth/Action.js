@@ -96,27 +96,6 @@ export const getProfile = (token) => async (dispatch) => {
     }
   }
 };
-export const addToFavorites =
-  ({ token, restaurantId }) =>
-  async (dispatch) => {
-    dispatch({ type: ADD_TO_FAVORITE });
-    try {
-      const { data } = await api.post(
-        `/restaurants/${restaurantId}/favourites`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      dispatch({ type: ADD_TO_FAVORITE_SUCCESS, payload: data });
-    } catch (error) {
-      dispatch({ type: ADD_TO_FAVORITE_FAILURE, payload: error });
-      console.log("error", error);
-    }
-  };
 
 export const logout = () => (dispatch) => {
   localStorage.removeItem("token");

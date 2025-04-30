@@ -66,6 +66,12 @@ import {
   CREATE_FOOD_FAILURE,
   CREATE_FOOD_SUCCESS,
   CREATE_FOOD_REQUEST,
+  UPDATE_CATEGORY_REQUEST,
+  UPDATE_CATEGORY_SUCCESS,
+  UPDATE_CATEGORY_FAILURE,
+  DELETE_CATEGORY_REQUEST,
+  DELETE_CATEGORY_SUCCESS,
+  DELETE_CATEGORY_FAILURE,
 
 } from "./ActionType";
 
@@ -196,13 +202,14 @@ export const updateStatusOfRestaurant = () => async (dispatch) => {
 export const getCategoriesByRestaurant = () => async (dispatch) => {
   dispatch({ type: GET_CATEGORY_OF_RESTAURANT_REQUEST });
   try {
+
     const response = await axios.get(
       `${BASE_URL}/api/v1/admin/restaurants/categories`,
-      {},
       getAuthHeaders()
     );
     dispatch({ type: GET_CATEGORY_OF_RESTAURANT_SUCCESS, payload: response.data.data });
   } catch (error) {
+    console.log(error)
     dispatch({
       type: GET_CATEGORY_OF_RESTAURANT_FAILURE,
       payload: error.response?.data?.message || {
@@ -229,8 +236,39 @@ export const createCategoryOfRestaurant = (categoryData) => async (dispatch) => 
     });
   }
 };
+export const updateCategory = (categoryId, categoryData) => async (dispatch) => {
+  dispatch({ type: UPDATE_CATEGORY_REQUEST });
+  try {
+    const response = await axios.put(
+      `${BASE_URL}/api/v1/admin/restaurants/categories/${categoryId}`,
+      categoryData,
+      getAuthHeaders()
+    );
+    dispatch({ type: UPDATE_CATEGORY_SUCCESS, payload: response.data.data });
+  } catch (error) {
+    dispatch({
+      type: UPDATE_CATEGORY_FAILURE,
+      payload: error.response?.data?.message || "Failed to update ingredient",
+    });
+  }
+};
 
-
+// Delete Category
+export const deleteCategory = (categoryId) => async (dispatch) => {
+  dispatch({ type: DELETE_CATEGORY_REQUEST });
+  try {
+    await axios.delete(
+      `${BASE_URL}/api/v1/admin/restaurants/categories/${categoryId}`,
+      getAuthHeaders()
+    );
+    dispatch({ type: DELETE_CATEGORY_SUCCESS, payload: categoryId });
+  } catch (error) {
+    dispatch({
+      type: DELETE_CATEGORY_FAILURE,
+      payload: error.response?.data?.message || "Failed to delete ingredient",
+    });
+  }
+};
 
 // Create Food
 export const createFood = (foodData) => async (dispatch) => {

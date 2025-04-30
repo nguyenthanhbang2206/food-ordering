@@ -19,11 +19,9 @@ function App() {
       dispatch(getProfile(token)); // Gọi API để lấy thông tin người dùng
     }
   }, [dispatch, token, user]);
-  // useEffect(() => {
-    
-  //     dispatch(getMyRestaurant()); // Gọi API để lấy thông tin người dùng
-    
-  // }, [user]);
+  useEffect(() => {
+      dispatch(getMyRestaurant()); 
+  }, [user]);
 
   return (
     <ThemeProvider theme={darkTheme}>

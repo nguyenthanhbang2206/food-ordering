@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -131,6 +132,12 @@ public class CartServiceImpl implements CartService {
             throw new EntityNotFoundException("Cart not found");
         }
         cartRepository.delete(cart);
+    }
+
+    @Override
+    public List<CartItem> getCartItems() {
+        Cart cart = this.getCartByUserLogin();
+        return cartItemRepository.findByCart_Id(cart.getId());
     }
 
 

@@ -4,6 +4,8 @@ import com.nguyenthanhbang.foodordering.dto.request.CreateCartItemRequest;
 import com.nguyenthanhbang.foodordering.model.Cart;
 import com.nguyenthanhbang.foodordering.model.CartItem;
 
+import java.util.List;
+
 
 public interface CartService {
     CartItem addCartItemToCart(CreateCartItemRequest request);
@@ -14,4 +16,5 @@ public interface CartService {
     Cart getCartById(Long cartId);
     Cart getCartByUserLogin();
     void deleteCart();
+    List<CartItem> getCartItems();
 }

@@ -238,7 +238,7 @@ export const restaurantReducer = (state = initialState, action) => {
     case GET_FOOD_BY_RESTAURANT_SUCCESS:
       return {
         ...state,
-        foods: action.payload,
+        foods: Array.isArray(action.payload) ? action.payload : [],
         loading: false,
         error: null,
       };

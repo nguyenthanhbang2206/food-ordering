@@ -168,7 +168,6 @@ export const deleteRestaurant = ({restaurantId}) => async (dispatch) => {
   try {
     const response = await axios.delete(
       `${BASE_URL}/api/v1/admin/restaurants/${restaurantId}`,
-      {},
       getAuthHeaders()
     );
     dispatch({ type: DELETE_RESTAURANT_SUCCESS, payload: response.data.data });
@@ -281,6 +280,7 @@ export const createFood = (foodData) => async (dispatch) => {
     );
     dispatch({ type: CREATE_FOOD_SUCCESS, payload: response.data.data });
   } catch (error) {
+    console.log(error)
     dispatch({
       type: CREATE_FOOD_FAILURE,
       payload: error.response?.data?.message || "Failed to create food",
@@ -344,7 +344,7 @@ export const getFoodByRestaurant = () => async (dispatch) => {
         `${BASE_URL}/api/v1/admin/restaurants/foods`,
         getAuthHeaders()
       );
-      dispatch({ type: GET_FOOD_BY_RESTAURANT_SUCCESS, payload: response.data.data });
+      dispatch({ type: GET_FOOD_BY_RESTAURANT_SUCCESS, payload: response.data.data.items });
     } catch (error) {
       dispatch({
         type: GET_FOOD_BY_RESTAURANT_FAILURE,
@@ -358,7 +358,6 @@ export const updateAvailability = (foodId, availability) => async (dispatch) => 
   try {
     const response = await axios.put(
       `${BASE_URL}/api/v1/admin/restaurants/foods/${foodId}/availability`,
-      {  },
       getAuthHeaders()
     );
     dispatch({ type: UPDATE_AVAILABILITY_SUCCESS, payload: response.data.data });

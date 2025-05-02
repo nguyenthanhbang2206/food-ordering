@@ -27,6 +27,8 @@ export const CreateRestaurant = () => {
   const dispatch = useDispatch();
   const { restaurant, loading, error, message } = useSelector((state) => state.restaurant);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+    const [previewImages, setPreviewImages] = useState([]);
+  
 
 
   const handleChange = (e) => {
@@ -48,10 +50,6 @@ export const CreateRestaurant = () => {
     }
   };
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    setImageFiles(files);
-  };
 
   const uploadImages = async () => {
     if (imageFiles.length === 0) {
@@ -66,17 +64,32 @@ export const CreateRestaurant = () => {
     form.append("folder", "restaurants");
 
     try {
-      const response = await axios.post("http://localhost:8080/api/v1/files", form, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:8080/api/v1/files",
+        form,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       return response.data.data;
     } catch (error) {
-      alert(`Failed to upload images: ${error.response?.data?.message || error.message}`);
+      alert(
+        `Failed to upload images: ${
+          error.response?.data?.message || error.message
+        }`
+      );
       return [];
     }
+  };
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setImageFiles((prev) => [...prev, ...files]);
+
+    const previewUrls = files.map((file) => URL.createObjectURL(file));
+    setPreviewImages((prev) => [...prev, ...previewUrls]);
   };
 
   const handleSubmit = async (e) => {
@@ -247,6 +260,20 @@ export const CreateRestaurant = () => {
             />
           </div>
 
+ {/* Preview Images */}
+ <div className="col-span-2 overflow-x-auto">
+              <div className="flex gap-4">
+                {previewImages.map((image, index) => (
+                  <img
+                    key={index}
+                    // src={image}
+                    src={`http://localhost:8080/images/restaurants/${image}`}
+                    alt={`Preview ${index}`}
+                    className="w-24 h-24 object-cover rounded-lg shadow-md"
+                  />
+                ))}
+              </div>
+            </div>
           {/* Upload Images */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700">Upload Images</label>

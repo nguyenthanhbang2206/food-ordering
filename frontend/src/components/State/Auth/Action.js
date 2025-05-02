@@ -43,6 +43,7 @@ export const login =
   async (dispatch) => {
     dispatch({ type: LOGIN_REQUEST });
     try {
+      console.log("User Data:", userData); // Log userData to check its value
       const { data } = await api.post(`/auth/login`, userData);
 
       // Lưu accessToken và thông tin người dùng vào localStorage

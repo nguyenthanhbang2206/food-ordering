@@ -3,18 +3,17 @@ import { Card, Chip, IconButton } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
-export const RestaurantCard = () => {
-  const isOpen = true;
-  const isFavorite = true;
-
+export const RestaurantCard = ({
+  name,
+  image,
+  description,
+  isOpen,
+  isFavorite,
+}) => {
   return (
     <Card className="m-5 p-2 bg-gray-900 text-white">
       <div className="w-[300px] h-[200px] rounded-lg overflow-hidden relative">
-        <img
-          className="w-full h-full object-cover"
-          src="https://media.istockphoto.com/id/1829241109/photo/enjoying-a-brunch-together.jpg?s=612x612&w=0&k=20&c=9awLLRMBLeiYsrXrkgzkoscVU_3RoVwl_HA-OT-srjQ="
-          alt="Restaurant"
-        />
+        <img className="w-full h-full object-cover" src={`http://localhost:8080/images/restaurants/${image[0]}`} alt={name} />
         <Chip
           color={isOpen ? "success" : "error"}
           label={isOpen ? "Open" : "Closed"}
@@ -23,8 +22,8 @@ export const RestaurantCard = () => {
         />
       </div>
       <div className="mt-3 px-2">
-        <p className="font-semibold text-lg">Restaurant Name</p>
-        <p>4.5 ⭐</p>
+        <p className="font-semibold text-lg">{name}</p>
+        <p className="text-sm text-gray-400">{description}</p>
       </div>
       <div className="flex justify-center">
         <IconButton>

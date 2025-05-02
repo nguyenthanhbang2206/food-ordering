@@ -7,7 +7,7 @@ import { Ingredients } from "./Ingredients";
 import { FoodCategories } from "./FoodCategories";
 import { Food } from "./Food";
 import { RestaurantDetails } from "./RestaurantDetails";
-
+import { FoodEdit } from "./FoodEdit";
 export const Admin = () => {
   return (
     <div className="flex h-screen">
@@ -23,6 +23,7 @@ export const Admin = () => {
           <Route path="food-categories" element={<FoodCategories />} />
           <Route path="food" element={<Food />} />
           <Route path="details" element={<RestaurantDetails />} />
+          <Route path="food/edit" element={<FoodEdit />} />
         </Routes>
       </div>
     </div>

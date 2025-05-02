@@ -92,10 +92,10 @@ export const getAllRestaurant = () => async (dispatch) => {
   dispatch({ type: GET_ALL_RESTAURANT_REQUEST });
   try {
     const response = await axios.get(
-      `${BASE_URL}/api/v1/admin/restaurants`,
+      `${BASE_URL}/api/v1/restaurants`,
       getAuthHeaders()
     );
-    dispatch({ type: GET_ALL_RESTAURANT_SUCCESS, payload: response.data.data });
+    dispatch({ type: GET_ALL_RESTAURANT_SUCCESS, payload: response.data.data.items });
   } catch (error) {
     dispatch({
       type: GET_ALL_RESTAURANT_FAILURE,

@@ -19,6 +19,8 @@ import Select from "@mui/material/Select";
 import Chip from "@mui/material/Chip";
 import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
+
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -30,6 +32,7 @@ const modalStyle = {
   p: 4,
   borderRadius: "8px",
 };
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -60,7 +63,6 @@ export const Food = () => {
     foodCategoryId: "",
     ingredients: [],
   });
-  const [isEditing, setIsEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [imageFiles, setImageFiles] = useState([]);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -154,6 +156,7 @@ export const Food = () => {
       images: uploadedImages,
     };
 
+    console.log("Food Data:", foodData);
     dispatch(createFood(foodData));
     setFormData({
       id: "",
@@ -171,42 +174,8 @@ export const Food = () => {
     setPreviewImages([]);
     setShowForm(false);
   };
-
-  const handleEditFood = async (e) => {
-    e.preventDefault();
-
-    const uploadedImages = await uploadImages();
-    const foodData = {
-      name: foodData.name,
-      description: foodData.description,
-      price: foodData.price,
-      images: foodData.images,
-      foodCategoryId: foodData.foodCategory.id, // Lấy ID từ foodCategory
-      ingredients: foodData.ingredients.map((ingredient) => ingredient.id), // Lấy danh sách ID từ ingredients
-      cuisine: foodData.cuisine,
-      vegetarian: foodData.vegetarian,
-      spicy: foodData.spicy,
-    };
-
-    dispatch(updateFood(formData.id, foodData));
-    setFormData({
-      id: "",
-      name: "",
-      description: "",
-      price: "",
-      cuisine: "",
-      vegetarian: false,
-      spicy: false,
-      images: [],
-      foodCategoryId: "",
-      ingredients: [],
-    });
-    setImageFiles([]);
-    setPreviewImages([]);
-    setIsEditing(false);
-    setShowForm(false);
-  };
-
+  const navigate = useNavigate();
+ 
   const handleDeleteFood = (id) => {
     dispatch(deleteFood(id));
   };
@@ -223,7 +192,6 @@ export const Food = () => {
         <button
           onClick={() => {
             setShowForm(true);
-            setIsEditing(false);
             setFormData({
               id: "",
               name: "",
@@ -253,7 +221,7 @@ export const Food = () => {
       {/* Form thêm hoặc cập nhật món ăn */}
       {showForm && (
         <form
-          onSubmit={isEditing ? handleEditFood : handleAddFood}
+          onSubmit={handleAddFood}
           className="mb-6"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -326,12 +294,14 @@ export const Food = () => {
                 {previewImages.map((image, index) => (
                   <img
                     key={index}
-                    src={image}
+                    // src={image}
+                    src={`${image}`}
                     alt={`Preview ${index}`}
                     className="w-24 h-24 object-cover rounded-lg shadow-md"
                   />
                 ))}
               </div>
+            
             </div>
 
             {/* Dropdown for Food Category */}
@@ -374,8 +344,8 @@ export const Food = () => {
                         <Chip
                           key={value}
                           label={
-                            ingredients.find((ing) => ing.id === value)?.name ||
-                            value
+                            ingredients.find((ingredient) => ingredient.id === value)
+                              ?.name || "N/A"
                           }
                         />
                       ))}
@@ -405,7 +375,7 @@ export const Food = () => {
               type="submit"
               className="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
             >
-              {isEditing ? "Update Food" : "Add Food"}
+              {"Add Food"}
             </button>
             <button
               type="button"
@@ -469,9 +439,9 @@ export const Food = () => {
                   </button>
                   <button
                     onClick={() => {
-                      setIsEditing(true);
                       setShowForm(true);
                       setFormData(food);
+                      navigate(`/admin/restaurant/food/edit`, { state: { food } });
                       setPreviewImages(food.images || []);
                     }}
                     className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 mr-2"

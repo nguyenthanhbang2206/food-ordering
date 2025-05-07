@@ -70,7 +70,7 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<AuthenticationResponse>> refresh(@CookieValue(name = "refreshToken", defaultValue = "default") String refreshToken) {
         if(refreshToken.equals("default")) {
-            throw new IllegalArgumentException("Chưa truyền refresh token, không có refresh token ở cookie");
+            throw new IllegalArgumentException("Invalid refreshToken");
         }
         Jwt decodedToken = securityUtil.checkValidToken(refreshToken);
         String email = decodedToken.getSubject();
@@ -105,7 +105,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Authorization") String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new IllegalArgumentException("Không có token hợp lệ");
+            throw new IllegalArgumentException("Invalid token");
         }
 
         String token = authHeader.substring(7);

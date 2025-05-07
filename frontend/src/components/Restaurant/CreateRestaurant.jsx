@@ -25,11 +25,15 @@ export const CreateRestaurant = () => {
 
   const [imageFiles, setImageFiles] = useState([]);
   const dispatch = useDispatch();
-  const { restaurant, loading, error, message } = useSelector((state) => state.restaurant);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-    const [previewImages, setPreviewImages] = useState([]);
-  
-
+  const { restaurant, loading, error, message } = useSelector(
+    (state) => state.restaurant
+  );
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const [previewImages, setPreviewImages] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,7 +53,6 @@ export const CreateRestaurant = () => {
       }));
     }
   };
-
 
   const uploadImages = async () => {
     if (imageFiles.length === 0) {
@@ -105,12 +108,16 @@ export const CreateRestaurant = () => {
 
     try {
       await dispatch(createRestaurant(restaurantData));
-      setSnackbar({ open: true, message: "Restaurant created successfully!", severity: "success" });
-      dispatch(getMyRestaurant()); 
+      setSnackbar({
+        open: true,
+        message: "Restaurant created successfully!",
+        severity: "success",
+      });
+      dispatch(getMyRestaurant());
     } catch {
       setSnackbar({
         open: true,
-        message: error|| "An unknown error occurred.",
+        message: error || "An unknown error occurred.",
         severity: "error",
       });
     }
@@ -119,22 +126,31 @@ export const CreateRestaurant = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-4xl">
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Create Restaurant</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+          Create Restaurant
+        </h2>
 
         {message && (
           <div
             className={`mb-4 p-4 rounded ${
-              message.type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+              message.type === "success"
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
             }`}
           >
             {message.text}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Name
+            </label>
             <input
               type="text"
               name="name"
@@ -147,7 +163,9 @@ export const CreateRestaurant = () => {
 
           {/* Description */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">Description</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Description
+            </label>
             <textarea
               name="description"
               value={formData.description}
@@ -159,7 +177,9 @@ export const CreateRestaurant = () => {
 
           {/* Opening Hours */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">Opening Hours</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Opening Hours
+            </label>
             <input
               type="text"
               name="openingHours"
@@ -172,7 +192,9 @@ export const CreateRestaurant = () => {
 
           {/* Contact Information */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               name="contactInformation.email"
@@ -183,7 +205,9 @@ export const CreateRestaurant = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Phone Number
+            </label>
             <input
               type="text"
               name="contactInformation.phoneNumber"
@@ -194,7 +218,9 @@ export const CreateRestaurant = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Facebook</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Facebook
+            </label>
             <input
               type="text"
               name="contactInformation.facebook"
@@ -204,7 +230,9 @@ export const CreateRestaurant = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Instagram</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Instagram
+            </label>
             <input
               type="text"
               name="contactInformation.instagram"
@@ -216,7 +244,9 @@ export const CreateRestaurant = () => {
 
           {/* Address */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Street</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Street
+            </label>
             <input
               type="text"
               name="address.street"
@@ -227,7 +257,9 @@ export const CreateRestaurant = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Ward</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Ward
+            </label>
             <input
               type="text"
               name="address.ward"
@@ -238,7 +270,9 @@ export const CreateRestaurant = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">District</label>
+            <label className="block text-sm font-medium text-gray-700">
+              District
+            </label>
             <input
               type="text"
               name="address.district"
@@ -249,7 +283,9 @@ export const CreateRestaurant = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">City</label>
+            <label className="block text-sm font-medium text-gray-700">
+              City
+            </label>
             <input
               type="text"
               name="address.city"
@@ -260,23 +296,39 @@ export const CreateRestaurant = () => {
             />
           </div>
 
- {/* Preview Images */}
- <div className="col-span-2 overflow-x-auto">
-              <div className="flex gap-4">
-                {previewImages.map((image, index) => (
+          {/* Preview Images */}
+          <div className="col-span-2 overflow-x-auto">
+            <div className="flex gap-4">
+              {previewImages.map((image, index) => (
+                <div key={index} className="relative">
                   <img
-                    key={index}
-                    // src={image}
-                    src={`http://localhost:8080/images/restaurants/${image}`}
+                    src={image}
                     alt={`Preview ${index}`}
                     className="w-24 h-24 object-cover rounded-lg shadow-md"
                   />
-                ))}
-              </div>
+                  <button
+                    onClick={() => {
+                      // Xóa ảnh khỏi danh sách previewImages và imageFiles
+                      setPreviewImages((prev) =>
+                        prev.filter((_, i) => i !== index)
+                      );
+                      setImageFiles((prev) =>
+                        prev.filter((_, i) => i !== index)
+                      );
+                    }}
+                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                  >
+                    x
+                  </button>
+                </div>
+              ))}
             </div>
+          </div>
           {/* Upload Images */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">Upload Images</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Upload Images
+            </label>
             <input
               type="file"
               multiple

@@ -175,7 +175,7 @@ export const Food = () => {
     setShowForm(false);
   };
   const navigate = useNavigate();
- 
+
   const handleDeleteFood = (id) => {
     dispatch(deleteFood(id));
   };
@@ -220,10 +220,7 @@ export const Food = () => {
 
       {/* Form thêm hoặc cập nhật món ăn */}
       {showForm && (
-        <form
-          onSubmit={handleAddFood}
-          className="mb-6"
-        >
+        <form onSubmit={handleAddFood} className="mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
@@ -288,20 +285,32 @@ export const Food = () => {
               className="px-4 py-2 border border-gray-300 rounded-lg"
             />
 
-            {/* Preview Images */}
             <div className="col-span-2 overflow-x-auto">
               <div className="flex gap-4">
                 {previewImages.map((image, index) => (
-                  <img
-                    key={index}
-                    // src={image}
-                    src={`${image}`}
-                    alt={`Preview ${index}`}
-                    className="w-24 h-24 object-cover rounded-lg shadow-md"
-                  />
+                  <div key={index} className="relative">
+                    <img
+                      src={image}
+                      alt={`Preview ${index}`}
+                      className="w-24 h-24 object-cover rounded-lg shadow-md"
+                    />
+                    <button
+                      onClick={() => {
+                        // Xóa ảnh khỏi danh sách previewImages và imageFiles
+                        setPreviewImages((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        );
+                        setImageFiles((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        );
+                      }}
+                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                    >
+                      x
+                    </button>
+                  </div>
                 ))}
               </div>
-            
             </div>
 
             {/* Dropdown for Food Category */}
@@ -344,8 +353,9 @@ export const Food = () => {
                         <Chip
                           key={value}
                           label={
-                            ingredients.find((ingredient) => ingredient.id === value)
-                              ?.name || "N/A"
+                            ingredients.find(
+                              (ingredient) => ingredient.id === value
+                            )?.name || "N/A"
                           }
                         />
                       ))}
@@ -441,7 +451,9 @@ export const Food = () => {
                     onClick={() => {
                       setShowForm(true);
                       setFormData(food);
-                      navigate(`/admin/restaurant/food/edit`, { state: { food } });
+                      navigate(`/admin/restaurant/food/edit`, {
+                        state: { food },
+                      });
                       setPreviewImages(food.images || []);
                     }}
                     className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 mr-2"

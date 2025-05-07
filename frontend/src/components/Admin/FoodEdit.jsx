@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { updateFood, getCategoriesByRestaurant, getIngredientsByRestaurant } from "../State/Restaurant/Action";
+import {
+  updateFood,
+  getCategoriesByRestaurant,
+  getIngredientsByRestaurant,
+} from "../State/Restaurant/Action";
 import axios from "axios";
-import { Box, Chip, FormControl, InputLabel, MenuItem, OutlinedInput, Select, useTheme } from "@mui/material";
+import {
+  Box,
+  Chip,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  useTheme,
+} from "@mui/material";
 import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
 
@@ -72,17 +85,72 @@ export const FoodEdit = () => {
     };
   };
 
+  // const handleImageUpload = (e) => {
+  //   const files = Array.from(e.target.files);
+  //   setImageFiles((prev) => [...prev, ...files]);
+
+  //   const previewUrls = files.map((file) => URL.createObjectURL(file));
+  //   setPreviewImages((prev) => [...prev, ...previewUrls]);
+  // };
+
+  // const uploadImages = async () => {
+  //   if (imageFiles.length === 0) {
+  //     return formData.images; // Nếu không có ảnh mới, giữ nguyên ảnh cũ
+  //   }
+
+  //   const form = new FormData();
+  //   imageFiles.forEach((file) => {
+  //     form.append("files", file);
+  //   });
+  //   form.append("folder", "foods");
+
+  //   try {
+  //     const response = await axios.post(
+  //       "http://localhost:8080/api/v1/files",
+  //       form,
+  //       {
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       }
+  //     );
+  //     return response.data.data; // Trả về danh sách URL ảnh đã upload
+  //   } catch (error) {
+  //     alert(
+  //       `Failed to upload images: ${
+  //         error.response?.data?.message || error.message
+  //       }`
+  //     );
+  //     return [];
+  //   }
+  // };
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   const uploadedImages = await uploadImages();
+  //   const updatedFoodData = {
+  //     ...formData,
+  //     images: uploadedImages,
+  //   };
+  //   console.log("Updated Food Data:", updatedFoodData);
+  //   dispatch(updateFood(formData.id, updatedFoodData));
+  //   navigate("/admin/restaurant/food");
+  // };
+
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    setImageFiles((prev) => [...prev, ...files]);
 
-    const previewUrls = files.map((file) => URL.createObjectURL(file));
-    setPreviewImages((prev) => [...prev, ...previewUrls]);
+    const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
+    setPreviewImages((prev) => [...prev, ...newPreviewUrls]);
+
+    setImageFiles((prev) => [...prev, ...files]);
   };
 
   const uploadImages = async () => {
     if (imageFiles.length === 0) {
-      return formData.images; // Nếu không có ảnh mới, giữ nguyên ảnh cũ
+      return formData.images; // Giữ nguyên ảnh cũ nếu không có ảnh mới
     }
 
     const form = new FormData();
@@ -102,15 +170,31 @@ export const FoodEdit = () => {
           },
         }
       );
-      return response.data.data; // Trả về danh sách URL ảnh đã upload
+
+      const newUploadedImages = response.data.data;
+
+      // ✅ Ghép ảnh cũ (còn lại) và ảnh mới
+      return [...formData.images, ...newUploadedImages];
     } catch (error) {
       alert(
         `Failed to upload images: ${
           error.response?.data?.message || error.message
         }`
       );
-      return [];
+      return formData.images; // Nếu lỗi, giữ nguyên ảnh cũ
     }
+  };
+
+  const handleDeleteOldImage = (filename) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((img) => img !== filename),
+    }));
+  };
+
+  const handleDeleteNewImage = (index) => {
+    setPreviewImages((prev) => prev.filter((_, i) => i !== index));
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
@@ -121,6 +205,7 @@ export const FoodEdit = () => {
       ...formData,
       images: uploadedImages,
     };
+    console.log("Updated Food Data:", updatedFoodData);
 
     dispatch(updateFood(formData.id, updatedFoodData));
     navigate("/admin/restaurant/food");
@@ -232,8 +317,9 @@ export const FoodEdit = () => {
                       <Chip
                         key={value}
                         label={
-                          ingredients.find((ingredient) => ingredient.id === value)
-                            ?.name || "N/A"
+                          ingredients.find(
+                            (ingredient) => ingredient.id === value
+                          )?.name || "N/A"
                         }
                       />
                     ))}
@@ -245,7 +331,11 @@ export const FoodEdit = () => {
                   <MenuItem
                     key={ingredient.id}
                     value={ingredient.id}
-                    style={getStyles(ingredient.id, formData.ingredients, theme)}
+                    style={getStyles(
+                      ingredient.id,
+                      formData.ingredients,
+                      theme
+                    )}
                   >
                     {ingredient.name}
                   </MenuItem>
@@ -255,18 +345,45 @@ export const FoodEdit = () => {
           </div>
         </div>
 
-        {/* Hiển thị ảnh preview */}
-        <div className="mt-4 flex gap-4">
-          {previewImages.map((image, index) => (
-            <img
-              key={index}
-              src={`http://localhost:8080/images/foods/${image}`}
-              alt={`Preview ${index}`}
-              className="w-24 h-24 object-cover rounded-lg shadow-md"
-            />
+        <div className="flex gap-4">
+          {/* Hiển thị ảnh cũ từ server */}
+          {formData.images.map((image, index) => (
+            <div key={`old-${index}`} className="relative">
+              <img
+                src={`http://localhost:8080/images/foods/${image}`}
+                alt={`Old Preview ${index}`}
+                className="w-24 h-24 object-cover rounded-lg shadow-md"
+              />
+              <button
+                type="button"
+                onClick={() => handleDeleteOldImage(image)}
+                className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+              >
+                x
+              </button>
+            </div>
+          ))}
+
+          {/* Hiển thị ảnh mới upload (dùng URL.createObjectURL) */}
+          {imageFiles.map((file, index) => (
+            <div key={`new-${index}`} className="relative">
+              <img
+                src={URL.createObjectURL(file)}
+                alt={`New Preview ${index}`}
+                className="w-24 h-24 object-cover rounded-lg shadow-md"
+              />
+              <button
+                type="button"
+                onClick={() => handleDeleteNewImage(index)}
+                className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+              >
+                x
+              </button>
+            </div>
           ))}
         </div>
 
+        {/* Submit and Cancel Buttons */}
         <div className="mt-4">
           <button
             type="submit"

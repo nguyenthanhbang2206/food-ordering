@@ -18,10 +18,7 @@ export const CustomerRoutes = () => {
         <Route path="/register" element={<Register />} />{" "}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/restaurant/:city/:title/:id"
-          element={<RestaurantDetail />}
-        />
+        <Route path="/restaurant/:id" element={<RestaurantDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/myProfile/*" element={<Profile />} />
       </Routes>

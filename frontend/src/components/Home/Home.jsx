@@ -46,7 +46,9 @@ export const Home = () => {
             restaurants.map((restaurant) => (
               <RestaurantCard
                 key={restaurant.id}
+                id={restaurant.id}
                 name={restaurant.name}
+                isOpen={restaurant.open}
                 image={restaurant.images[0]}
                 description={restaurant.description}
               />

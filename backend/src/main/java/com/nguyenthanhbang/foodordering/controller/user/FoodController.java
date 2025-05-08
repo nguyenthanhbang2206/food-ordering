@@ -18,9 +18,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FoodController {
     private final FoodService foodService;
-    @GetMapping("/foods")
-    public ResponseEntity<ApiResponse<PaginationResponse>> getAllFoods(Pageable pageable, FoodCriteria foodCriteria){
-        PaginationResponse paginationResponse = foodService.getAllFoods(pageable, foodCriteria);
+    @GetMapping("/restaurants/{restaurantId}/foods")
+    public ResponseEntity<ApiResponse<PaginationResponse>> getAllFoods(@PathVariable Long restaurantId,Pageable pageable, FoodCriteria foodCriteria){
+        PaginationResponse paginationResponse = foodService.getAllFoods(restaurantId,pageable, foodCriteria);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Get all foods successfully")

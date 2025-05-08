@@ -2,7 +2,9 @@ package com.nguyenthanhbang.foodordering.controller.user;
 
 import com.nguyenthanhbang.foodordering.dto.response.ApiResponse;
 import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
+import com.nguyenthanhbang.foodordering.model.Category;
 import com.nguyenthanhbang.foodordering.model.Restaurant;
+import com.nguyenthanhbang.foodordering.service.CategoryService;
 import com.nguyenthanhbang.foodordering.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RestaurantController {
     private final RestaurantService restaurantService;
+    private final CategoryService categoryService;
     @GetMapping("/restaurants/{restaurantId}")
     public ResponseEntity<ApiResponse<Restaurant>> getRestaurantById(@PathVariable Long restaurantId) {
         Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
@@ -65,6 +68,16 @@ public class RestaurantController {
                 .status(HttpStatus.OK.value())
                 .message("Search restaurants successfully")
                 .data(restaurants)
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+    @GetMapping("/restaurants/{restaurantId}/categories")
+    public ResponseEntity<ApiResponse<List<Category>>> getCategoryByRestaurantId(@PathVariable Long restaurantId) {
+        List<Category> categories = categoryService.getCategoriesByRestaurantId(restaurantId);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Get categories by restaurantId successfully")
+                .data(categories)
                 .build();
         return ResponseEntity.ok(apiResponse);
     }

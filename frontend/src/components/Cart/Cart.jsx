@@ -4,27 +4,18 @@ import { Button, Modal, TextField } from "@mui/material";
 import { Address } from "./Address";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllCartItems } from "../State/Cart/Action"; // Import action để lấy danh sách sản phẩm trong giỏ hàng
+import { updateQuantityOfCartItem } from "../State/Cart/Action"; // Import action để cập nhật số lượng sản phẩm trong giỏ hàng
 export const Cart = () => {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Margherita Pizza",
-      price: 9.99,
-      quantity: 2,
-      image:
-        "https://media.istockphoto.com/id/1829241109/photo/enjoying-a-brunch-together.jpg?s=612x612&w=0&k=20&c=9awLLRMBLeiYsrXrkgzkoscVU_3RoVwl_HA-OT-srjQ=",
-    },
-    {
-      id: 2,
-      name: "Cheeseburger",
-      price: 5.99,
-      quantity: 1,
-      image:
-        "https://media.istockphoto.com/id/1829241109/photo/enjoying-a-brunch-together.jpg?s=612x612&w=0&k=20&c=9awLLRMBLeiYsrXrkgzkoscVU_3RoVwl_HA-OT-srjQ=",
-    },
-  ]);
+  const dispatch = useDispatch();
 
+  const { cartItems, loading, error } = useSelector((state) => state.cart); // Lấy dữ liệu từ Redux
+
+  useEffect(() => {
+    dispatch(getAllCartItems()); // Gọi API để lấy danh sách sản phẩm trong giỏ hàng
+  }, [dispatch]);
   const [addresses, setAddresses] = useState([
     { id: 1, address: "123 Main St, City A" },
     { id: 2, address: "456 Elm St, City B" },
@@ -33,23 +24,15 @@ export const Cart = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Tăng số lượng sản phẩm
-  const handleIncrease = (id) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
+  const handleIncrease = (id, quantity) => {
+    dispatch(updateQuantityOfCartItem(id, quantity + 1)); // Gọi API để tăng số lượng
   };
 
   // Giảm số lượng sản phẩm
-  const handleDecrease = (id) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
-    );
+  const handleDecrease = (id, quantity) => {
+    if (quantity > 1) {
+      dispatch(updateQuantityOfCartItem(id, quantity - 1)); // Gọi API để giảm số lượng
+    }
   };
 
   // Tính tổng tiền
@@ -82,7 +65,10 @@ export const Cart = () => {
     }),
     onSubmit: (values) => {
       const newAddress = `${values.street}, ${values.ward}, ${values.district}, ${values.city}`;
-      setAddresses((prev) => [...prev, { id: prev.length + 1, address: newAddress }]);
+      setAddresses((prev) => [
+        ...prev,
+        { id: prev.length + 1, address: newAddress },
+      ]);
       handleCloseAddressModal();
     },
   });
@@ -105,7 +91,8 @@ export const Cart = () => {
           </div>
           <div className="mt-6 text-left">
             <p className="text-lg font-bold">
-              Total: <span className="text-green-600">${totalPrice.toFixed(2)}</span>
+              Total:{" "}
+              <span className="text-green-600">${totalPrice.toFixed(2)}</span>
             </p>
           </div>
         </main>
@@ -115,10 +102,7 @@ export const Cart = () => {
           <h2 className="text-xl font-bold mb-4">Delivery Address</h2>
           <div className="space-y-4">
             {addresses.map((address) => (
-              <Address
-                key={address.id}
-                address={address.address}
-              />
+              <Address key={address.id} address={address.address} />
             ))}
           </div>
           <Button
@@ -192,5 +176,3 @@ export const Cart = () => {
     </>
   );
 };
-
-

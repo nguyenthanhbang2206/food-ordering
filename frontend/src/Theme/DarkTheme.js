@@ -7,12 +7,12 @@ export const darkTheme = createTheme({
             main: "#5A20CB",
         },
         secondary: {
-            main: "#5A20CB",
+            main: "#E6E6FA",
         },
         background: {
-            main: "#5A20CB",
+            main: "#E6E6FA",
             default: "#E6E6FA",
-            paper: "#5A20CB",
+            paper: "#E6E6FA",
         },
         textColor: {
             main: "#000000",

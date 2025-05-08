@@ -156,10 +156,15 @@ public class FoodServiceImpl implements FoodService {
         }
         return combinedSpec;
     }
+    private Specification<Food> byRestaurant(Long restaurantId) {
+        return (root, query, builder) -> {
+            return builder.equal(root.get("restaurant").get("id"), restaurantId);
+        };
+    }
 
 
 
-    private Specification<Food> makeSpecs(FoodCriteria foodCriteria) {
+    private Specification<Food> makeSpecs(Long restaurantId,FoodCriteria foodCriteria) {
         Specification combinedSpec = Specification.where(null);
         if(foodCriteria.getSpicy() != null) {
             combinedSpec = combinedSpec.and(bySpicy(foodCriteria.getSpicy()));
@@ -179,11 +184,14 @@ public class FoodServiceImpl implements FoodService {
         if(foodCriteria.getPrices() != null) {
             combinedSpec = combinedSpec.and(matchPrice(foodCriteria.getPrices()));
         }
+        if(restaurantId != null){
+            combinedSpec = combinedSpec.and(byRestaurant(restaurantId));
+        }
         return combinedSpec;
     }
     @Override
-    public PaginationResponse getAllFoods(Pageable pageable, FoodCriteria foodCriteria) {
-        Page<Food> foodPage = foodRepository.findAll(makeSpecs(foodCriteria), pageable);
+    public PaginationResponse getAllFoods(Long restaurantId, Pageable pageable, FoodCriteria foodCriteria) {
+        Page<Food> foodPage = foodRepository.findAll(makeSpecs(restaurantId,foodCriteria), pageable);
         PaginationResponse.Pagination pagination = PaginationResponse.Pagination.builder()
                 .page(pageable.getPageNumber() + 1)
                 .size(pageable.getPageSize())

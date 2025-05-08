@@ -71,6 +71,11 @@ import {
   DELETE_INGREDIENT_REQUEST,
   DELETE_INGREDIENT_SUCCESS,
   DELETE_INGREDIENT_FAILURE,
+  GET_CATEGORY_OF_RESTAURANT_ID_REQUEST,
+  GET_CATEGORY_OF_RESTAURANT_ID_SUCCESS,
+  GET_CATEGORY_OF_RESTAURANT_ID_FAILURE,
+  GET_RESTAURANT_BY_ID_SUCCESS,
+  GET_RESTAURANT_BY_ID_FAILURE,
 } from "./ActionType";
 
 const initialState = {
@@ -78,6 +83,7 @@ const initialState = {
   userRestaurant: null,
   restaurant: null,
   categories: [],
+  categoriesByRestaurant: [],
   favouriteRestaurants: [],
   foods: [],
   food: null,
@@ -114,6 +120,7 @@ export const restaurantReducer = (state = initialState, action) => {
     case UPDATE_INGREDIENT_REQUEST:
     case GET_INGREDIENTS_BY_RESTAURANT_REQUEST:
     case DELETE_INGREDIENT_REQUEST:
+    case GET_CATEGORY_OF_RESTAURANT_ID_REQUEST:
       return {
         ...state,
         loading: true,
@@ -121,12 +128,38 @@ export const restaurantReducer = (state = initialState, action) => {
       };
 
     // Success states
+    case GET_RESTAURANT_BY_ID_SUCCESS:
+      return {
+        ...state,
+        restaurant: action.payload,
+        loading: false,
+        error: null,
+      };
+    case GET_RESTAURANT_BY_ID_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
     case GET_MY_RESTAURANT_SUCCESS:
       return {
         ...state,
         userRestaurant: action.payload,
         loading: false,
         error: null,
+      };
+    case GET_CATEGORY_OF_RESTAURANT_ID_SUCCESS:
+      return {
+        ...state,
+        categories: action.payload,
+        loading: false,
+        error: null,
+      };
+    case GET_CATEGORY_OF_RESTAURANT_ID_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
       };
     case CREATE_RESTAURANT_SUCCESS:
       return {
@@ -182,6 +215,7 @@ export const restaurantReducer = (state = initialState, action) => {
         loading: false,
         error: null,
       };
+
     case DELETE_CATEGORY_SUCCESS:
       return {
         ...state,

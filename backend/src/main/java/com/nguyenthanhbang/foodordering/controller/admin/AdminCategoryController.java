@@ -1,10 +1,8 @@
 package com.nguyenthanhbang.foodordering.controller.admin;
 
 import com.nguyenthanhbang.foodordering.dto.request.CategoryRequest;
-import com.nguyenthanhbang.foodordering.dto.request.IngredientRequest;
 import com.nguyenthanhbang.foodordering.dto.response.ApiResponse;
 import com.nguyenthanhbang.foodordering.model.Category;
-import com.nguyenthanhbang.foodordering.model.Ingredient;
 import com.nguyenthanhbang.foodordering.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
-public class CategoryController {
+public class AdminCategoryController {
     private final CategoryService categoryService;
     @PostMapping("/restaurants/categories")
     public ResponseEntity<ApiResponse<Category>> createCategory(@Valid @RequestBody CategoryRequest request) {

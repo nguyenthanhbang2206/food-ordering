@@ -72,7 +72,12 @@ import {
   DELETE_CATEGORY_REQUEST,
   DELETE_CATEGORY_SUCCESS,
   DELETE_CATEGORY_FAILURE,
-
+  GET_CATEGORY_OF_RESTAURANT_ID_REQUEST,
+  GET_CATEGORY_OF_RESTAURANT_ID_SUCCESS,
+  GET_CATEGORY_OF_RESTAURANT_ID_FAILURE,
+  GET_RESTAURANT_BY_ID_SUCCESS,
+  GET_RESTAURANT_BY_ID_FAILURE,
+  GET_RESTAURANT_BY_ID_REQUEST,
 } from "./ActionType";
 
 const BASE_URL = "http://localhost:8080";
@@ -88,6 +93,24 @@ const getAuthHeaders = () => {
     },
   };
 };
+export const getRestaurantById = (restaurantId) => async (dispatch) => {
+  dispatch({ type: GET_RESTAURANT_BY_ID_REQUEST });
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/api/v1/restaurants/${restaurantId}`,
+      getAuthHeaders()
+    );
+    dispatch({
+      type: GET_RESTAURANT_BY_ID_SUCCESS,
+      payload: response.data.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GET_RESTAURANT_BY_ID_FAILURE,
+      payload: error.response?.data?.message || "Failed to fetch restaurant details",
+    });
+  }
+};
 export const getAllRestaurant = () => async (dispatch) => {
   dispatch({ type: GET_ALL_RESTAURANT_REQUEST });
   try {
@@ -95,7 +118,10 @@ export const getAllRestaurant = () => async (dispatch) => {
       `${BASE_URL}/api/v1/restaurants`,
       getAuthHeaders()
     );
-    dispatch({ type: GET_ALL_RESTAURANT_SUCCESS, payload: response.data.data.items });
+    dispatch({
+      type: GET_ALL_RESTAURANT_SUCCESS,
+      payload: response.data.data.items,
+    });
   } catch (error) {
     dispatch({
       type: GET_ALL_RESTAURANT_FAILURE,
@@ -163,23 +189,47 @@ export const updateRestaurant = (restaurantData) => async (dispatch) => {
     });
   }
 };
-export const deleteRestaurant = ({restaurantId}) => async (dispatch) => {
-  dispatch({ type: DELETE_RESTAURANT_REQUEST });
-  try {
-    const response = await axios.delete(
-      `${BASE_URL}/api/v1/admin/restaurants/${restaurantId}`,
-      getAuthHeaders()
-    );
-    dispatch({ type: DELETE_RESTAURANT_SUCCESS, payload: response.data.data });
-  } catch (error) {
-    dispatch({
-      type: DELETE_RESTAURANT_FAILURE,
-      payload: error.response?.data?.message || {
-        message: error.message || "Failed to create restaurant",
-      },
-    });
-  }
-};
+export const deleteRestaurant =
+  ({ restaurantId }) =>
+  async (dispatch) => {
+    dispatch({ type: DELETE_RESTAURANT_REQUEST });
+    try {
+      const response = await axios.delete(
+        `${BASE_URL}/api/v1/admin/restaurants/${restaurantId}`,
+        getAuthHeaders()
+      );
+      dispatch({
+        type: DELETE_RESTAURANT_SUCCESS,
+        payload: response.data.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: DELETE_RESTAURANT_FAILURE,
+        payload: error.response?.data?.message || {
+          message: error.message || "Failed to create restaurant",
+        },
+      });
+    }
+  };
+export const getCategoriesByRestaurantId =
+  (restaurantId) => async (dispatch) => {
+    dispatch({ type: GET_CATEGORY_OF_RESTAURANT_ID_REQUEST });
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/api/v1/restaurants/${restaurantId}/categories`,
+        getAuthHeaders()
+      );
+      dispatch({
+        type: GET_CATEGORY_OF_RESTAURANT_ID_SUCCESS,
+        payload: response.data.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_CATEGORY_OF_RESTAURANT_ID_FAILURE,
+        payload: error.response?.data?.message || "Failed to fetch categories",
+      });
+    }
+  };
 export const updateStatusOfRestaurant = () => async (dispatch) => {
   dispatch({ type: UPDATE_RESTAURANT_STATUS_REQUEST });
   try {
@@ -188,7 +238,10 @@ export const updateStatusOfRestaurant = () => async (dispatch) => {
       {},
       getAuthHeaders()
     );
-    dispatch({ type: UPDATE_RESTAURANT_STATUS_SUCCESS, payload: response.data.data });
+    dispatch({
+      type: UPDATE_RESTAURANT_STATUS_SUCCESS,
+      payload: response.data.data,
+    });
   } catch (error) {
     dispatch({
       type: UPDATE_RESTAURANT_STATUS_FAILURE,
@@ -201,14 +254,16 @@ export const updateStatusOfRestaurant = () => async (dispatch) => {
 export const getCategoriesByRestaurant = () => async (dispatch) => {
   dispatch({ type: GET_CATEGORY_OF_RESTAURANT_REQUEST });
   try {
-
     const response = await axios.get(
       `${BASE_URL}/api/v1/admin/restaurants/categories`,
       getAuthHeaders()
     );
-    dispatch({ type: GET_CATEGORY_OF_RESTAURANT_SUCCESS, payload: response.data.data });
+    dispatch({
+      type: GET_CATEGORY_OF_RESTAURANT_SUCCESS,
+      payload: response.data.data,
+    });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     dispatch({
       type: GET_CATEGORY_OF_RESTAURANT_FAILURE,
       payload: error.response?.data?.message || {
@@ -217,40 +272,42 @@ export const getCategoriesByRestaurant = () => async (dispatch) => {
     });
   }
 };
-export const createCategoryOfRestaurant = (categoryData) => async (dispatch) => {
-  dispatch({ type: CREATE_CATEGORY_REQUEST });
-  try {
-    const response = await axios.post(
-      `${BASE_URL}/api/v1/admin/restaurants/categories`,
-      categoryData,
-      getAuthHeaders()
-    );
-    dispatch({ type: CREATE_CATEGORY_SUCCESS, payload: response.data.data });
-  } catch (error) {
-    dispatch({
-      type: CREATE_CATEGORY_FAILURE,
-      payload: error.response?.data?.message || {
-        message: error.message || "Failed to create restaurant",
-      },
-    });
-  }
-};
-export const updateCategory = (categoryId, categoryData) => async (dispatch) => {
-  dispatch({ type: UPDATE_CATEGORY_REQUEST });
-  try {
-    const response = await axios.put(
-      `${BASE_URL}/api/v1/admin/restaurants/categories/${categoryId}`,
-      categoryData,
-      getAuthHeaders()
-    );
-    dispatch({ type: UPDATE_CATEGORY_SUCCESS, payload: response.data.data });
-  } catch (error) {
-    dispatch({
-      type: UPDATE_CATEGORY_FAILURE,
-      payload: error.response?.data?.message || "Failed to update ingredient",
-    });
-  }
-};
+export const createCategoryOfRestaurant =
+  (categoryData) => async (dispatch) => {
+    dispatch({ type: CREATE_CATEGORY_REQUEST });
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/api/v1/admin/restaurants/categories`,
+        categoryData,
+        getAuthHeaders()
+      );
+      dispatch({ type: CREATE_CATEGORY_SUCCESS, payload: response.data.data });
+    } catch (error) {
+      dispatch({
+        type: CREATE_CATEGORY_FAILURE,
+        payload: error.response?.data?.message || {
+          message: error.message || "Failed to create restaurant",
+        },
+      });
+    }
+  };
+export const updateCategory =
+  (categoryId, categoryData) => async (dispatch) => {
+    dispatch({ type: UPDATE_CATEGORY_REQUEST });
+    try {
+      const response = await axios.put(
+        `${BASE_URL}/api/v1/admin/restaurants/categories/${categoryId}`,
+        categoryData,
+        getAuthHeaders()
+      );
+      dispatch({ type: UPDATE_CATEGORY_SUCCESS, payload: response.data.data });
+    } catch (error) {
+      dispatch({
+        type: UPDATE_CATEGORY_FAILURE,
+        payload: error.response?.data?.message || "Failed to update ingredient",
+      });
+    }
+  };
 
 // Delete Category
 export const deleteCategory = (categoryId) => async (dispatch) => {
@@ -280,7 +337,7 @@ export const createFood = (foodData) => async (dispatch) => {
     );
     dispatch({ type: CREATE_FOOD_SUCCESS, payload: response.data.data });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     dispatch({
       type: CREATE_FOOD_FAILURE,
       payload: error.response?.data?.message || "Failed to create food",
@@ -310,7 +367,10 @@ export const updateFood = (foodId, foodData) => async (dispatch) => {
 export const deleteFood = (foodId) => async (dispatch) => {
   dispatch({ type: DELETE_FOOD_REQUEST });
   try {
-    await axios.delete(`${BASE_URL}/api/v1/admin/restaurants/foods/${foodId}`, getAuthHeaders());
+    await axios.delete(
+      `${BASE_URL}/api/v1/admin/restaurants/foods/${foodId}`,
+      getAuthHeaders()
+    );
     dispatch({ type: DELETE_FOOD_SUCCESS, payload: foodId });
   } catch (error) {
     dispatch({
@@ -328,57 +388,89 @@ export const getFoodByRestaurantId = (restaurantId) => async (dispatch) => {
       `${BASE_URL}/api/v1/admin/restaurants/${restaurantId}/foods`,
       getAuthHeaders()
     );
-    dispatch({ type: GET_FOOD_BY_RESTAURANT_SUCCESS, payload: response.data.data });
+    dispatch({
+      type: GET_FOOD_BY_RESTAURANT_SUCCESS,
+      payload: response.data.data,
+    });
   } catch (error) {
     dispatch({
       type: GET_FOOD_BY_RESTAURANT_FAILURE,
-      payload: error.response?.data?.message || "Failed to fetch foods by restaurant",
+      payload:
+        error.response?.data?.message || "Failed to fetch foods by restaurant",
     });
   }
 };
 // Get Food by Restaurant
 export const getFoodByRestaurant = () => async (dispatch) => {
-    dispatch({ type: GET_FOOD_BY_RESTAURANT_REQUEST });
-    try {
-      const response = await axios.get(
-        `${BASE_URL}/api/v1/admin/restaurants/foods`,
-        getAuthHeaders()
-      );
-      dispatch({ type: GET_FOOD_BY_RESTAURANT_SUCCESS, payload: response.data.data.items });
-    } catch (error) {
-      dispatch({
-        type: GET_FOOD_BY_RESTAURANT_FAILURE,
-        payload: error.response?.data?.message || "Failed to fetch foods by restaurant",
-      });
-    }
-  };
-// Update Availability
-export const updateAvailability = (foodId, availability) => async (dispatch) => {
-  dispatch({ type: UPDATE_AVAILABILITY_REQUEST });
+  dispatch({ type: GET_FOOD_BY_RESTAURANT_REQUEST });
   try {
-    const response = await axios.put(
-      `${BASE_URL}/api/v1/admin/restaurants/foods/${foodId}/availability`,
+    const response = await axios.get(
+      `${BASE_URL}/api/v1/admin/restaurants/foods`,
       getAuthHeaders()
     );
-    dispatch({ type: UPDATE_AVAILABILITY_SUCCESS, payload: response.data.data });
+    dispatch({
+      type: GET_FOOD_BY_RESTAURANT_SUCCESS,
+      payload: response.data.data.items,
+    });
   } catch (error) {
     dispatch({
-      type: UPDATE_AVAILABILITY_FAILURE,
-      payload: error.response?.data?.message || "Failed to update availability",
+      type: GET_FOOD_BY_RESTAURANT_FAILURE,
+      payload:
+        error.response?.data?.message || "Failed to fetch foods by restaurant",
     });
   }
 };
+// Update Availability
+export const updateAvailability =
+  (foodId, availability) => async (dispatch) => {
+    dispatch({ type: UPDATE_AVAILABILITY_REQUEST });
+    try {
+      const response = await axios.put(
+        `${BASE_URL}/api/v1/admin/restaurants/foods/${foodId}/availability`,
+        getAuthHeaders()
+      );
+      dispatch({
+        type: UPDATE_AVAILABILITY_SUCCESS,
+        payload: response.data.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: UPDATE_AVAILABILITY_FAILURE,
+        payload:
+          error.response?.data?.message || "Failed to update availability",
+      });
+    }
+  };
 
 // Get All Foods
-export const getAllFoods = () => async (dispatch) => {
+export const getAllFoods = (restaurantId, filters) => async (dispatch) => {
   dispatch({ type: GET_ALL_FOODS_REQUEST });
   try {
-    const response = await axios.get(`${BASE_URL}/api/v1/foods`, getAuthHeaders());
-    dispatch({ type: GET_ALL_FOODS_SUCCESS, payload: response.data.data });
+    // Lọc các tham số không rỗng hoặc không null
+    const filteredParams = Object.fromEntries(
+      Object.entries(filters).filter(
+        ([_, value]) => value !== null && value !== "" && value !== undefined
+      )
+    );
+
+    const response = await axios.get(
+      `${BASE_URL}/api/v1/restaurants/${restaurantId}/foods`,
+      {
+        params: filteredParams, // Chỉ gửi các tham số đã được lọc
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    dispatch({
+      type: GET_ALL_FOODS_SUCCESS,
+      payload: response.data.data.items,
+    });
   } catch (error) {
     dispatch({
       type: GET_ALL_FOODS_FAILURE,
-      payload: error.response?.data?.message || "Failed to fetch all foods",
+      payload:
+        error.response?.data?.message || "Failed to fetch foods by restaurant",
     });
   }
 };
@@ -419,22 +511,26 @@ export const createIngredient = (ingredientData) => async (dispatch) => {
 };
 
 // Update Ingredient
-export const updateIngredient = (ingredientId, ingredientData) => async (dispatch) => {
-  dispatch({ type: UPDATE_INGREDIENT_REQUEST });
-  try {
-    const response = await axios.put(
-      `${BASE_URL}/api/v1/admin/restaurants/ingredients/${ingredientId}`,
-      ingredientData,
-      getAuthHeaders()
-    );
-    dispatch({ type: UPDATE_INGREDIENT_SUCCESS, payload: response.data.data });
-  } catch (error) {
-    dispatch({
-      type: UPDATE_INGREDIENT_FAILURE,
-      payload: error.response?.data?.message || "Failed to update ingredient",
-    });
-  }
-};
+export const updateIngredient =
+  (ingredientId, ingredientData) => async (dispatch) => {
+    dispatch({ type: UPDATE_INGREDIENT_REQUEST });
+    try {
+      const response = await axios.put(
+        `${BASE_URL}/api/v1/admin/restaurants/ingredients/${ingredientId}`,
+        ingredientData,
+        getAuthHeaders()
+      );
+      dispatch({
+        type: UPDATE_INGREDIENT_SUCCESS,
+        payload: response.data.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: UPDATE_INGREDIENT_FAILURE,
+        payload: error.response?.data?.message || "Failed to update ingredient",
+      });
+    }
+  };
 
 // Get Ingredients by Restaurant
 export const getIngredientsByRestaurant = () => async (dispatch) => {
@@ -444,11 +540,16 @@ export const getIngredientsByRestaurant = () => async (dispatch) => {
       `${BASE_URL}/api/v1/admin/restaurants/ingredients`,
       getAuthHeaders()
     );
-    dispatch({ type: GET_INGREDIENTS_BY_RESTAURANT_SUCCESS, payload: response.data.data });
+    dispatch({
+      type: GET_INGREDIENTS_BY_RESTAURANT_SUCCESS,
+      payload: response.data.data,
+    });
   } catch (error) {
     dispatch({
       type: GET_INGREDIENTS_BY_RESTAURANT_FAILURE,
-      payload: error.response?.data?.message || "Failed to fetch ingredients by restaurant",
+      payload:
+        error.response?.data?.message ||
+        "Failed to fetch ingredients by restaurant",
     });
   }
 };
@@ -479,11 +580,15 @@ export const addFavouriteRestaurant = (restaurantId) => async (dispatch) => {
       {},
       getAuthHeaders()
     );
-    dispatch({ type: ADD_FAVOURITE_RESTAURANT_SUCCESS, payload: response.data.data });
+    dispatch({
+      type: ADD_FAVOURITE_RESTAURANT_SUCCESS,
+      payload: response.data.data,
+    });
   } catch (error) {
     dispatch({
       type: ADD_FAVOURITE_RESTAURANT_FAILURE,
-      payload: error.response?.data?.message || "Failed to add favourite restaurant",
+      payload:
+        error.response?.data?.message || "Failed to add favourite restaurant",
     });
   }
 };
@@ -496,11 +601,16 @@ export const getFavouriteRestaurants = () => async (dispatch) => {
       `${BASE_URL}/api/v1/restaurants/favourites`,
       getAuthHeaders()
     );
-    dispatch({ type: GET_FAVOURITE_RESTAURANTS_SUCCESS, payload: response.data.data });
+    dispatch({
+      type: GET_FAVOURITE_RESTAURANTS_SUCCESS,
+      payload: response.data.data,
+    });
   } catch (error) {
     dispatch({
       type: GET_FAVOURITE_RESTAURANTS_FAILURE,
-      payload: error.response?.data?.message || "Failed to fetch favourite restaurants",
+      payload:
+        error.response?.data?.message ||
+        "Failed to fetch favourite restaurants",
     });
   }
 };

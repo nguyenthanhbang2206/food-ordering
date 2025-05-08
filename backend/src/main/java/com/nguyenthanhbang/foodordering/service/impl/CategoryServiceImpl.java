@@ -60,4 +60,10 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findByIdAndRestaurantId(categoryId, restaurant.getId()).orElseThrow(() -> new EntityNotFoundException("Category not found"));
         return category;
     }
+
+    @Override
+    public List<Category> getCategoriesByRestaurantId(Long restaurantId) {
+        Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
+        return categoryRepository.findByRestaurantId(restaurant.getId());
+    }
 }

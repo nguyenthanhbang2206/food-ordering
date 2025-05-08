@@ -11,52 +11,78 @@ import React, { useState } from "react";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { CalendarToday } from "@mui/icons-material";
 import { MenuCard } from "./MenuCard";
-
-const menu = [1, 1, 1, 1, 1, 1];
-const categories = ["pizza", "burger", "sushi", "salad", "dessert", "drink"];
-const foodTypes = [
-  { label: "All", value: "all" },
-  { label: "Cuisine", value: "cuisine" },
-  { label: "Spicy", value: "spicy" },
-  { label: "Category", value: "category" },
-];
+import {
+  getAllFoods,
+  getRestaurantById,
+  getCategoriesByRestaurantId,
+} from "../State/Restaurant/Action";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 export const RestaurantDetail = () => {
-  const [foodType, setFoodType] = useState("all");
-  const [category, setCategory] = useState("");
+  const { foods, categories, loading, error, restaurant } = useSelector(
+    (state) => state.restaurant
+  );
+  const { id: restaurantId } = useParams(); // Lấy restaurantId từ URL
+  const dispatch = useDispatch();
+  const [filters, setFilters] = useState({
+    available: true,
+    cuisine: "",
+    vegetarian: "",
+    spicy: "",
+    category: "",
+    prices: [],
+    sort: "price,desc",
+  });
 
-  const handleFoodTypeFilter = (e) => {
-    setFoodType(e.target.value);
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   };
 
-  const handleCategoryFilter = (e) => {
-    setCategory(e.target.value);
-  };
+  useEffect(() => {
+    // Lấy thông tin chi tiết của restaurant
+    dispatch(getRestaurantById(restaurantId));
+  }, [restaurantId, dispatch]);
+  // Gọi API khi filters thay đổi
+  useEffect(() => {
+    // Lấy danh sách categories
+    dispatch(getCategoriesByRestaurantId(restaurantId));
+
+    console.log(foods);
+    // Lấy danh sách foods
+    dispatch(getAllFoods(restaurantId, filters));
+  }, [restaurantId, filters, dispatch]);
 
   return (
     <div className="flex flex-col items-center justify-center">
-      {/* Banner Section */}
       <section className="w-full max-w-screen-xl mx-auto px-4 mt-10">
-        <h3>Fast food</h3>
-        <div>
-          <Grid container spacing={2}>
-            <Grid item xs={12} lg={3}>
-              <img
-                className="w-[100vw] h-[50vh] object-cover"
-                src="https://media.istockphoto.com/id/1829241109/photo/enjoying-a-brunch-together.jpg?s=612x612&w=0&k=20&c=9awLLRMBLeiYsrXrkgzkoscVU_3RoVwl_HA-OT-srjQ="
-                alt="Restaurant Banner"
-              />
-            </Grid>
-          </Grid>
-        </div>
-        <div className="w-[50vw] z-10 text-center absolute bottom-10">
-          <p className="text-4xl font-bold text-white">Name</p>
-          <p className="z-10 font-bold text-white">Desc</p>
-          <div className="flex justify-center items-center space-x-2 text-white">
-            <LocationOnIcon />
-            <span>HN</span>
-            <CalendarToday sx={{ fontSize: 20, color: "white" }} />
-            <span>Time</span>
+        <div className="relative">
+          {/* Ảnh banner */}
+          <img
+            src={`http://localhost:8080/images/restaurants/${restaurant?.images[0]}`}
+            alt={restaurant?.name}
+            className="w-full h-64 object-cover rounded-lg shadow-md"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-white">
+            <h3 className="text-4xl font-bold text-center">
+              {restaurant?.name}
+            </h3>
+            <p className="text-lg text-center text-gray-300 mt-2">
+              {restaurant?.description}
+            </p>
+            <div className="flex justify-center items-center space-x-4 mt-4">
+              <LocationOnIcon />
+              <p>
+                {restaurant?.address.street}, {restaurant?.address.ward},{" "}
+                {restaurant?.address.district}, {restaurant?.address.city}
+              </p>
+              <CalendarToday sx={{ fontSize: 20, color: "white" }} />
+              <span>{restaurant?.openingHours}</span>
+            </div>
           </div>
         </div>
       </section>
@@ -64,51 +90,136 @@ export const RestaurantDetail = () => {
       <Divider sx={{ width: "100vw", marginTop: "2rem" }} />
 
       {/* Main Content Section */}
-      <section className="flex justify-center mt-10 w-full px-4 lg:px-20">
+      <section className="w-full max-w-screen-xl mx-auto px-4 mt-10">
         <Grid container spacing={4}>
-          {/* Filter Section (Left) */}
-          <Grid item xs={12} lg={3}>
-            <div className="space-y-8 sticky top-28">
+          {/* Filter Section */}
+          <Grid item xs={12} lg={4}>
+            <div className="flex flex-col space-y-6">
+              {/* Filter by Cuisine */}
               <div>
                 <Typography variant="h5" gutterBottom>
-                  Filter by food type
+                  Filter by Cuisine
                 </Typography>
                 <FormControl component="fieldset">
                   <RadioGroup
-                    onChange={handleFoodTypeFilter}
-                    name="foodType"
-                    value={foodType}
+                    onChange={(e) =>
+                      handleFilterChange("cuisine", e.target.value)
+                    }
+                    name="cuisine"
+                    value={filters.cuisine}
                   >
-                    {foodTypes.map((item) => (
-                      <FormControlLabel
-                        key={item.value}
-                        value={item.value}
-                        control={<Radio />}
-                        label={item.label}
-                      />
-                    ))}
+                    <FormControlLabel
+                      value=""
+                      control={<Radio />}
+                      label="All"
+                    />
+                    <FormControlLabel
+                      value="vietnamese"
+                      control={<Radio />}
+                      label="Vietnamese"
+                    />
+                    <FormControlLabel
+                      value="italian"
+                      control={<Radio />}
+                      label="Italian"
+                    />
+                    <FormControlLabel
+                      value="chinese"
+                      control={<Radio />}
+                      label="Chinese"
+                    />
                   </RadioGroup>
                 </FormControl>
               </div>
 
-              <Divider />
+              {/* Filter by Vegetarian */}
+              <div>
+                <Typography variant="h5" gutterBottom>
+                  Filter by Vegetarian
+                </Typography>
+                <FormControl component="fieldset">
+                  <RadioGroup
+                    onChange={(e) =>
+                      handleFilterChange("vegetarian", e.target.value)
+                    }
+                    name="vegetarian"
+                    value={filters.vegetarian}
+                  >
+                    <FormControlLabel
+                      value=""
+                      control={<Radio />}
+                      label="All"
+                    />
+                    <FormControlLabel
+                      value="true"
+                      control={<Radio />}
+                      label="Yes"
+                    />
+                    <FormControlLabel
+                      value="false"
+                      control={<Radio />}
+                      label="No"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </div>
 
+              {/* Filter by Spicy */}
+              <div>
+                <Typography variant="h5" gutterBottom>
+                  Filter by Spicy
+                </Typography>
+                <FormControl component="fieldset">
+                  <RadioGroup
+                    onChange={(e) =>
+                      handleFilterChange("spicy", e.target.value)
+                    }
+                    name="spicy"
+                    value={filters.spicy}
+                  >
+                    <FormControlLabel
+                      value=""
+                      control={<Radio />}
+                      label="All"
+                    />
+                    <FormControlLabel
+                      value="true"
+                      control={<Radio />}
+                      label="Yes"
+                    />
+                    <FormControlLabel
+                      value="false"
+                      control={<Radio />}
+                      label="No"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </div>
+
+              {/* Filter by Category */}
               <div>
                 <Typography variant="h5" gutterBottom>
                   Filter by Category
                 </Typography>
                 <FormControl component="fieldset">
                   <RadioGroup
-                    onChange={handleCategoryFilter}
+                    onChange={(e) =>
+                      handleFilterChange("category", e.target.value)
+                    }
                     name="category"
-                    value={category}
+                    value={filters.category}
                   >
-                    {categories.map((item) => (
+                    <FormControlLabel
+                      value=""
+                      control={<Radio />}
+                      label="All"
+                    />
+                    {categories.map((category) => (
                       <FormControlLabel
-                        key={item}
-                        value={item}
+                        key={category.id}
+                        value={category.name}
                         control={<Radio />}
-                        label={item}
+                        label={category.name}
                       />
                     ))}
                   </RadioGroup>
@@ -117,13 +228,15 @@ export const RestaurantDetail = () => {
             </div>
           </Grid>
 
-          <Grid item xs={12} lg={9}>
-  <div className="grid grid-cols-1 gap-6">
-    {menu.map((item, index) => (
-      <MenuCard key={index} />
-    ))}
-  </div>
-</Grid>
+          {/* Foods Section */}
+          <Grid item xs={12} lg={8}>
+            <div className="grid grid-cols-1 gap-6">
+              {loading && <p>Loading...</p>}
+              {error && <p className="text-red-500">Error: {error}</p>}
+              {!loading &&
+                foods.map((food) => <MenuCard key={food.id} food={food} />)}
+            </div>
+          </Grid>
         </Grid>
       </section>
     </div>

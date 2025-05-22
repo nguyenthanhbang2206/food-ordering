@@ -9,7 +9,7 @@ import lombok.Getter;
 public class UpdateUserRequest {
     @NotBlank(message = "FullName must not be blank")
     private String fullName;
-    @NotBlank(message = "Avatar must not be blank")
-    private String avatar;
+//    @NotBlank(message = "Avatar must not be blank")
+//    private String avatar;
     private Gender gender;
 }

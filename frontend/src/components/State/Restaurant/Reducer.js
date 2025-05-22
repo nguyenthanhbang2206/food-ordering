@@ -1,3 +1,4 @@
+import { isPresentInFavorites } from "../../../config/api";
 import {
   GET_MY_RESTAURANT_REQUEST,
   GET_MY_RESTAURANT_SUCCESS,
@@ -71,6 +72,12 @@ import {
   DELETE_INGREDIENT_REQUEST,
   DELETE_INGREDIENT_SUCCESS,
   DELETE_INGREDIENT_FAILURE,
+  UPDATE_ORDER_STATUS_FAILURE,
+  UPDATE_ORDER_STATUS_REQUEST,
+  UPDATE_ORDER_STATUS_SUCCESS,
+  GET_ORDER_BY_RESTAURANT_REQUEST,
+  GET_ORDER_BY_RESTAURANT_SUCCESS,
+  GET_ORDER_BY_RESTAURANT_FAILURE,
   GET_CATEGORY_OF_RESTAURANT_ID_REQUEST,
   GET_CATEGORY_OF_RESTAURANT_ID_SUCCESS,
   GET_CATEGORY_OF_RESTAURANT_ID_FAILURE,
@@ -84,6 +91,7 @@ const initialState = {
   restaurant: null,
   categories: [],
   categoriesByRestaurant: [],
+  restaurantOrders: [],
   favouriteRestaurants: [],
   foods: [],
   food: null,
@@ -95,6 +103,50 @@ const initialState = {
 
 export const restaurantReducer = (state = initialState, action) => {
   switch (action.type) {
+     case GET_ORDER_BY_RESTAURANT_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+    case GET_ORDER_BY_RESTAURANT_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        restaurantOrders: action.payload, // Lưu danh sách order của nhà hàng
+        error: null,
+      };
+    case GET_ORDER_BY_RESTAURANT_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+
+    // Cập nhật trạng thái đơn hàng
+    case UPDATE_ORDER_STATUS_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+      case UPDATE_ORDER_STATUS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        // Cập nhật order vừa thay đổi trong danh sách restaurantOrders
+        restaurantOrders: state.restaurantOrders.map((order) =>
+          order.id === action.payload.id ? action.payload : order
+        ),
+        error: null,
+        message: "Cập nhật trạng thái đơn hàng thành công!",
+      };
+    case UPDATE_ORDER_STATUS_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
     // Loading states
     case GET_MY_RESTAURANT_REQUEST:
     case CREATE_RESTAURANT_REQUEST:
@@ -228,8 +280,13 @@ export const restaurantReducer = (state = initialState, action) => {
     case ADD_FAVOURITE_RESTAURANT_SUCCESS:
       return {
         ...state,
-        favouriteRestaurants: [...state.favouriteRestaurants, action.payload],
-        loading: false,
+        favouriteRestaurants: isPresentInFavorites(
+          state.favouriteRestaurants,
+          action.payload
+        )
+          ? state.favouriteRestaurants.filter((item) => item.id !== action.payload.id)
+          : [action.payload, ...state.favouriteRestaurants], // thêm hoặc xóa món ăn khỏi danh sách yêu thích     
+           loading: false,
         error: null,
       };
     case GET_FAVOURITE_RESTAURANTS_SUCCESS:

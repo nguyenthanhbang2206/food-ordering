@@ -1,27 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CartItem } from "./CartItem";
 import { Button, Modal, TextField } from "@mui/material";
-import { Address } from "./Address";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllCartItems } from "../State/Cart/Action"; // Import action để lấy danh sách sản phẩm trong giỏ hàng
-import { updateQuantityOfCartItem } from "../State/Cart/Action"; // Import action để cập nhật số lượng sản phẩm trong giỏ hàng
+import {
+  deleteCart,
+  getAllCartItems,
+  placeOrder,
+  updateQuantityOfCartItem,
+} from "../State/Cart/Action";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 export const Cart = () => {
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const { cartItems, loading, error } = useSelector((state) => state.cart); // Lấy dữ liệu từ Redux
+  const { user } = useSelector((state) => state.auth); // Lấy thông tin người dùng từ Redux
+
+  const [addresses, setAddresses] = useState([]); // Danh sách địa chỉ giao hàng
+  const [selectedAddress, setSelectedAddress] = useState(null); // Địa chỉ được chọn
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(getAllCartItems()); // Gọi API để lấy danh sách sản phẩm trong giỏ hàng
+    fetchUserAddresses(); // Lấy danh sách địa chỉ giao hàng từ người dùng
   }, [dispatch]);
-  const [addresses, setAddresses] = useState([
-    { id: 1, address: "123 Main St, City A" },
-    { id: 2, address: "456 Elm St, City B" },
-  ]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const fetchUserAddresses = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/api/v1/users/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setAddresses(response.data.data.deliveryAddresses || []); // Lấy danh sách địa chỉ từ thuộc tính deliveryAddresses
+    } catch (error) {
+      console.error("Failed to fetch user addresses:", error);
+    }
+  };
 
   // Tăng số lượng sản phẩm
   const handleIncrease = (id, quantity) => {
@@ -36,10 +57,12 @@ export const Cart = () => {
   };
 
   // Tính tổng tiền
-  const totalPrice = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+  const totalPrice = Array.isArray(cartItems)
+    ? cartItems.reduce(
+        (total, item) => total + item.food.price * item.quantity,
+        0
+      )
+    : 0;
 
   const handleOpenAddressModal = () => {
     setIsModalOpen(true);
@@ -49,7 +72,27 @@ export const Cart = () => {
     setIsModalOpen(false);
   };
 
-  // Formik và Yup để validate form
+  const handlePlaceOrder = async () => {
+    if (!selectedAddress) {
+      alert("Please select a delivery address.");
+      return;
+    }
+
+    const restaurantId = cartItems[0]?.food?.restaurant.id; // Lấy restaurantId từ sản phẩm đầu tiên
+    if (!restaurantId) {
+      alert("Restaurant ID is missing.");
+      return;
+    }
+
+    console.log(selectedAddress + " " + restaurantId);
+
+    await dispatch(placeOrder(selectedAddress, restaurantId)); // Gọi action placeOrder
+    await dispatch(deleteCart());
+
+    navigate("/");
+  };
+
+  // Formik và Yup để validate form thêm địa chỉ mới
   const formik = useFormik({
     initialValues: {
       city: "",
@@ -63,13 +106,29 @@ export const Cart = () => {
       ward: Yup.string().required("Ward is required"),
       street: Yup.string().required("Street is required"),
     }),
-    onSubmit: (values) => {
-      const newAddress = `${values.street}, ${values.ward}, ${values.district}, ${values.city}`;
-      setAddresses((prev) => [
-        ...prev,
-        { id: prev.length + 1, address: newAddress },
-      ]);
-      handleCloseAddressModal();
+    onSubmit: async (values) => {
+      const newAddress = {
+        street: values.street,
+        ward: values.ward,
+        district: values.district,
+        city: values.city,
+      };
+      const restaurantId = cartItems[0]?.food?.restaurant.id; // Lấy restaurantId từ sản phẩm đầu tiên
+      if (!restaurantId) {
+        alert("Restaurant ID is missing.");
+        return;
+      }
+      console.log(newAddress + " " + restaurantId);
+
+      try {
+        await dispatch(placeOrder(newAddress, restaurantId)); // Gọi action placeOrder
+        // Gọi API deleteCart sau khi đặt hàng thành công
+        await dispatch(deleteCart());
+        navigate("/"); // Chuyển hướng về trang chủ
+      } catch (error) {
+        console.error("Failed to place order:", error);
+        alert("Failed to place order. Please try again.");
+      }
     },
   });
 
@@ -80,14 +139,18 @@ export const Cart = () => {
         <main className="lg:w-2/3 w-full bg-white shadow-md rounded-lg p-4">
           <h2 className="text-xl font-bold mb-4">Your Cart</h2>
           <div className="space-y-4">
-            {cartItems.map((item) => (
-              <CartItem
-                key={item.id}
-                item={item}
-                onIncrease={handleIncrease}
-                onDecrease={handleDecrease}
-              />
-            ))}
+            {Array.isArray(cartItems) && cartItems.length > 0 ? (
+              cartItems.map((item) => (
+                <CartItem
+                  key={item.id}
+                  item={item}
+                  onIncrease={() => handleIncrease(item.id, item.quantity)}
+                  onDecrease={() => handleDecrease(item.id, item.quantity)}
+                />
+              ))
+            ) : (
+              <p>Your cart is empty.</p>
+            )}
           </div>
           <div className="mt-6 text-left">
             <p className="text-lg font-bold">
@@ -97,12 +160,20 @@ export const Cart = () => {
           </div>
         </main>
 
-        {/* Address and History Section */}
+        {/* Address and Place Order Section */}
         <aside className="lg:w-1/3 w-full bg-white shadow-md rounded-lg p-4">
           <h2 className="text-xl font-bold mb-4">Delivery Address</h2>
           <div className="space-y-4">
             {addresses.map((address) => (
-              <Address key={address.id} address={address.address} />
+              <div
+                key={address.id}
+                className={`p-2 border rounded-lg cursor-pointer ${
+                  selectedAddress?.id === address.id ? "border-green-500" : ""
+                }`}
+                onClick={() => setSelectedAddress(address)}
+              >
+                <p>{`${address.street}, ${address.ward}, ${address.district}, ${address.city}`}</p>
+              </div>
             ))}
           </div>
           <Button
@@ -111,11 +182,12 @@ export const Cart = () => {
           >
             Add New Address
           </Button>
-
-          <h2 className="text-xl font-bold mt-6 mb-4">Order History</h2>
-          <div className="space-y-2">
-            <p className="text-gray-500">No previous orders found.</p>
-          </div>
+          <Button
+            onClick={handlePlaceOrder}
+            className="mt-4 w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600"
+          >
+            Place Order
+          </Button>
         </aside>
       </div>
 
@@ -168,7 +240,7 @@ export const Cart = () => {
               type="submit"
               className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600"
             >
-              Place Order
+              Place order
             </Button>
           </form>
         </div>

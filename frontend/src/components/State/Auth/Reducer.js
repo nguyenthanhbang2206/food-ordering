@@ -9,6 +9,9 @@ import {
   REGISTER_FAILURE,
   REGISTER_REQUEST,
   REGISTER_SUCCESS,
+  UPDATE_USER_PROFILE_REQUEST,
+  UPDATE_USER_PROFILE_SUCCESS,
+  UPDATE_USER_PROFILE_FAILURE,
 } from "./ActionType";
 
 const initialState = {
@@ -26,6 +29,7 @@ const authReducer = (state = initialState, action) => {
     case LOGIN_REQUEST:
     case REGISTER_REQUEST:
     case GET_USER_PROFILE_REQUEST:
+    case UPDATE_USER_PROFILE_REQUEST:
       return {
         ...state,
         isLoading: true,
@@ -47,8 +51,8 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
         isLoading: false,
-        token: action.payload, // Lưu token
-        user: JSON.parse(localStorage.getItem("user")), // Lấy thông tin người dùng từ localStorage
+        token: action.payload,
+        user: JSON.parse(localStorage.getItem("user")),
         success: "Đăng nhập thành công!",
       };
 
@@ -57,10 +61,18 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
         isLoading: false,
-        user: action.payload, // Lưu thông tin người dùng
+        user: action.payload,
         success: "Thông tin người dùng đã được tải thành công!",
       };
 
+    // Cập nhật thông tin người dùng thành công
+    case UPDATE_USER_PROFILE_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+        user: action.payload,
+        success: "Cập nhật thông tin thành công!",
+      };
 
     // Đăng xuất
     case LOGOUT:
@@ -72,10 +84,11 @@ const authReducer = (state = initialState, action) => {
     case REGISTER_FAILURE:
     case LOGIN_FAILURE:
     case GET_USER_PROFILE_FAILURE:
+    case UPDATE_USER_PROFILE_FAILURE:
       return {
         ...state,
         isLoading: false,
-        error: action.payload, // Lưu thông báo lỗi
+        error: action.payload,
         success: null,
       };
 

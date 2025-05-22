@@ -62,6 +62,12 @@ import {
   DELETE_FOOD_SUCCESS,
   UPDATE_FOOD_FAILURE,
   UPDATE_FOOD_SUCCESS,
+  UPDATE_ORDER_STATUS_FAILURE,
+  UPDATE_ORDER_STATUS_SUCCESS,
+  UPDATE_ORDER_STATUS_REQUEST,
+  GET_ORDER_BY_RESTAURANT_FAILURE,
+  GET_ORDER_BY_RESTAURANT_SUCCESS,
+  GET_ORDER_BY_RESTAURANT_REQUEST,
   UPDATE_FOOD_REQUEST,
   CREATE_FOOD_FAILURE,
   CREATE_FOOD_SUCCESS,
@@ -107,7 +113,8 @@ export const getRestaurantById = (restaurantId) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: GET_RESTAURANT_BY_ID_FAILURE,
-      payload: error.response?.data?.message || "Failed to fetch restaurant details",
+      payload:
+        error.response?.data?.message || "Failed to fetch restaurant details",
     });
   }
 };
@@ -426,7 +433,7 @@ export const updateAvailability =
     dispatch({ type: UPDATE_AVAILABILITY_REQUEST });
     try {
       const response = await axios.put(
-        `${BASE_URL}/api/v1/admin/restaurants/foods/${foodId}/availability`,
+        `${BASE_URL}/api/v1/admin/restaurants/foods/${foodId}/availability`,{},
         getAuthHeaders()
       );
       dispatch({
@@ -585,6 +592,7 @@ export const addFavouriteRestaurant = (restaurantId) => async (dispatch) => {
       payload: response.data.data,
     });
   } catch (error) {
+    console.log(error);
     dispatch({
       type: ADD_FAVOURITE_RESTAURANT_FAILURE,
       payload:
@@ -628,6 +636,48 @@ export const searchRestaurants = (query) => async (dispatch) => {
     dispatch({
       type: SEARCH_RESTAURANTS_FAILURE,
       payload: error.response?.data?.message || "Failed to search restaurants",
+    });
+  }
+};
+
+export const getOrderByRestaurant = () => async (dispatch) => {
+  dispatch({ type: GET_ORDER_BY_RESTAURANT_REQUEST });
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/v1/admin/restaurants/orders`,
+      getAuthHeaders()
+    );
+    // response.data.data là PaginationResponse
+    dispatch({
+      type: GET_ORDER_BY_RESTAURANT_SUCCESS,
+      payload: response.data.data.items,
+    });
+  } catch (error) {
+    dispatch({
+      type: GET_ORDER_BY_RESTAURANT_FAILURE,
+      payload:
+        error.response?.data?.message || "Failed to fetch orders by restaurant",
+    });
+  }
+};
+
+// Cập nhật trạng thái đơn hàng
+export const updateOrderStatus = (orderId, status) => async (dispatch) => {
+  dispatch({ type: UPDATE_ORDER_STATUS_REQUEST });
+  try {
+    const response = await axios.put(
+      `http://localhost:8080/api/v1/admin/restaurants/orders/${orderId}`,
+      { status }, // body: { status: "NEW_STATUS" }
+      getAuthHeaders()
+    );
+    dispatch({
+      type: UPDATE_ORDER_STATUS_SUCCESS,
+      payload: response.data.data, // Trả về order đã cập nhật
+    });
+  } catch (error) {
+    dispatch({
+      type: UPDATE_ORDER_STATUS_FAILURE,
+      payload: error.response?.data?.message || "Failed to update order status",
     });
   }
 };

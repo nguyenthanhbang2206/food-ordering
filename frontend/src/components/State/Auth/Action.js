@@ -13,6 +13,9 @@ import {
   GET_USER_PROFILE_FAILURE,
   ADD_TO_FAVORITE_SUCCESS,
   ADD_TO_FAVORITE_FAILURE,
+  UPDATE_USER_PROFILE_REQUEST,
+  UPDATE_USER_PROFILE_SUCCESS,
+  UPDATE_USER_PROFILE_FAILURE,
 } from "./ActionType";
 
 import { api } from "../../../config/api";
@@ -102,4 +105,27 @@ export const logout = () => (dispatch) => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
   dispatch({ type: LOGOUT });
+};
+export const updateUserProfile = (profileData) => async (dispatch) => {
+  dispatch({ type: UPDATE_USER_PROFILE_REQUEST });
+  try {
+    const token = localStorage.getItem("token");
+    const { data } = await api.put(
+      "/users/profile",
+      profileData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    // Lưu thông tin user mới vào localStorage
+    localStorage.setItem("user", JSON.stringify(data.data));
+    dispatch({ type: UPDATE_USER_PROFILE_SUCCESS, payload: data.data });
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || "Failed to update profile. Please try again.";
+    dispatch({ type: UPDATE_USER_PROFILE_FAILURE, payload: errorMessage });
+    console.error("Update Profile Error:", errorMessage);
+  }
 };

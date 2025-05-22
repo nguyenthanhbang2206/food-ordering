@@ -24,7 +24,6 @@ public class Order {
     private int totalItems;
     private long totalPrice;
     @ManyToOne
-    @JsonIgnore
     private User customer;
     @ManyToOne
     private Address deliveryAddress;

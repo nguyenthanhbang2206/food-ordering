@@ -20,6 +20,7 @@ import Chip from "@mui/material/Chip";
 import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
+import { updateAvailability } from "../State/Restaurant/Action";
 
 const modalStyle = {
   position: "absolute",
@@ -183,6 +184,10 @@ export const Food = () => {
   const handleViewFood = (food) => {
     setSelectedFood(food);
     setShowDetailModal(true);
+  };
+   const handleAvailabilityChange = (foodId, currentAvailability) => {
+    // Đảo ngược trạng thái hiện tại
+    dispatch(updateAvailability(foodId, !currentAvailability));
   };
 
   return (
@@ -415,6 +420,9 @@ export const Food = () => {
               <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
                 Category
               </th>
+               <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+                Availability
+              </th>
               <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
                 Actions
               </th>
@@ -439,6 +447,18 @@ export const Food = () => {
                 <td className="px-4 py-2 border-b text-sm text-gray-700">
                   {categories.find((cat) => cat.id === food.foodCategory.id)
                     ?.name || "N/A"}
+                </td>
+                <td className="px-4 py-2 border-b text-sm text-gray-700">
+                  <button
+                    className={`px-3 py-1 rounded text-white ${
+                      food.available ? "bg-green-500" : "bg-gray-400"
+                    }`}
+                    onClick={() =>
+                      handleAvailabilityChange(food.id, food.available)
+                    }
+                  >
+                    {food.available ? "Available" : "Unavailable"}
+                  </button>
                 </td>
                 <td className="px-4 py-2 border-b text-sm text-gray-700">
                   <button

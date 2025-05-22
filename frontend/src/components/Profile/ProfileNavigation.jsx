@@ -26,16 +26,6 @@ const menu = [
     path: "/myProfile/favorites",
   },
   {
-    title: "Address",
-    icon: <AddReactionIcon className="text-blue-500" />,
-    path: "/myProfile/address",
-  },
-  {
-    title: "Notifications",
-    icon: <NotificationsActiveIcon className="text-yellow-500" />,
-    path: "/myProfile/notifications",
-  },
-  {
     title: "Logout",
     icon: <LogoutIcon className="text-gray-500" />,
     path: "/logout",

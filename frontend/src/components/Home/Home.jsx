@@ -3,17 +3,28 @@ import "./Home.css";
 import { MultiCarousel } from "./MultiCarousel";
 import { RestaurantCard } from "../Restaurant/RestaurantCard";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllRestaurant } from "../State/Restaurant/Action";
+import {
+  addFavouriteRestaurant,
+  getAllRestaurant,
+  getFavouriteRestaurants,
+} from "../State/Restaurant/Action";
+import { isPresentInFavorites } from "../../config/api";
 
 export const Home = () => {
   const dispatch = useDispatch();
-  const { restaurants, loading, error } = useSelector(
+  const { restaurants, loading, error, favouriteRestaurants } = useSelector(
     (state) => state.restaurant
   );
+ 
 
   useEffect(() => {
-    dispatch(getAllRestaurant()); // Gọi API để lấy danh sách nhà hàng
+    dispatch(getAllRestaurant());
+    dispatch(getFavouriteRestaurants());
   }, [dispatch]);
+
+  const handleFavouriteToggle = (restaurantId) => {
+    dispatch(addFavouriteRestaurant(restaurantId)); // Toggle yêu thích
+  };
 
   return (
     <div>
@@ -50,7 +61,12 @@ export const Home = () => {
                 name={restaurant.name}
                 isOpen={restaurant.open}
                 image={restaurant.images[0]}
+                isFavorite={isPresentInFavorites(
+                  favouriteRestaurants,
+                  restaurant
+                )}
                 description={restaurant.description}
+                onFavouriteToggle={() => handleFavouriteToggle(restaurant.id)}
               />
             ))}
         </div>

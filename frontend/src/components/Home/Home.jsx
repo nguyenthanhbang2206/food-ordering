@@ -15,7 +15,6 @@ export const Home = () => {
   const { restaurants, loading, error, favouriteRestaurants } = useSelector(
     (state) => state.restaurant
   );
- 
 
   useEffect(() => {
     dispatch(getAllRestaurant());
@@ -27,47 +26,66 @@ export const Home = () => {
   };
 
   return (
-    <div>
-      <section className="banner relative flex flex-col items-center justify-center mt-10">
-        <div className="w-[50vw] z-10 text-center">
-          <p className="text-4xl font-bold text-white">
-            Welcome to Our Website
+    <div className="bg-gradient-to-b from-[#5A20CB] to-[#f3e8ff] min-h-screen">
+      {/* Banner */}
+      <section className="banner relative flex flex-col items-center justify-center h-[350px] md:h-[420px]">
+        <img
+          src="/banner-food.jpg"
+          alt="Banner"
+          className="absolute inset-0 w-full h-full object-cover rounded-b-3xl shadow-lg"
+          style={{ zIndex: 1, opacity: 0.85 }}
+        />
+        <div
+          className="absolute inset-0 bg-black bg-opacity-60 rounded-b-3xl"
+          style={{ zIndex: 2 }}
+        ></div>
+        <div className="relative z-10 text-center mt-10">
+          <p className="text-4xl md:text-5xl font-extrabold text-white drop-shadow-lg">
+            Welcome to <span className="text-yellow-300">Food Ordering</span>
           </p>
-          <p className="z-10 font-bold text-white">
-            Taste the convenience: Food, Fast, and Delivered
+          <p className="mt-4 text-lg md:text-2xl text-white font-medium">
+            Discover, order, and enjoy your favorite meals from the best
+            restaurants!
           </p>
         </div>
-        <div className="cover absolute top-0 left-0 right-0 bottom-0 bg-black opacity-50"></div>
       </section>
 
+      {/* Top Meals */}
       <section className="flex flex-col items-center justify-center">
         <p className="text-4xl font-bold text-center mt-10">Top Meals</p>
         <MultiCarousel />
       </section>
-
-      <section className="flex flex-col items-center justify-center mt-10">
-        <h1 className="text-4xl font-bold text-center">
+      {/* Favourites */}
+      <section className="flex flex-col items-center justify-center mt-16">
+        <h1 className="text-4xl font-bold text-center text-[#5A20CB] mb-2 drop-shadow">
           Order from our favourites
         </h1>
-        <div className="flex flex-wrap justify-around mt-10 items-center">
+        <p className="text-lg text-gray-600 mb-8 text-center">
+          Hand-picked restaurants loved by our community
+        </p>
+        <div className="flex flex-wrap gap-8 justify-center items-center">
           {loading && <p>Loading...</p>}
-          {error && <p className="text-red-500">Error: {error}</p>}
+          {error && <p className="text-red-500">{error}</p>}
           {!loading &&
             restaurants &&
             restaurants.map((restaurant) => (
-              <RestaurantCard
+              <div
                 key={restaurant.id}
-                id={restaurant.id}
-                name={restaurant.name}
-                isOpen={restaurant.open}
-                image={restaurant.images[0]}
-                isFavorite={isPresentInFavorites(
-                  favouriteRestaurants,
-                  restaurant
-                )}
-                description={restaurant.description}
-                onFavouriteToggle={() => handleFavouriteToggle(restaurant.id)}
-              />
+                className="transition-transform duration-200 hover:scale-105"
+              >
+                <RestaurantCard
+                  id={restaurant.id}
+                  name={restaurant.name}
+                  isOpen={restaurant.open}
+                  image={restaurant.images[0]}
+                  isFavorite={isPresentInFavorites(
+                    favouriteRestaurants,
+                    restaurant
+                  )}
+                  description={restaurant.description}
+                  onFavouriteToggle={() => handleFavouriteToggle(restaurant.id)}
+                />
+              </div>
             ))}
         </div>
       </section>

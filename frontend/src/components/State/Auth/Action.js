@@ -17,8 +17,9 @@ import {
   UPDATE_USER_PROFILE_SUCCESS,
   UPDATE_USER_PROFILE_FAILURE,
 } from "./ActionType";
+import api from "../../../config/api";
 
-import { api } from "../../../config/api";
+
 export const register =
   ({ userData, navigate }) =>
   async (dispatch) => {

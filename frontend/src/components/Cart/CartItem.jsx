@@ -1,4 +1,6 @@
-export const CartItem = ({ item, onIncrease, onDecrease }) => {
+import DeleteIcon from "@mui/icons-material/Delete";
+
+export const CartItem = ({ item, onIncrease, onDecrease, onDelete }) => {
   return (
     <div className="flex items-center justify-between border-b pb-4">
       <div className="flex items-center space-x-4">
@@ -23,6 +25,14 @@ export const CartItem = ({ item, onIncrease, onDecrease }) => {
               className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
             >
               +
+            </button>
+            {/* Nút xóa */}
+            <button
+              onClick={() => onDelete(item.id)}
+              className="ml-2 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 flex items-center"
+              title="Delete"
+            >
+              <DeleteIcon fontSize="small" />
             </button>
           </div>
         </div>

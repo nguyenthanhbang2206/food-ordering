@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Avatar, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { pink } from "@mui/material/colors";
@@ -9,16 +9,21 @@ import "./Navbar.css";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getCartByUserLogin } from "../State/Cart/Action";
+import { Button, InputBase, Paper } from "@mui/material";
+import { searchRestaurants } from "../State/Restaurant/Action";
 
 export const Navbar = () => {
   const { auth } = useSelector((store) => store);
-  const { cart } = useSelector((store) => store.cart); // Lấy thông tin giỏ hàng từ Redux
+  const { cart } = useSelector((store) => store.cart);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const [searchValue, setSearchValue] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
+
   useEffect(() => {
     if (auth.user) {
-      dispatch(getCartByUserLogin()); // Gọi API lấy thông tin giỏ hàng khi người dùng đã đăng nhập
+      dispatch(getCartByUserLogin());
     }
   }, [auth.user, dispatch]);
 
@@ -30,6 +35,20 @@ export const Navbar = () => {
     navigate("/cart");
   };
 
+  const handleAdminClick = () => {
+    navigate("/admin/restaurant/dashboard");
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchValue.trim()) {
+      dispatch(searchRestaurants(searchValue.trim()));
+      setShowSearch(false);
+      setSearchValue("");
+      navigate("/search");
+    }
+  };
+
   return (
     <div className="px-5 z-50 py-[.8rem] bg-[#5A20CB] lg:px-20 flex justify-between">
       {/* Logo */}
@@ -38,19 +57,61 @@ export const Navbar = () => {
           onClick={() => navigate("/")}
           className="text-white text-2xl logo font-semibold"
         >
-          Logo
+          Food ordering
         </li>
       </div>
 
       {/* Navbar Actions */}
       <div className="flex items-center space-x-2 lg:space-x-10">
-        {/* Search Icon */}
+        {/* Search Icon & Input */}
         <div>
-          <IconButton>
+          <IconButton onClick={() => setShowSearch((prev) => !prev)}>
             <SearchIcon sx={{ fontSize: 30, color: "white" }} />
           </IconButton>
+          {showSearch && (
+            <Paper
+              component="form"
+              onSubmit={handleSearch}
+              sx={{
+                p: "2px 4px",
+                display: "flex",
+                alignItems: "center",
+                position: "absolute",
+                top: "60px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                zIndex: 100,
+                width: 300,
+              }}
+              elevation={4}
+            >
+              <InputBase
+                sx={{ ml: 1, flex: 1 }}
+                placeholder="Search restaurants…"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                autoFocus
+              />
+              <IconButton type="submit" sx={{ p: "10px" }}>
+                <SearchIcon />
+              </IconButton>
+            </Paper>
+          )}
         </div>
 
+        {/* Nếu user là RESTAURANT_OWNER thì hiện nút Admin */}
+        {auth.user?.role === "RESTAURANT_OWNER" && (
+          <Button
+            variant="contained"
+            color="secondary"
+            size="small"
+            onClick={handleAdminClick}
+            className="!bg-yellow-500 hover:!bg-yellow-600 text-white font-semibold"
+            sx={{ minWidth: 0, px: 2, py: 1, borderRadius: 2 }}
+          >
+            Admin
+          </Button>
+        )}
         {/* User Avatar or Login Icon */}
         <div>
           {auth.user ? (
@@ -79,7 +140,7 @@ export const Navbar = () => {
           <IconButton>
             <Badge
               onClick={handleCartClick}
-              badgeContent={cart?.sum || 0} // Hiển thị số lượng cartItem từ thuộc tính sum
+              badgeContent={auth.user ? cart?.sum || 0 : 0} // Nếu chưa đăng nhập thì luôn là 0
               color="primary"
             >
               <ShoppingCartIcon sx={{ fontSize: 30, color: "white" }} />

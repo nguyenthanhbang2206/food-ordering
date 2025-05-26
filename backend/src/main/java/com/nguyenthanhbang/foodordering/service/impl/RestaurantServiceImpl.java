@@ -2,12 +2,11 @@ package com.nguyenthanhbang.foodordering.service.impl;
 
 import com.nguyenthanhbang.foodordering.dto.request.RestaurantRequest;
 import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
+import com.nguyenthanhbang.foodordering.dto.response.Statistics;
 import com.nguyenthanhbang.foodordering.model.Address;
 import com.nguyenthanhbang.foodordering.model.Restaurant;
 import com.nguyenthanhbang.foodordering.model.User;
-import com.nguyenthanhbang.foodordering.repository.AddressRepository;
-import com.nguyenthanhbang.foodordering.repository.RestaurantRepository;
-import com.nguyenthanhbang.foodordering.repository.UserRepository;
+import com.nguyenthanhbang.foodordering.repository.*;
 import com.nguyenthanhbang.foodordering.service.RestaurantService;
 import com.nguyenthanhbang.foodordering.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,9 +25,24 @@ public class RestaurantServiceImpl implements RestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
+    private final FoodRepository foodRepository;
+    private final OrderRepository orderRepository;
+
     @Override
     public List<Restaurant> searchRestaurants(String keyword) {
         return restaurantRepository.search(keyword);
+    }
+
+    @Override
+    public Statistics getRestaurantStatistics() {
+        Restaurant restaurant = this.getRestaurantOfUser();
+        long totalFoods = foodRepository.countByRestaurantId(restaurant.getId());
+        long totalOrders = orderRepository.countByRestaurantId(restaurant.getId());
+        Statistics statistics = Statistics.builder()
+                .totalFoods(totalFoods)
+                .totalOrders(totalOrders)
+                .build();
+        return statistics;
     }
 
 

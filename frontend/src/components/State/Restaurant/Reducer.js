@@ -75,6 +75,9 @@ import {
   UPDATE_ORDER_STATUS_FAILURE,
   UPDATE_ORDER_STATUS_REQUEST,
   UPDATE_ORDER_STATUS_SUCCESS,
+  GET_RESTAURANT_STATISTICS_REQUEST,
+  GET_RESTAURANT_STATISTICS_SUCCESS,
+  GET_RESTAURANT_STATISTICS_FAILURE,
   GET_ORDER_BY_RESTAURANT_REQUEST,
   GET_ORDER_BY_RESTAURANT_SUCCESS,
   GET_ORDER_BY_RESTAURANT_FAILURE,
@@ -87,6 +90,7 @@ import {
 
 const initialState = {
   restaurants: [],
+  statistics: null,
   userRestaurant: null,
   restaurant: null,
   categories: [],
@@ -99,11 +103,12 @@ const initialState = {
   loading: false,
   error: null,
   message: null,
+  searchResults: [], 
 };
 
 export const restaurantReducer = (state = initialState, action) => {
   switch (action.type) {
-     case GET_ORDER_BY_RESTAURANT_REQUEST:
+    case GET_ORDER_BY_RESTAURANT_REQUEST:
       return {
         ...state,
         loading: true,
@@ -113,7 +118,10 @@ export const restaurantReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        restaurantOrders: action.payload, // Lưu danh sách order của nhà hàng
+        restaurantOrders: Array.isArray(action.payload.items)
+          ? action.payload.items
+          : [],
+        pagination: action.payload.pagination,
         error: null,
       };
     case GET_ORDER_BY_RESTAURANT_FAILURE:
@@ -130,7 +138,7 @@ export const restaurantReducer = (state = initialState, action) => {
         loading: true,
         error: null,
       };
-      case UPDATE_ORDER_STATUS_SUCCESS:
+    case UPDATE_ORDER_STATUS_SUCCESS:
       return {
         ...state,
         loading: false,
@@ -284,9 +292,11 @@ export const restaurantReducer = (state = initialState, action) => {
           state.favouriteRestaurants,
           action.payload
         )
-          ? state.favouriteRestaurants.filter((item) => item.id !== action.payload.id)
-          : [action.payload, ...state.favouriteRestaurants], // thêm hoặc xóa món ăn khỏi danh sách yêu thích     
-           loading: false,
+          ? state.favouriteRestaurants.filter(
+              (item) => item.id !== action.payload.id
+            )
+          : [action.payload, ...state.favouriteRestaurants], // thêm hoặc xóa món ăn khỏi danh sách yêu thích
+        loading: false,
         error: null,
       };
     case GET_FAVOURITE_RESTAURANTS_SUCCESS:
@@ -299,7 +309,7 @@ export const restaurantReducer = (state = initialState, action) => {
     case SEARCH_RESTAURANTS_SUCCESS:
       return {
         ...state,
-        restaurants: action.payload,
+        searchResults: action.payload, // <-- Lưu kết quả tìm kiếm vào searchResults
         loading: false,
         error: null,
       };
@@ -329,14 +339,16 @@ export const restaurantReducer = (state = initialState, action) => {
     case GET_FOOD_BY_RESTAURANT_SUCCESS:
       return {
         ...state,
-        foods: Array.isArray(action.payload) ? action.payload : [],
+        foods: Array.isArray(action.payload.items) ? action.payload.items : [],
+        pagination: action.payload.pagination,
         loading: false,
         error: null,
       };
     case GET_ALL_FOODS_SUCCESS:
       return {
         ...state,
-        foods: action.payload,
+        foods: action.payload.items,
+        pagination: action.payload.pagination,
         loading: false,
         error: null,
       };
@@ -347,6 +359,17 @@ export const restaurantReducer = (state = initialState, action) => {
         loading: false,
         error: null,
       };
+    case GET_RESTAURANT_STATISTICS_REQUEST:
+      return { ...state, loading: true, error: null };
+    case GET_RESTAURANT_STATISTICS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        statistics: action.payload,
+        error: null,
+      };
+    case GET_RESTAURANT_STATISTICS_FAILURE:
+      return { ...state, loading: false, error: action.payload };
     case UPDATE_AVAILABILITY_SUCCESS:
       return {
         ...state,

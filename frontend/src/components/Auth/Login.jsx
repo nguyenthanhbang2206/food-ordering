@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { login } from "../State/Auth/Action";
+import { useEffect } from "react";
+
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 export const Login = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +21,21 @@ export const Login = () => {
       ...prev,
       [name]: value,
     }));
+  };
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const { error, success } = useSelector((state) => state.auth); // Lấy error và success từ Redux store
+
+  useEffect(() => {
+    if (error) {
+      setSnackbar({ open: true, message: error, severity: "error" });
+    }
+  }, [error]);
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   const handleSubmit = (e) => {
@@ -93,6 +112,20 @@ export const Login = () => {
           </p>
         </div>
       </div>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

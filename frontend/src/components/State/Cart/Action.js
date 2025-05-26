@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../../../config/api";
 import {
   GET_ALL_CART_ITEM_REQUEST,
   GET_ALL_CART_ITEM_SUCCESS,
@@ -29,28 +29,11 @@ import {
   GET_ORDER_BY_ID_FAILURE,
 } from "./ActionType";
 
-const BASE_URL = "http://localhost:8080";
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    throw new Error("Token not found");
-  }
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-};
-
 // Get all cart items
 export const getAllCartItems = () => async (dispatch) => {
   dispatch({ type: GET_ALL_CART_ITEM_REQUEST });
   try {
-    const response = await axios.get(
-      `${BASE_URL}/api/v1/cart/cartItems`,
-      getAuthHeaders()
-    );
+    const response = await api.get("/cart/cartItems");
     dispatch({ type: GET_ALL_CART_ITEM_SUCCESS, payload: response.data.data });
   } catch (error) {
     dispatch({
@@ -64,15 +47,15 @@ export const getAllCartItems = () => async (dispatch) => {
 export const addCartItemToCart = (foodId, quantity) => async (dispatch) => {
   dispatch({ type: ADD_CART_ITEM_TO_CART_REQUEST });
   try {
-    const response = await axios.post(
-      `${BASE_URL}/api/v1/cart/cartItems`,
-      { foodId, quantity },
-      getAuthHeaders()
-    );
+    const response = await api.post("/cart/cartItems", {
+      foodId,
+      quantity,
+    });
     dispatch({
       type: ADD_CART_ITEM_TO_CART_SUCCESS,
       payload: response.data.data,
     });
+    dispatch(getCartByUserLogin());
   } catch (error) {
     dispatch({
       type: ADD_CART_ITEM_TO_CART_FAILURE,
@@ -86,15 +69,14 @@ export const updateQuantityOfCartItem =
   (cartItemId, quantity) => async (dispatch) => {
     dispatch({ type: UPDATE_QUANTITY_OF_CART_ITEM_REQUEST });
     try {
-      const response = await axios.put(
-        `${BASE_URL}/api/v1/cart/cartItems/${cartItemId}`,
-        { quantity }, // Body chỉ chứa quantity
-        getAuthHeaders()
-      );
+      const response = await api.put(`/cart/cartItems/${cartItemId}`, {
+        quantity,
+      });
       dispatch({
         type: UPDATE_QUANTITY_OF_CART_ITEM_SUCCESS,
-        payload: response.data.data, // Payload là cartItem đã được cập nhật
+        payload: response.data.data,
       });
+      dispatch(getCartByUserLogin());
     } catch (error) {
       dispatch({
         type: UPDATE_QUANTITY_OF_CART_ITEM_FAILURE,
@@ -109,13 +91,10 @@ export const updateQuantityOfCartItem =
 export const getCartByUserLogin = () => async (dispatch) => {
   dispatch({ type: GET_CART_BY_USER_LOGIN_REQUEST });
   try {
-    const response = await axios.get(
-      `${BASE_URL}/api/v1/cart`,
-      getAuthHeaders()
-    );
+    const response = await api.get("/cart");
     dispatch({
       type: GET_CART_BY_USER_LOGIN_SUCCESS,
-      payload: response.data.data, // Payload chứa thông tin cart
+      payload: response.data.data,
     });
   } catch (error) {
     dispatch({
@@ -129,8 +108,9 @@ export const getCartByUserLogin = () => async (dispatch) => {
 export const deleteCartItem = (itemId) => async (dispatch) => {
   dispatch({ type: DELETE_CART_ITEM_REQUEST });
   try {
-    await axios.delete(`${BASE_URL}/api/v1/cart/${itemId}`, getAuthHeaders());
+    await api.delete(`/cart/cartItems/${itemId}`);
     dispatch({ type: DELETE_CART_ITEM_SUCCESS, payload: itemId });
+    dispatch(getCartByUserLogin());
   } catch (error) {
     dispatch({
       type: DELETE_CART_ITEM_FAILURE,
@@ -143,8 +123,9 @@ export const deleteCartItem = (itemId) => async (dispatch) => {
 export const deleteCart = () => async (dispatch) => {
   dispatch({ type: DELETE_CART_REQUEST });
   try {
-    await axios.delete(`${BASE_URL}/api/v1/cart`, getAuthHeaders());
+    await api.delete("/cart");
     dispatch({ type: DELETE_CART_SUCCESS });
+    dispatch(getCartByUserLogin());
   } catch (error) {
     dispatch({
       type: DELETE_CART_FAILURE,
@@ -154,45 +135,37 @@ export const deleteCart = () => async (dispatch) => {
 };
 
 // Place order
-// Place order
-export const placeOrder = (selectedAddress, restaurantId) => async (dispatch) => {
-  dispatch({ type: PLACE_ORDER_REQUEST });
-  try {
-    const response = await axios.post(
-      `${BASE_URL}/api/v1/orders`,
-      {
-        deliveryAddress: selectedAddress, // Địa chỉ giao hàng
-        restaurantId: restaurantId, // ID của nhà hàng
-      },
-      getAuthHeaders()
-    );
+export const placeOrder =
+  (selectedAddress, restaurantId) => async (dispatch) => {
+    dispatch({ type: PLACE_ORDER_REQUEST });
+    try {
+      const response = await api.post("/orders", {
+        deliveryAddress: selectedAddress,
+        restaurantId,
+      });
+      dispatch({
+        type: PLACE_ORDER_SUCCESS,
+        payload: response.data.data,
+      });
+      console.log("Order Response:", response.data);
+    } catch (error) {
+      dispatch({
+        type: PLACE_ORDER_FAILURE,
+        payload: error.response?.data?.message || "Failed to place order",
+      });
+      console.error("Failed to place order:", error);
+      alert("Failed to place order. Please try again.");
+    }
+  };
 
-    dispatch({
-      type: PLACE_ORDER_SUCCESS,
-      payload: response.data.data, // Lưu thông tin đơn hàng vào Redux
-    });
-
-    console.log("Order Response:", response.data);
-  } catch (error) {
-    dispatch({
-      type: PLACE_ORDER_FAILURE,
-      payload: error.response?.data?.message || "Failed to place order",
-    });
-
-    console.error("Failed to place order:", error);
-    alert("Failed to place order. Please try again.");
-  }
-};
+// Get orders by user
 export const getOrderByUserLogin = () => async (dispatch) => {
   dispatch({ type: GET_ORDER_BY_USER_LOGIN_REQUEST });
   try {
-    const response = await axios.get(
-      `${BASE_URL}/api/v1/orders`,
-      getAuthHeaders()
-    );
+    const response = await api.get("/orders");
     dispatch({
       type: GET_ORDER_BY_USER_LOGIN_SUCCESS,
-      payload: response.data.data.items, // Payload là danh sách đơn hàng của user
+      payload: response.data.data.items,
     });
   } catch (error) {
     dispatch({
@@ -201,16 +174,15 @@ export const getOrderByUserLogin = () => async (dispatch) => {
     });
   }
 };
+
+// Get order by ID
 export const getOrderById = (orderId) => async (dispatch) => {
   dispatch({ type: GET_ORDER_BY_ID_REQUEST });
   try {
-    const response = await axios.get(
-      `${BASE_URL}/api/v1/orders/${orderId}`,
-      getAuthHeaders()
-    );
+    const response = await api.get(`/orders/${orderId}`);
     dispatch({
       type: GET_ORDER_BY_ID_SUCCESS,
-      payload: response.data.data, // Payload là chi tiết đơn hàng
+      payload: response.data.data,
     });
   } catch (error) {
     dispatch({

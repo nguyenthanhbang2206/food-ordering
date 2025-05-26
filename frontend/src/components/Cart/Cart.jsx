@@ -9,6 +9,7 @@ import {
   getAllCartItems,
   placeOrder,
   updateQuantityOfCartItem,
+  deleteCartItem,
 } from "../State/Cart/Action";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -16,16 +17,16 @@ import { useNavigate } from "react-router-dom";
 export const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { cartItems, loading, error } = useSelector((state) => state.cart); // Lấy dữ liệu từ Redux
-  const { user } = useSelector((state) => state.auth); // Lấy thông tin người dùng từ Redux
+  const { cartItems, loading, error } = useSelector((state) => state.cart);
+  const { user } = useSelector((state) => state.auth);
 
-  const [addresses, setAddresses] = useState([]); // Danh sách địa chỉ giao hàng
-  const [selectedAddress, setSelectedAddress] = useState(null); // Địa chỉ được chọn
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    dispatch(getAllCartItems()); // Gọi API để lấy danh sách sản phẩm trong giỏ hàng
-    fetchUserAddresses(); // Lấy danh sách địa chỉ giao hàng từ người dùng
+    dispatch(getAllCartItems());
+    fetchUserAddresses();
   }, [dispatch]);
 
   const fetchUserAddresses = async () => {
@@ -38,25 +39,22 @@ export const Cart = () => {
           },
         }
       );
-      setAddresses(response.data.data.deliveryAddresses || []); // Lấy danh sách địa chỉ từ thuộc tính deliveryAddresses
+      setAddresses(response.data.data.deliveryAddresses || []);
     } catch (error) {
       console.error("Failed to fetch user addresses:", error);
     }
   };
 
-  // Tăng số lượng sản phẩm
   const handleIncrease = (id, quantity) => {
-    dispatch(updateQuantityOfCartItem(id, quantity + 1)); // Gọi API để tăng số lượng
+    dispatch(updateQuantityOfCartItem(id, quantity + 1));
   };
 
-  // Giảm số lượng sản phẩm
   const handleDecrease = (id, quantity) => {
     if (quantity > 1) {
-      dispatch(updateQuantityOfCartItem(id, quantity - 1)); // Gọi API để giảm số lượng
+      dispatch(updateQuantityOfCartItem(id, quantity - 1));
     }
   };
 
-  // Tính tổng tiền
   const totalPrice = Array.isArray(cartItems)
     ? cartItems.reduce(
         (total, item) => total + item.food.price * item.quantity,
@@ -78,21 +76,18 @@ export const Cart = () => {
       return;
     }
 
-    const restaurantId = cartItems[0]?.food?.restaurant.id; // Lấy restaurantId từ sản phẩm đầu tiên
+    const restaurantId = cartItems[0]?.food?.restaurant.id;
     if (!restaurantId) {
       alert("Restaurant ID is missing.");
       return;
     }
 
-    console.log(selectedAddress + " " + restaurantId);
-
-    await dispatch(placeOrder(selectedAddress, restaurantId)); // Gọi action placeOrder
+    await dispatch(placeOrder(selectedAddress, restaurantId));
     await dispatch(deleteCart());
 
     navigate("/");
   };
 
-  // Formik và Yup để validate form thêm địa chỉ mới
   const formik = useFormik({
     initialValues: {
       city: "",
@@ -113,18 +108,15 @@ export const Cart = () => {
         district: values.district,
         city: values.city,
       };
-      const restaurantId = cartItems[0]?.food?.restaurant.id; // Lấy restaurantId từ sản phẩm đầu tiên
+      const restaurantId = cartItems[0]?.food?.restaurant.id;
       if (!restaurantId) {
         alert("Restaurant ID is missing.");
         return;
       }
-      console.log(newAddress + " " + restaurantId);
-
       try {
-        await dispatch(placeOrder(newAddress, restaurantId)); // Gọi action placeOrder
-        // Gọi API deleteCart sau khi đặt hàng thành công
+        await dispatch(placeOrder(newAddress, restaurantId));
         await dispatch(deleteCart());
-        navigate("/"); // Chuyển hướng về trang chủ
+        navigate("/");
       } catch (error) {
         console.error("Failed to place order:", error);
         alert("Failed to place order. Please try again.");
@@ -132,28 +124,38 @@ export const Cart = () => {
     },
   });
 
+  const handleDelete = (id) => {
+    dispatch(deleteCartItem(id));
+  };
+
   return (
     <>
-      <div className="flex flex-col lg:flex-row gap-6 p-6">
+      <div className="flex flex-col lg:flex-row gap-8 p-6 bg-gradient-to-b from-[#E6E6FA] to-white min-h-screen">
         {/* Cart Items Section */}
-        <main className="lg:w-2/3 w-full bg-white shadow-md rounded-lg p-4">
-          <h2 className="text-xl font-bold mb-4">Your Cart</h2>
+        <main className="lg:w-2/3 w-full bg-white shadow-xl rounded-2xl p-6">
+          <h2 className="text-2xl font-bold mb-6 text-[#5A20CB] flex items-center gap-2">
+            <span role="img" aria-label="cart">
+              🛒
+            </span>{" "}
+            Your Cart
+          </h2>
           <div className="space-y-4">
             {Array.isArray(cartItems) && cartItems.length > 0 ? (
               cartItems.map((item) => (
                 <CartItem
                   key={item.id}
                   item={item}
+                  onDelete={handleDelete}
                   onIncrease={() => handleIncrease(item.id, item.quantity)}
                   onDecrease={() => handleDecrease(item.id, item.quantity)}
                 />
               ))
             ) : (
-              <p>Your cart is empty.</p>
+              <p className="text-gray-500 italic">Your cart is empty.</p>
             )}
           </div>
-          <div className="mt-6 text-left">
-            <p className="text-lg font-bold">
+          <div className="mt-8 text-left border-t pt-4">
+            <p className="text-xl font-bold">
               Total:{" "}
               <span className="text-green-600">${totalPrice.toFixed(2)}</span>
             </p>
@@ -161,30 +163,39 @@ export const Cart = () => {
         </main>
 
         {/* Address and Place Order Section */}
-        <aside className="lg:w-1/3 w-full bg-white shadow-md rounded-lg p-4">
-          <h2 className="text-xl font-bold mb-4">Delivery Address</h2>
+        <aside className="lg:w-1/3 w-full bg-white shadow-xl rounded-2xl p-6 flex flex-col">
+          <h2 className="text-2xl font-bold mb-6 text-[#5A20CB] flex items-center gap-2">
+            <span role="img" aria-label="address">
+              🏠
+            </span>{" "}
+            Delivery Address
+          </h2>
           <div className="space-y-4">
             {addresses.map((address) => (
               <div
                 key={address.id}
-                className={`p-2 border rounded-lg cursor-pointer ${
-                  selectedAddress?.id === address.id ? "border-green-500" : ""
-                }`}
+                className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                  selectedAddress?.id === address.id
+                    ? "border-[#5A20CB] bg-[#E6E6FA]"
+                    : "border-gray-200 bg-gray-50"
+                } hover:border-[#5A20CB]`}
                 onClick={() => setSelectedAddress(address)}
               >
-                <p>{`${address.street}, ${address.ward}, ${address.district}, ${address.city}`}</p>
+                <p className="font-medium text-gray-700">
+                  {`${address.street}, ${address.ward}, ${address.district}, ${address.city}`}
+                </p>
               </div>
             ))}
           </div>
           <Button
             onClick={handleOpenAddressModal}
-            className="mt-4 w-full bg-purple-500 text-white py-2 rounded-lg hover:bg-purple-500"
+            className="mt-6 w-full !bg-[#5A20CB] !text-white py-2 rounded-lg hover:!bg-[#431a9e] font-semibold shadow"
           >
-            Add New Address
+            + Add New Address
           </Button>
           <Button
             onClick={handlePlaceOrder}
-            className="mt-4 w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600"
+            className="mt-4 w-full !bg-green-500 !text-white py-2 rounded-lg hover:!bg-green-600 font-semibold shadow"
           >
             Place Order
           </Button>
@@ -193,9 +204,11 @@ export const Cart = () => {
 
       {/* Modal for Adding New Address */}
       <Modal open={isModalOpen} onClose={handleCloseAddressModal}>
-        <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md mx-auto mt-20">
-          <h2 className="text-xl font-bold mb-4">Add New Address</h2>
-          <form onSubmit={formik.handleSubmit} className="space-y-4">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl w-[90%] max-w-md mx-auto mt-20">
+          <h2 className="text-2xl font-bold mb-6 text-[#5A20CB] text-center">
+            Add New Address
+          </h2>
+          <form onSubmit={formik.handleSubmit} className="space-y-5">
             <TextField
               fullWidth
               label="City"
@@ -238,7 +251,7 @@ export const Cart = () => {
             />
             <Button
               type="submit"
-              className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600"
+              className="w-full !bg-green-500 !text-white py-2 rounded-lg hover:!bg-green-600 font-semibold shadow"
             >
               Place order
             </Button>

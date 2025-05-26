@@ -122,13 +122,13 @@ export const RestaurantDetails = () => {
         <div>
           <button
             onClick={() => setShowEdit(true)}
-            className="px-4 py-2 rounded-lg text-white bg-yellow-500 hover:bg-yellow-600 mr-2"
+            className="flex-col sm:flex-row gap-2 px-4 py-2 rounded-lg text-white bg-yellow-500 hover:bg-yellow-600 mr-2"
           >
             Edit
           </button>
           <button
             onClick={handleStatusToggle}
-            className={`px-4 py-2 rounded-lg text-white ${
+            className={`flex-col sm:flex-row gap-2 px-4 py-2 rounded-lg text-white ${
               userRestaurant.open
                 ? "bg-red-500 hover:bg-red-600"
                 : "bg-green-500 hover:bg-green-600"
@@ -245,17 +245,17 @@ export const RestaurantDetails = () => {
               required
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="flex-col sm:flex-row gap-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             >
               Save
             </button>
             <button
               type="button"
               onClick={() => setShowEdit(false)}
-              className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+              className="flex-col sm:flex-row gap-2 bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
             >
               Cancel
             </button>
@@ -264,7 +264,7 @@ export const RestaurantDetails = () => {
       ) : (
         <>
           {/* Card 1 */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="bg-white rounded-lg shadow-md p-2 sm:p-4 md:p-6 mb-8">
             <h2 className="text-2xl font-bold mb-6 text-gray-800">
               General Information
             </h2>
@@ -294,7 +294,7 @@ export const RestaurantDetails = () => {
           </div>
 
           {/* Row with Card 2 and Card 3 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
             {/* Card 2 */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-2xl font-bold mb-6 text-gray-800">Address</h2>

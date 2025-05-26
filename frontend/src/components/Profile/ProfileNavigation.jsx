@@ -39,15 +39,15 @@ export const ProfileNavigation = () => {
   const handleNavigation = (path) => {
     if (path === "/logout") {
       // Xử lý logic logout tại đây (nếu cần)
-     dispatch(logout());
-     navigate("/login") // Giả sử bạn có một action logoutUser để xử lý đăng xuất
+      dispatch(logout());
+      navigate("/login"); // Giả sử bạn có một action logoutUser để xử lý đăng xuất
     }
     navigate(path);
   };
 
   return (
     <div className="w-full max-w-sm bg-white shadow-md rounded-lg p-4">
-      <h2 className="text-xl font-bold mb-4">Profile Navigation</h2>
+      <h2 className="text-xl font-bold mb-4"></h2>
       <ul className="space-y-4">
         {menu.map((item, index) => (
           <li

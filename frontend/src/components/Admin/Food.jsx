@@ -47,11 +47,11 @@ const MenuProps = {
 
 export const Food = () => {
   const dispatch = useDispatch();
-  const { foods, loading, error, ingredients, categories } = useSelector(
-    (state) => state.restaurant
-  );
+  const { foods, loading, error, ingredients, categories, pagination } =
+    useSelector((state) => state.restaurant);
   const [selectedFood, setSelectedFood] = useState(null);
-
+  const [page, setPage] = useState(1);
+  const [size] = useState(5);
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -73,10 +73,10 @@ export const Food = () => {
 
   // Gọi API để lấy danh sách món ăn, nguyên liệu và danh mục
   useEffect(() => {
-    dispatch(getFoodByRestaurant());
+    dispatch(getFoodByRestaurant(page, size));
     dispatch(getIngredientsByRestaurant());
     dispatch(getCategoriesByRestaurant());
-  }, [dispatch]);
+  }, [dispatch, page, size]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -185,13 +185,18 @@ export const Food = () => {
     setSelectedFood(food);
     setShowDetailModal(true);
   };
-   const handleAvailabilityChange = (foodId, currentAvailability) => {
+  const handleAvailabilityChange = (foodId, currentAvailability) => {
     // Đảo ngược trạng thái hiện tại
     dispatch(updateAvailability(foodId, !currentAvailability));
   };
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && (!pagination || newPage <= pagination.totalPages)) {
+      setPage(newPage);
+    }
+  };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
+    <div className="p-2 sm:p-4 md:p-6 bg-white rounded-lg shadow-md">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Food</h1>
         <button
@@ -211,7 +216,7 @@ export const Food = () => {
             });
             setPreviewImages([]);
           }}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="w-full sm:w-auto flex-col sm:flex-row gap-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
           Add Food
         </button>
@@ -291,13 +296,13 @@ export const Food = () => {
             />
 
             <div className="col-span-2 overflow-x-auto">
-              <div className="flex gap-4">
+              <div className="flex-wrap flex gap-4">
                 {previewImages.map((image, index) => (
                   <div key={index} className="relative">
                     <img
                       src={image}
                       alt={`Preview ${index}`}
-                      className="w-24 h-24 object-cover rounded-lg shadow-md"
+                      className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg shadow-md"
                     />
                     <button
                       onClick={() => {
@@ -405,92 +410,115 @@ export const Food = () => {
 
       {/* Hiển thị danh sách món ăn */}
       {!loading && foods && foods.length > 0 ? (
-        <table className="min-w-full bg-white border border-gray-200">
-          <thead>
-            <tr>
-              <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
-                Image
-              </th>
-              <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
-                Name
-              </th>
-              <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
-                Price
-              </th>
-              <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
-                Category
-              </th>
-               <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
-                Availability
-              </th>
-              <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {foods.map((food) => (
-              <tr key={food.id} className="hover:bg-gray-100">
-                <td className="px-4 py-2 border-b text-sm text-gray-700">
-                  <img
-                    src={`http://localhost:8080/images/foods/${food.images[0]}`}
-                    alt={food.name}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                </td>
-                <td className="px-4 py-2 border-b text-sm text-gray-700">
-                  {food.name}
-                </td>
-                <td className="px-4 py-2 border-b text-sm text-gray-700">
-                  ${food.price.toFixed(2)}
-                </td>
-                <td className="px-4 py-2 border-b text-sm text-gray-700">
-                  {categories.find((cat) => cat.id === food.foodCategory.id)
-                    ?.name || "N/A"}
-                </td>
-                <td className="px-4 py-2 border-b text-sm text-gray-700">
-                  <button
-                    className={`px-3 py-1 rounded text-white ${
-                      food.available ? "bg-green-500" : "bg-gray-400"
-                    }`}
-                    onClick={() =>
-                      handleAvailabilityChange(food.id, food.available)
-                    }
-                  >
-                    {food.available ? "Available" : "Unavailable"}
-                  </button>
-                </td>
-                <td className="px-4 py-2 border-b text-sm text-gray-700">
-                  <button
-                    onClick={() => handleViewFood(food)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 mr-2"
-                  >
-                    View
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowForm(true);
-                      setFormData(food);
-                      navigate(`/admin/restaurant/food/edit`, {
-                        state: { food },
-                      });
-                      setPreviewImages(food.images || []);
-                    }}
-                    className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 mr-2"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteFood(food.id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-200">
+            <thead>
+              <tr>
+                <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+                  Image
+                </th>
+                <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+                  Name
+                </th>
+                <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+                  Price
+                </th>
+                <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+                  Category
+                </th>
+                <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+                  Availability
+                </th>
+                <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {foods.map((food) => (
+                <tr key={food.id} className="hover:bg-gray-100">
+                  <td className="px-4 py-2 border-b text-sm text-gray-700">
+                    <img
+                      src={`http://localhost:8080/images/foods/${food.images[0]}`}
+                      alt={food.name}
+                      className="w-16 h-16 object-cover rounded"
+                    />
+                  </td>
+                  <td className="px-4 py-2 border-b text-sm text-gray-700">
+                    {food.name}
+                  </td>
+                  <td className="px-4 py-2 border-b text-sm text-gray-700">
+                    ${food.price.toFixed(2)}
+                  </td>
+                  <td className="px-4 py-2 border-b text-sm text-gray-700">
+                    {categories.find((cat) => cat.id === food.foodCategory.id)
+                      ?.name || "N/A"}
+                  </td>
+                  <td className="px-4 py-2 border-b text-sm text-gray-700">
+                    <button
+                      className={`px-3 py-1 rounded text-white ${
+                        food.available ? "bg-green-500" : "bg-gray-400"
+                      }`}
+                      onClick={() =>
+                        handleAvailabilityChange(food.id, food.available)
+                      }
+                    >
+                      {food.available ? "Available" : "Unavailable"}
+                    </button>
+                  </td>
+                  <td className="flex-col sm:flex-row gap-1 px-4 py-2 border-b text-sm text-gray-700">
+                    <button
+                      onClick={() => handleViewFood(food)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 mr-2"
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowForm(true);
+                        setFormData(food);
+                        navigate(`/admin/restaurant/food/edit`, {
+                          state: { food },
+                        });
+                        setPreviewImages(food.images || []);
+                      }}
+                      className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 mr-2"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteFood(food.id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-2">
+            <div>
+              <button
+                className="px-3 py-1 rounded bg-gray-200 mr-2"
+                onClick={() => handlePageChange(page - 1)}
+                disabled={page === 0}
+              >
+                Previous
+              </button>
+              <button
+                className="px-3 py-1 rounded bg-gray-200"
+                onClick={() => handlePageChange(page + 1)}
+                disabled={pagination && page >= pagination.totalPages}
+              >
+                Next
+              </button>
+            </div>
+            <div>
+              Page {page} / {pagination ? pagination.totalPages : 1}
+            </div>
+          </div>
+        </div>
       ) : (
         <p>No food items available.</p>
       )}

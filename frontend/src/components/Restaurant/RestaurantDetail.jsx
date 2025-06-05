@@ -1,5 +1,3 @@
-
-
 import {
   Divider,
   FormControl,
@@ -19,9 +17,16 @@ import {
   getCategoriesByRestaurantId,
 } from "../State/Restaurant/Action";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-
+import SockJS from "sockjs-client";
+import { CompatClient, Stomp } from "@stomp/stompjs";
+import { useRef } from "react";
 export const RestaurantDetail = () => {
+  const [comments, setComments] = useState([]);
+  const [commentContent, setCommentContent] = useState("");
+  const [commentLoading, setCommentLoading] = useState(false);
+  const stompClientRef = useRef(null);
   const { foods, categories, loading, error, restaurant, pagination } =
     useSelector((state) => state.restaurant);
   const { id: restaurantId } = useParams();
@@ -37,6 +42,81 @@ export const RestaurantDetail = () => {
   });
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(5);
+  // Kết nối websocket khi vào trang
+  useEffect(() => {
+    if (!restaurantId) return;
+
+    // Kết nối websocket
+    const socket = new SockJS("http://localhost:8080/ws");
+    const stompClient = Stomp.over(socket);
+    stompClientRef.current = stompClient;
+
+    stompClient.connect({}, () => {
+      stompClient.subscribe(`/topic/restaurants/${restaurantId}`, (message) => {
+        console.log("Received comment update:", message);
+        const newComment = JSON.parse(message.body);
+        setComments((prev) => {
+          if (prev.some((c) => c.id === newComment.id)) return prev;
+          return [newComment, ...prev];
+        });
+      });
+    });
+
+    // Cleanup khi rời trang
+    return () => {
+      if (stompClient && stompClient.connected) {
+        stompClient.disconnect();
+      }
+    };
+  }, [restaurantId]);
+
+  useEffect(() => {
+    if (restaurantId) {
+      fetchComments();
+    }
+    // eslint-disable-next-line
+  }, [restaurantId]);
+
+  const fetchComments = async () => {
+    setCommentLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(
+        `http://localhost:8080/api/v1/restaurants/${restaurantId}/comments`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setComments(res.data.data || []);
+    } catch (err) {
+      console.error("Failed to fetch comments", err);
+      setComments([]);
+    }
+    setCommentLoading(false);
+  };
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!commentContent.trim()) return;
+    try {
+      await axios.post(
+        "http://localhost:8080/api/v1/comments",
+        {
+          restaurantId: restaurantId,
+          content: commentContent,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setCommentContent("");
+    } catch (err) {
+      alert("Failed to post comment");
+    }
+  };
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({
@@ -116,7 +196,11 @@ export const RestaurantDetail = () => {
             <div className="flex flex-col space-y-8 bg-white rounded-2xl shadow-lg p-6">
               {/* Filter by Cuisine */}
               <div>
-                <Typography variant="h5" gutterBottom className="font-bold text-[#5A20CB]">
+                <Typography
+                  variant="h5"
+                  gutterBottom
+                  className="font-bold text-[#5A20CB]"
+                >
                   Filter by Cuisine
                 </Typography>
                 <FormControl component="fieldset">
@@ -127,17 +211,37 @@ export const RestaurantDetail = () => {
                     name="cuisine"
                     value={filters.cuisine}
                   >
-                    <FormControlLabel value="" control={<Radio />} label="All" />
-                    <FormControlLabel value="vietnamese" control={<Radio />} label="Vietnamese" />
-                    <FormControlLabel value="italian" control={<Radio />} label="Italian" />
-                    <FormControlLabel value="chinese" control={<Radio />} label="Chinese" />
+                    <FormControlLabel
+                      value=""
+                      control={<Radio />}
+                      label="All"
+                    />
+                    <FormControlLabel
+                      value="vietnamese"
+                      control={<Radio />}
+                      label="Vietnamese"
+                    />
+                    <FormControlLabel
+                      value="italian"
+                      control={<Radio />}
+                      label="Italian"
+                    />
+                    <FormControlLabel
+                      value="chinese"
+                      control={<Radio />}
+                      label="Chinese"
+                    />
                   </RadioGroup>
                 </FormControl>
               </div>
 
               {/* Filter by Vegetarian */}
               <div>
-                <Typography variant="h5" gutterBottom className="font-bold text-[#5A20CB]">
+                <Typography
+                  variant="h5"
+                  gutterBottom
+                  className="font-bold text-[#5A20CB]"
+                >
                   Filter by Vegetarian
                 </Typography>
                 <FormControl component="fieldset">
@@ -148,16 +252,32 @@ export const RestaurantDetail = () => {
                     name="vegetarian"
                     value={filters.vegetarian}
                   >
-                    <FormControlLabel value="" control={<Radio />} label="All" />
-                    <FormControlLabel value="true" control={<Radio />} label="Yes" />
-                    <FormControlLabel value="false" control={<Radio />} label="No" />
+                    <FormControlLabel
+                      value=""
+                      control={<Radio />}
+                      label="All"
+                    />
+                    <FormControlLabel
+                      value="true"
+                      control={<Radio />}
+                      label="Yes"
+                    />
+                    <FormControlLabel
+                      value="false"
+                      control={<Radio />}
+                      label="No"
+                    />
                   </RadioGroup>
                 </FormControl>
               </div>
 
               {/* Filter by Spicy */}
               <div>
-                <Typography variant="h5" gutterBottom className="font-bold text-[#5A20CB]">
+                <Typography
+                  variant="h5"
+                  gutterBottom
+                  className="font-bold text-[#5A20CB]"
+                >
                   Filter by Spicy
                 </Typography>
                 <FormControl component="fieldset">
@@ -168,16 +288,32 @@ export const RestaurantDetail = () => {
                     name="spicy"
                     value={filters.spicy}
                   >
-                    <FormControlLabel value="" control={<Radio />} label="All" />
-                    <FormControlLabel value="true" control={<Radio />} label="Yes" />
-                    <FormControlLabel value="false" control={<Radio />} label="No" />
+                    <FormControlLabel
+                      value=""
+                      control={<Radio />}
+                      label="All"
+                    />
+                    <FormControlLabel
+                      value="true"
+                      control={<Radio />}
+                      label="Yes"
+                    />
+                    <FormControlLabel
+                      value="false"
+                      control={<Radio />}
+                      label="No"
+                    />
                   </RadioGroup>
                 </FormControl>
               </div>
 
               {/* Filter by Category */}
               <div>
-                <Typography variant="h5" gutterBottom className="font-bold text-[#5A20CB]">
+                <Typography
+                  variant="h5"
+                  gutterBottom
+                  className="font-bold text-[#5A20CB]"
+                >
                   Filter by Category
                 </Typography>
                 <FormControl component="fieldset">
@@ -188,7 +324,11 @@ export const RestaurantDetail = () => {
                     name="category"
                     value={filters.category}
                   >
-                    <FormControlLabel value="" control={<Radio />} label="All" />
+                    <FormControlLabel
+                      value=""
+                      control={<Radio />}
+                      label="All"
+                    />
                     {categories.map((category) => (
                       <FormControlLabel
                         key={category.id}
@@ -202,7 +342,11 @@ export const RestaurantDetail = () => {
               </div>
               {/* Sort by Price */}
               <div>
-                <Typography variant="h5" gutterBottom className="font-bold text-[#5A20CB]">
+                <Typography
+                  variant="h5"
+                  gutterBottom
+                  className="font-bold text-[#5A20CB]"
+                >
                   Sort by Price
                 </Typography>
                 <FormControl component="fieldset">
@@ -211,8 +355,16 @@ export const RestaurantDetail = () => {
                     name="sort"
                     value={filters.sort}
                   >
-                    <FormControlLabel value="price,desc" control={<Radio />} label="Giảm dần" />
-                    <FormControlLabel value="price,asc" control={<Radio />} label="Tăng dần" />
+                    <FormControlLabel
+                      value="price,desc"
+                      control={<Radio />}
+                      label="Giảm dần"
+                    />
+                    <FormControlLabel
+                      value="price,asc"
+                      control={<Radio />}
+                      label="Tăng dần"
+                    />
                   </RadioGroup>
                 </FormControl>
               </div>
@@ -249,6 +401,47 @@ export const RestaurantDetail = () => {
             </div>
           </Grid>
         </Grid>
+      </section>
+      <section className="w-full max-w-screen-md mx-auto px-4 mt-12 mb-16">
+        <h2 className="text-2xl font-bold text-[#5A20CB] mb-4">Comments</h2>
+        <form onSubmit={handleCommentSubmit} className="flex gap-3 mb-6">
+          <input
+            type="text"
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-[#5A20CB]"
+            placeholder="Write your comment..."
+            value={commentContent}
+            onChange={(e) => setCommentContent(e.target.value)}
+            maxLength={300}
+          />
+          <button
+            type="submit"
+            className="bg-[#5A20CB] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#431a9e] transition"
+            disabled={commentLoading || !commentContent.trim()}
+          >
+            Post
+          </button>
+        </form>
+        <div className="space-y-4">
+          {commentLoading ? (
+            <p>Loading comments...</p>
+          ) : comments.length === 0 ? (
+            <p className="text-gray-500 italic">No comments yet.</p>
+          ) : (
+            comments.map((c) => (
+              <div key={c.id} className="bg-white rounded-xl shadow p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-semibold text-[#5A20CB]">
+                    {c.user?.fullName || "User"}
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    {c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}
+                  </span>
+                </div>
+                <div className="text-gray-800">{c.content}</div>
+              </div>
+            ))
+          )}
+        </div>
       </section>
     </div>
   );

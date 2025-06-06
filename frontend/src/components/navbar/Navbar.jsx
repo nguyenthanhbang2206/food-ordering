@@ -57,7 +57,7 @@ export const Navbar = () => {
           onClick={() => navigate("/")}
           className="text-white text-2xl logo font-semibold"
         >
-          Food ordering
+          Nguyễn Thanh Bằng
         </li>
       </div>
 

@@ -22,11 +22,19 @@ import { useDispatch, useSelector } from "react-redux";
 import SockJS from "sockjs-client";
 import { CompatClient, Stomp } from "@stomp/stompjs";
 import { useRef } from "react";
+import StarIcon from "@mui/icons-material/Star";
+import Rating from "@mui/material/Rating";
 export const RestaurantDetail = () => {
   const [comments, setComments] = useState([]);
   const [commentContent, setCommentContent] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
   const stompClientRef = useRef(null);
+  const [reviewStats, setReviewStats] = useState({
+    count: 0,
+    averageRating: 0,
+  });
+  const [myReview, setMyReview] = useState(null);
+  const [ratingLoading, setRatingLoading] = useState(false);
   const { foods, categories, loading, error, restaurant, pagination } =
     useSelector((state) => state.restaurant);
   const { id: restaurantId } = useParams();
@@ -147,7 +155,49 @@ export const RestaurantDetail = () => {
     dispatch(getCategoriesByRestaurantId(restaurantId));
     dispatch(getAllFoods(restaurantId, filters, page, size));
   }, [restaurantId, filters, page, size, dispatch]);
+  useEffect(() => {
+    if (restaurantId) {
+      fetchMyReview();
+    }
+  }, [restaurantId]);
 
+  const fetchMyReview = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8080/api/v1/restaurants/${restaurantId}/my-review`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setMyReview(res.data.data);
+    } catch (err) {
+      setMyReview(null);
+    }
+  };
+  const handleRatingChange = async (event, newValue) => {
+    setRatingLoading(true);
+    try {
+      await axios.post(
+        `http://localhost:8080/api/v1/reviews`,
+        {
+          restaurantId: restaurantId,
+          rating: newValue,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setMyReview({ ...myReview, rating: newValue });
+      dispatch(getRestaurantById(restaurantId));
+    } catch (err) {
+      alert("Failed to submit rating");
+    }
+    setRatingLoading(false);
+  };
   return (
     <div className="flex flex-col items-center justify-center bg-gradient-to-b from-[#E6E6FA] to-white min-h-screen">
       {/* Banner */}
@@ -162,7 +212,6 @@ export const RestaurantDetail = () => {
             }
             alt={restaurant?.name}
             className="w-full max-h-[400px] object-cover"
-            style={{ filter: "brightness(0.85) blur(0px)" }}
           />
           <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-white px-4">
             <h3 className="text-4xl md:text-5xl font-extrabold text-center drop-shadow-lg">
@@ -184,6 +233,32 @@ export const RestaurantDetail = () => {
             </div>
           </div>
         </div>
+      </section>
+      <section className="w-full max-w-screen-md mx-auto px-4 mt-8 mb-8">
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Rating
+              name="restaurant-rating"
+              value={myReview?.rating || 0}
+              precision={1}
+              onChange={handleRatingChange}
+              disabled={ratingLoading}
+              icon={<StarIcon fontSize="inherit" />}
+              emptyIcon={<StarIcon fontSize="inherit" />}
+            />
+            <span className="text-[#5A20CB] font-semibold">
+              {restaurant?.averageRating?.toFixed(1) || 0}/5
+            </span>
+          </div>
+          <span className="text-gray-600">
+            ({restaurant?.reviewCount || 0} lượt đánh giá)
+          </span>
+        </div>
+        {myReview && (
+          <div className="text-sm text-gray-500 mt-1">
+            Đánh giá của bạn: <b>{myReview.rating} sao</b>
+          </div>
+        )}
       </section>
 
       <Divider sx={{ width: "100vw", marginTop: "2rem" }} />

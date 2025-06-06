@@ -69,6 +69,17 @@ export const Cart = () => {
   const handleCloseAddressModal = () => {
     setIsModalOpen(false);
   };
+  const groupCartItemsByRestaurant = (cartItems) => {
+    const groups = {};
+    cartItems.forEach((item) => {
+      const restaurantId = item.food.restaurant.id;
+      if (!groups[restaurantId]) {
+        groups[restaurantId] = [];
+      }
+      groups[restaurantId].push(item);
+    });
+    return groups;
+  };
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
@@ -76,16 +87,21 @@ export const Cart = () => {
       return;
     }
 
-    const restaurantId = cartItems[0]?.food?.restaurant.id;
-    if (!restaurantId) {
-      alert("Restaurant ID is missing.");
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
+      alert("Your cart is empty.");
       return;
     }
+    const grouped = groupCartItemsByRestaurant(cartItems);
 
-    await dispatch(placeOrder(selectedAddress, restaurantId));
-    await dispatch(deleteCart());
-
-    navigate("/");
+    try {
+      for (const restaurantId in grouped) {
+        await dispatch(placeOrder(selectedAddress, Number(restaurantId)));
+      }
+      await dispatch(deleteCart());
+      navigate("/");
+    } catch (error) {
+      alert("Failed to place order for some restaurants.");
+    }
   };
 
   const formik = useFormik({
@@ -108,13 +124,16 @@ export const Cart = () => {
         district: values.district,
         city: values.city,
       };
-      const restaurantId = cartItems[0]?.food?.restaurant.id;
-      if (!restaurantId) {
-        alert("Restaurant ID is missing.");
+      if (!Array.isArray(cartItems) || cartItems.length === 0) {
+        alert("Your cart is empty.");
         return;
       }
+      // Gom cartItems theo restaurantId
+      const grouped = groupCartItemsByRestaurant(cartItems);
       try {
-        await dispatch(placeOrder(newAddress, restaurantId));
+        for (const restaurantId in grouped) {
+          await dispatch(placeOrder(newAddress, Number(restaurantId)));
+        }
         await dispatch(deleteCart());
         navigate("/");
       } catch (error) {

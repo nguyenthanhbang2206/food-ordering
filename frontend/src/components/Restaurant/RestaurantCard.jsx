@@ -5,7 +5,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addFavouriteRestaurant } from "../State/Restaurant/Action";
-
+import StarIcon from "@mui/icons-material/Star";
 export const RestaurantCard = ({
   id,
   name,
@@ -14,6 +14,8 @@ export const RestaurantCard = ({
   isOpen,
   isFavorite,
   onFavouriteToggle,
+    averageRating,  
+  reviewCount,     
 }) => {
   const navigate = useNavigate();
   const handleCardClick = () => {
@@ -43,6 +45,18 @@ export const RestaurantCard = ({
       </div>
       <div className="mt-3 px-2">
         <p className="font-semibold text-lg">{name}</p>
+        {/* Hiển thị average rating và review count */}
+        <div className="flex items-center gap-1 mb-1">
+          <StarIcon fontSize="small" className="text-yellow-400" />
+          <span className="text-sm text-yellow-900 font-semibold">
+            {typeof averageRating === "number"
+              ? averageRating.toFixed(1)
+              : "0.0"}
+          </span>
+          <span className="text-xs text-gray-400 ml-2">
+            ({reviewCount || 0} đánh giá)
+          </span>
+        </div>
         <p className="text-sm text-gray-400">{description}</p>
       </div>
       <div className="flex justify-center">

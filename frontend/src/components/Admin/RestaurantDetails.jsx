@@ -282,7 +282,7 @@ export const RestaurantDetails = () => {
               <strong className="mr-2">Opening Hours:</strong>{" "}
               {userRestaurant.openingHours}
             </p>
-            <p className="text-lg text-gray-700 flex items-center">
+            <p className="text-lg text-gray-700 flex items-center mb-4">
               <CheckCircleIcon
                 className={`mr-2 ${
                   userRestaurant.open ? "text-green-500" : "text-red-500"
@@ -290,6 +290,16 @@ export const RestaurantDetails = () => {
               />
               <strong className="mr-2">Status:</strong>
               {userRestaurant.open ? "Open" : "Closed"}
+            </p>
+            <p className="text-lg text-gray-700 flex items-center">
+              <span className="mr-2 text-yellow-500">★</span>
+              <strong className="mr-2">Average Rating:</strong>
+              {typeof userRestaurant.averageRating === "number"
+                ? userRestaurant.averageRating.toFixed(1)
+                : "0.0"}
+              <span className="ml-4 text-gray-500">
+                ({userRestaurant.reviewCount || 0} đánh giá)
+              </span>
             </p>
           </div>
 

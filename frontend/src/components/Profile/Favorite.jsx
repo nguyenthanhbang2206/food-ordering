@@ -37,6 +37,8 @@ export const Favorite = () => {
               image={restaurant.images[0]}
               description={restaurant.description}
               isFavorite={true}
+              averageRating={restaurant.averageRating}
+              reviewCount={restaurant.reviewCount}
               onFavouriteToggle={() => handleFavouriteToggle(restaurant.id)}
             />
           ))}

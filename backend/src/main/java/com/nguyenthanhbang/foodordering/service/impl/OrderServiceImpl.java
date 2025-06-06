@@ -42,7 +42,8 @@ public class OrderServiceImpl implements OrderService {
         if(cart == null) {
             throw new EntityNotFoundException("Cart is empty");
         }
-        List<CartItem> cartItems = cart.getCartItems();
+        List<CartItem> cartItems = cart.getCartItems().stream()
+                .filter(item -> item.getFood().getRestaurant().getId().equals(request.getRestaurantId())).collect(Collectors.toList());
         List<Food> foods = cartItems.stream().map(cartItem -> cartItem.getFood()).collect(Collectors.toList());
         if(!fromOneRestaurant(foods, restaurant.getId())){
             throw new RuntimeException("All food must be from one restaurant");
@@ -51,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
         order.setCustomer(user);
         order.setRestaurant(restaurant);
         order.setStatus(OrderStatus.PENDING);
-        order.setTotalItems(cart.getSum());
+        order.setTotalItems(cartItems.size());
         Address address = request.getDeliveryAddress();
         Optional<Address> existingAddressOpt = user.getDeliveryAddresses().stream()
                 .filter(a -> a.getCity().equals(address.getCity()) &&
@@ -70,9 +71,10 @@ public class OrderServiceImpl implements OrderService {
             savedAddress = existingAddressOpt.get();
         }
         order.setDeliveryAddress(savedAddress);
-        order.setTotalPrice(cartService.calculateCartPrice(cart));
+        long price = cartItems.stream().map(item -> item.getTotalPrice()).reduce(0L, (p1, p2) -> p1 + p2);
+        order.setTotalPrice(price);
         order = orderRepository.save(order);
-        for(CartItem cartItem : cart.getCartItems()) {
+        for(CartItem cartItem : cartItems) {
             OrderItem orderItem = new OrderItem();
             orderItem.setTotalPrice(cartItem.getTotalPrice());
             orderItem.setQuantity(cartItem.getQuantity());

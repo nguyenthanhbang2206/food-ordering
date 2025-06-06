@@ -83,12 +83,32 @@ export const Home = () => {
                     restaurant
                   )}
                   description={restaurant.description}
+                  averageRating={restaurant.averageRating}
+                  reviewCount={restaurant.reviewCount}
                   onFavouriteToggle={() => handleFavouriteToggle(restaurant.id)}
                 />
               </div>
             ))}
         </div>
       </section>
+      <footer className="w-full bg-[#5A20CB] text-white mt-16 py-6">
+        <div className="max-w-screen-xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
+          <div className="text-lg font-bold mb-2 md:mb-0">Food Ordering</div>
+          <div className="flex gap-4 text-sm">
+            <a
+              href="https://github.com/nguyenthanhbang2206"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              GitHub
+            </a>
+            <span>
+              <span className="font-semibold">Nguyễn Thanh Bằng</span>
+            </span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

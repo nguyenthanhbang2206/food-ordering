@@ -1,4 +1,4 @@
-package com.nguyenthanhbang.foodordering.util;
+package com.nguyenthanhbang.foodordering.exception;
 
 import com.nguyenthanhbang.foodordering.dto.response.ErrorDetails;
 import jakarta.persistence.EntityExistsException;

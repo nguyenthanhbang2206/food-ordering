@@ -55,12 +55,12 @@ This project is built with modern technologies such as Java Spring Boot for the 
 
 ---
 ### 4.Project Structure
-foodordering/
-├── backend/                   
+foodordering/  
+├── backend/  
 │   ├── src/  
 │   │   ├── main/  
 │   │   │   ├── java/  
-│   │   │   │   └── com/nguyenthanhbang/foodordering/
+│   │   │   │   └── com/nguyenthanhbang/foodordering/  
 │   │   │   │       ├── config/  
 │   │   │   │       ├── controller/  
 │   │   │   │       ├── dto/  
@@ -143,6 +143,6 @@ npm start
 
 ### 7. Contact  
   
-> Project developed by **Nguyễn Thanh Bằng**
+> Project developed by **Nguyễn Thanh Bằng**  
 > 📧 Email: [nguyenthanhbang2206@gmail.com](mailto:nguyenthanhbang2206@gmail.com)  
 > 🗝 GitHub: [nguyenthanhbang2206](https://github.com/nguyenthanhbang2206)

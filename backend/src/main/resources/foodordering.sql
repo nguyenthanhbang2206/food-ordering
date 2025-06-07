@@ -32,7 +32,7 @@ CREATE TABLE `addresses` (
                              PRIMARY KEY (`id`),
                              KEY `FK1fa36y2oqhao3wgg2rw1pi459` (`user_id`),
                              CONSTRAINT `FK1fa36y2oqhao3wgg2rw1pi459` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +41,7 @@ CREATE TABLE `addresses` (
 
 LOCK TABLES `addresses` WRITE;
 /*!40000 ALTER TABLE `addresses` DISABLE KEYS */;
-INSERT INTO `addresses` VALUES (1,'TP.HCM','Quận 1','123 Lê Lợi','Phường Bến Thành',NULL),(2,'Hà Nội','Quận Thanh Xuân','48 Nguyễn Huy Tưởng','Phường hNhân Chính',NULL),(3,'Hà Nội','Phúc Thọ','Thượng Cốc','Thượng Cốc',3),(4,'Hà Nội','Hà Đông','123','Trần Phú',4);
+INSERT INTO `addresses` VALUES (1,'TP.HCM','Quận 1','123 Lê Lợi','Phường Bến Thành',NULL),(2,'Hà Nội','Quận Thanh Xuân','48 Nguyễn Huy Tưởng','Phường hNhân Chính',NULL),(3,'Hà Nội','Phúc Thọ','Thượng Cốc','Thượng Cốc',3),(4,'Hà Nội','Hà Đông','123','Trần Phú',4),(5,'Hà Nội','Phúc Thọ','tc','Thượng Cốc',1);
 /*!40000 ALTER TABLE `addresses` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -63,7 +63,7 @@ CREATE TABLE `cartitems` (
                              KEY `FKo7kh4q9ego57iw6fxdflddrw5` (`food_id`),
                              CONSTRAINT `FKo7kh4q9ego57iw6fxdflddrw5` FOREIGN KEY (`food_id`) REFERENCES `foods` (`id`),
                              CONSTRAINT `FKqbf3k33jhqlj6hhuqc4n65s3d` FOREIGN KEY (`cart_id`) REFERENCES `carts` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -90,7 +90,7 @@ CREATE TABLE `carts` (
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `UK_88sv4i13lo80s74ox7rsb5a2c` (`customer_id`),
                          CONSTRAINT `FK99i1rh5nm7r3f1b3wdcuq5h57` FOREIGN KEY (`customer_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -127,6 +127,37 @@ LOCK TABLES `categories` WRITE;
 /*!40000 ALTER TABLE `categories` DISABLE KEYS */;
 INSERT INTO `categories` VALUES (1,'Pizza',1),(2,'Nước uống',1),(3,'Tráng miệng',1),(4,'Món chính',2),(5,'Nước uống',2);
 /*!40000 ALTER TABLE `categories` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `comments`
+--
+
+DROP TABLE IF EXISTS `comments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `comments` (
+                            `id` bigint NOT NULL AUTO_INCREMENT,
+                            `content` mediumtext,
+                            `created_at` datetime(6) DEFAULT NULL,
+                            `restaurant_id` bigint DEFAULT NULL,
+                            `user_id` bigint DEFAULT NULL,
+                            PRIMARY KEY (`id`),
+                            KEY `FK1mg7fv8grmac9w8if19l3qxn` (`restaurant_id`),
+                            KEY `FK8omq0tc18jd43bu5tjh6jvraq` (`user_id`),
+                            CONSTRAINT `FK1mg7fv8grmac9w8if19l3qxn` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants` (`id`),
+                            CONSTRAINT `FK8omq0tc18jd43bu5tjh6jvraq` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `comments`
+--
+
+LOCK TABLES `comments` WRITE;
+/*!40000 ALTER TABLE `comments` DISABLE KEYS */;
+INSERT INTO `comments` VALUES (1,'Nhà hàng này ở đâu vậy','2025-06-05 09:37:45.404163',1,1),(2,'Nhà hàng này ở đâu vậy ạ?','2025-06-05 09:40:21.933490',1,1),(3,'Hello','2025-06-05 09:42:57.444880',1,1),(4,'A','2025-06-05 09:43:55.081716',1,1),(5,'Hi','2025-06-05 09:49:23.126048',1,1),(6,'hello','2025-06-05 09:53:32.137968',1,1),(7,'Hi','2025-06-05 09:54:08.297541',2,1),(8,'hello','2025-06-05 09:56:43.888772',2,1),(9,'Quán này đắt thế','2025-06-05 09:59:52.261245',2,1),(10,'test','2025-06-05 10:09:00.419551',2,3),(11,'test','2025-06-05 10:09:15.156027',2,1),(12,'?','2025-06-05 10:09:23.098552',2,1),(13,'???','2025-06-05 10:11:57.225306',1,2),(14,'?','2025-06-05 10:12:06.930999',1,4);
+/*!40000 ALTER TABLE `comments` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -285,7 +316,7 @@ CREATE TABLE `orderitems` (
                               KEY `FKm3mp87f5ygbbfuqfdhc09y9a` (`order_id`),
                               CONSTRAINT `FKm3mp87f5ygbbfuqfdhc09y9a` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
                               CONSTRAINT `FKqk0tfxvx3bofo7w9rshjng4h` FOREIGN KEY (`food_id`) REFERENCES `foods` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -294,7 +325,7 @@ CREATE TABLE `orderitems` (
 
 LOCK TABLES `orderitems` WRITE;
 /*!40000 ALTER TABLE `orderitems` DISABLE KEYS */;
-INSERT INTO `orderitems` VALUES (1,1,12,5,1),(2,1,12,1,1),(3,2,40,8,1),(4,1,12,5,2),(5,1,12,1,2),(6,1,30,10,3);
+INSERT INTO `orderitems` VALUES (1,1,12,5,1),(2,1,12,1,1),(3,2,40,8,1),(4,1,12,5,2),(5,1,12,1,2),(6,1,30,10,3),(15,1,12,1,9),(16,1,30,9,10);
 /*!40000 ALTER TABLE `orderitems` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -320,7 +351,7 @@ CREATE TABLE `orders` (
                           CONSTRAINT `FK2m9qulf12xm537bku3jnrrbup` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants` (`id`),
                           CONSTRAINT `FK3s2t83m5ddty3rgomn94d4ht6` FOREIGN KEY (`delivery_address_id`) REFERENCES `addresses` (`id`),
                           CONSTRAINT `FKsjfs85qf6vmcurlx43cnc16gy` FOREIGN KEY (`customer_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -329,7 +360,7 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES (1,'DELIVERED',3,64,3,3,1),(2,'PENDING',2,24,4,4,1),(3,'PENDING',1,30,4,4,2);
+INSERT INTO `orders` VALUES (1,'DELIVERED',3,64,3,3,1),(2,'PENDING',2,24,4,4,1),(3,'PENDING',1,30,4,4,2),(9,'PENDING',1,12,3,3,1),(10,'PENDING',1,30,3,3,2);
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -377,6 +408,8 @@ CREATE TABLE `restaurants` (
                                `opening_hours` varchar(255) DEFAULT NULL,
                                `address_id` bigint DEFAULT NULL,
                                `owner_id` bigint DEFAULT NULL,
+                               `average_rating` double NOT NULL,
+                               `review_count` int NOT NULL,
                                PRIMARY KEY (`id`),
                                UNIQUE KEY `UK_qmof4bn52u3t3qtpqlt80ypej` (`address_id`),
                                UNIQUE KEY `UK_82grnfy9su7xfo22jh2wopaen` (`owner_id`),
@@ -391,8 +424,38 @@ CREATE TABLE `restaurants` (
 
 LOCK TABLES `restaurants` WRITE;
 /*!40000 ALTER TABLE `restaurants` DISABLE KEYS */;
-INSERT INTO `restaurants` VALUES (1,'pizzahome@gmail.com','https://www.facebook.com/pizzahome','https://www.instagram.com/pizzahome.vn','0909123456','Nhà hàng chuyên phục vụ các món pizza Ý chất lượng cao.','Pizza Home	',_binary '','09:00 - 22:00',1,2),(2,'bunchahanoi@gmail.com','https://facebook.com/bunchahanoi','https://instagram.com/bunchahanoi','0987654321','Nhà hàng chuyên phục vụ món bún chả đậm chất Hà Nội, thơm ngon, chuẩn vị truyền thống.','Bún Chả Hà Nội',_binary '','08:00 - 21:00',2,1);
+INSERT INTO `restaurants` VALUES (1,'pizzahome@gmail.com','https://www.facebook.com/pizzahome','https://www.instagram.com/pizzahome.vn','0909123456','Nhà hàng chuyên phục vụ các món pizza Ý chất lượng cao.','Pizza Home	',_binary '','09:00 - 22:00',1,2,2,2),(2,'bunchahanoi@gmail.com','https://facebook.com/bunchahanoi','https://instagram.com/bunchahanoi','0987654321','Nhà hàng chuyên phục vụ món bún chả đậm chất Hà Nội, thơm ngon, chuẩn vị truyền thống.','Bún Chả Hà Nội',_binary '','08:00 - 21:00',2,1,3,1);
 /*!40000 ALTER TABLE `restaurants` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `reviews`
+--
+
+DROP TABLE IF EXISTS `reviews`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reviews` (
+                           `id` bigint NOT NULL AUTO_INCREMENT,
+                           `rating` int NOT NULL,
+                           `restaurant_id` bigint DEFAULT NULL,
+                           `user_id` bigint DEFAULT NULL,
+                           PRIMARY KEY (`id`),
+                           KEY `FKsu8ow2q842enesfbqphjrfi5g` (`restaurant_id`),
+                           KEY `FKcgy7qjc1r99dp117y9en6lxye` (`user_id`),
+                           CONSTRAINT `FKcgy7qjc1r99dp117y9en6lxye` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+                           CONSTRAINT `FKsu8ow2q842enesfbqphjrfi5g` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `reviews`
+--
+
+LOCK TABLES `reviews` WRITE;
+/*!40000 ALTER TABLE `reviews` DISABLE KEYS */;
+INSERT INTO `reviews` VALUES (9,3,1,3),(10,1,1,1),(11,3,2,1);
+/*!40000 ALTER TABLE `reviews` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -448,7 +511,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,NULL,'admin1@gmail.com','admin1',NULL,'$2a$10$/JE.gt/AX1MGCJndkkYgy.Y3/eMiUqNJsgkIhKZ0HO2Zxlnxaax3G','eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbjFAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfUkVTVEFVUkFOVF9PV05FUiIsImV4cCI6MTc0ODM1NTQ1NywiaWF0IjoxNzQ4MjY5MDU3fQ.RVWJRYAfN1q8LFV4qD00Nj3GlDviteyAraEbQhcjEkBsJTjul4zB9fOeEPm7zMDCnIO47AYpOujAn5ib2B84Zg','RESTAURANT_OWNER'),(2,NULL,'admin2@gmail.com','admin2',NULL,'$2a$10$lhmiDVh3fwwiq9pn3zSTn./whRgEKC5AaVIYAdMD5RlsntX88HiDy','eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbjJAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfUkVTVEFVUkFOVF9PV05FUiIsImV4cCI6MTc0ODM1NTQwNiwiaWF0IjoxNzQ4MjY5MDA2fQ.aF9l_pkqLVXIInQ9eXzaWrveqA2O9HEpclm6rXymKE55h3XUeQL0i7-OR5IQBRIIgZDJlpe4be7o0R1GjVn7mQ','RESTAURANT_OWNER'),(3,NULL,'customer1@gmail.com','customer1',NULL,'$2a$10$zjHC2WoPxTFuvWjfwgUztuS8zhuPHyWA563RpyuIYEocZTATX53/G','eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjdXN0b21lcjFAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfQ1VTVE9NRVIiLCJleHAiOjE3NDgzNTUyMjAsImlhdCI6MTc0ODI2ODgyMH0.22aTI9moyhvtzHxI-r3qp7fYsp2XSs5bfLNynSMEzU9kZd0pxEsYIF7Yy4pX6LKLbGQVO7bMBiO7aZzEnLojcw','CUSTOMER'),(4,NULL,'customer2@gmail.com','customer2',NULL,'$2a$10$zp06tHrsEXf0QQL.Nj5UjuUJ3UNDqzsr8iTaykbik6JMSxHwyOKnq','eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjdXN0b21lcjJAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfQ1VTVE9NRVIiLCJleHAiOjE3NDgzNTUzMzksImlhdCI6MTc0ODI2ODkzOX0.HqcLYdEXg3O3GnoD3tJmT5FIvoX0D072CruMvRBMw2yxK8FlvWYQCHFhE2pysd8xxEZuM9RTtWWfTKlQrj43Dg','CUSTOMER');
+INSERT INTO `users` VALUES (1,NULL,'admin1@gmail.com','admin1',NULL,'$2a$10$/JE.gt/AX1MGCJndkkYgy.Y3/eMiUqNJsgkIhKZ0HO2Zxlnxaax3G','eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbjFAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfUkVTVEFVUkFOVF9PV05FUiIsImV4cCI6MTc0OTI5MTE2NiwiaWF0IjoxNzQ5MjA0NzY2fQ.Jj9v_ofUIXG3Rt21Xjg4aGAhPfdSHLg4b_3DoVyx1PdSoQkfBlbL5KwMxT-ZpfjxkErRf_HjozSgathwSFKeQg','RESTAURANT_OWNER'),(2,NULL,'admin2@gmail.com','admin2',NULL,'$2a$10$lhmiDVh3fwwiq9pn3zSTn./whRgEKC5AaVIYAdMD5RlsntX88HiDy','eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbjJAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfUkVTVEFVUkFOVF9PV05FUiIsImV4cCI6MTc0OTI5MDIzNywiaWF0IjoxNzQ5MjAzODM3fQ.roxu-qavjWr7Boj1FFF_TbJ5BNeS58awC4xeOnOLyzyXwNM47_LUmTdfS0HwF0YQ8qy2m3m9qLGuiGYSHO6JCg','RESTAURANT_OWNER'),(3,NULL,'customer1@gmail.com','customer1',NULL,'$2a$10$zjHC2WoPxTFuvWjfwgUztuS8zhuPHyWA563RpyuIYEocZTATX53/G','eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjdXN0b21lcjFAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfQ1VTVE9NRVIiLCJleHAiOjE3NDkyODIzMDAsImlhdCI6MTc0OTE5NTkwMH0.gIvyBDW3rJnuoSJmwGfp8BVJSdajqvW96mce6ElN5OX6isejfSArws1vgV-wnR2aQ398YnQRFpEFblBxEBh1_w','CUSTOMER'),(4,NULL,'customer2@gmail.com','customer2',NULL,'$2a$10$zp06tHrsEXf0QQL.Nj5UjuUJ3UNDqzsr8iTaykbik6JMSxHwyOKnq','eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjdXN0b21lcjJAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfQ1VTVE9NRVIiLCJleHAiOjE3NDkxOTk3MzcsImlhdCI6MTc0OTExMzMzN30.wUYnv35E-auSsIuXV0PKRs1RkpJj0pOAdUFeDhNNlOC5268THljTkKzSZxcV8jXpfMxpAZhGgKqxa7YkM-xGXA','CUSTOMER');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -461,4 +524,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-26 21:32:57
+-- Dump completed on 2025-06-07 17:00:23

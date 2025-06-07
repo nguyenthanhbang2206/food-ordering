@@ -57,24 +57,24 @@ This project is built with modern technologies such as Java Spring Boot for the 
 ### 4.Project Structure
 foodordering/
 ├── backend/                   
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/
+│   ├── src/  
+│   │   ├── main/  
+│   │   │   ├── java/  
 │   │   │   │   └── com/nguyenthanhbang/foodordering/
-│   │   │   │       ├── config/       
-│   │   │   │       ├── controller/       
-│   │   │   │       ├── dto/         
-│   │   │   │       ├── enums/      
-│   │   │   │       ├── exception/           
-│   │   │   │       ├── model/ 
-│   │   │   │       ├── repository/      
-│   │   │   │       ├── service/ 
-│   │   │   │       ├── util/         
-│   │   │   │       └── validator/       
+│   │   │   │       ├── config/  
+│   │   │   │       ├── controller/  
+│   │   │   │       ├── dto/  
+│   │   │   │       ├── enums/  
+│   │   │   │       ├── exception/  
+│   │   │   │       ├── model/  
+│   │   │   │       ├── repository/  
+│   │   │   │       ├── service/  
+│   │   │   │       ├── util/  
+│   │   │   │       └── validator/  
 
-### 5. 🚀 Project Setup Guide
+### 5. 🚀 Project Setup Guide  
 
-#### 5.1. Run Backend (Spring Boot)
+#### 5.1. Run Backend (Spring Boot)  
 
 1. Install JDK 17 and Maven
 2. Configure the database in the `application.properties` file:
@@ -93,7 +93,7 @@ spring.datasource.password=your_password
 ./mvnw spring-boot:run
 ```
 
-#### 5.2. Run Frontend (React)
+#### 5.2. Run Frontend (React)  
 
 1. Navigate to the frontend directory:
 
@@ -115,34 +115,34 @@ npm start
 
 ---
 
-### 6. 📸 Demo
-
-#### 🔐 Login Page , Register Page
-![Login](images_demo/login.png) 
-![Register](images_demo/register.png)
+### 6. 📸 Demo  
+  
+#### 🔐 Login Page , Register Page  
+![Login](images_demo/login.png)  
+![Register](images_demo/register.png)  
 
 #### 🏠 Homepage – Restaurant List  
-![Homepage](images_demo/homepage1.png)
-![Restaurant List](images_demo/homepage2.png)
+![Homepage](images_demo/homepage1.png)  
+![Restaurant List](images_demo/homepage2.png)  
 
 #### 🛒 Cart  
-![Cart](images_demo/cart.png)
+![Cart](images_demo/cart.png)  
 
 #### 🍽️ Restaurant Detail  
-![Restaurant Detail](images_demo/restaurantDetails.png)
-
+![Restaurant Detail](images_demo/restaurantDetails.png)  
+  
 #### 👤 Profile  
 ![Profile](images_demo/profile.png)
-
+  
 #### 🧑‍🍳 Admin Dashboard – Manage Restaurants  
-![Admin Dashboard](images_demo/admin.png)
-
+![Admin Dashboard](images_demo/admin.png)  
+  
 #### 🌟 Review and Rating  
-![Review](images_demo/review.png)
-![Comment](images_demo/comment.png)
+![Review](images_demo/review.png)  
+![Comment](images_demo/comment.png)  
 
-### 7. Contact
-
+### 7. Contact  
+  
 > Project developed by **Nguyễn Thanh Bằng**
-> 📧 Email: [nguyenthanhbang2206@gmail.com](mailto:nguyenthanhbang2206@gmail.com)
+> 📧 Email: [nguyenthanhbang2206@gmail.com](mailto:nguyenthanhbang2206@gmail.com)  
 > 🗝 GitHub: [nguyenthanhbang2206](https://github.com/nguyenthanhbang2206)

@@ -115,6 +115,18 @@ npm start
 ```
 
 ---
+#### 5.3. Account Test   
+👤 Tài khoản người dùng (User):
+- 📧 Email: `customer1@gmail.com`  
+- 🔑 Mật khẩu: `Abcd1234!`  
+- 📧 Email: `customer2@gmail.com`  
+- 🔑 Mật khẩu: `Abcd1234!`  
+  
+🧑‍🍳 Tài khoản chủ nhà hàng (Restaurant Owner):
+- 📧 Email: `admin1@gmail.com`  
+- 🔑 Mật khẩu: `Abcd1234`  
+- 📧 Email: `admin2@gmail.com`  
+- 🔑 Mật khẩu: `Abcd1234`  
 
 ### 6. 📸 Demo  
   

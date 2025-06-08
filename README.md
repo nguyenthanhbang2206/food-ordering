@@ -39,6 +39,7 @@ This project is built with modern technologies such as Java Spring Boot for the 
 * **Spring Boot 3.2.2**
 * Spring Web, Spring Security, Spring Data JPA
 * Spring Validation, Spring WebSocket
+* JWT (JSON Web Token) - for authentication & authorization
 * **MySQL** as the database
 * **Lombok** for reducing boilerplate code
 

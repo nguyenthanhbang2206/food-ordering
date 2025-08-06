@@ -38,4 +38,24 @@ public class FoodController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+    @GetMapping("/foods/popular")
+    public ResponseEntity<ApiResponse<List<Food>>> getPopularFood() {
+        List<Food> foods = foodService.getPopularFoods();
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Get popular foods successfully")
+                .data(foods)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+    @GetMapping("/foods/latest")
+    public ResponseEntity<ApiResponse<List<Food>>> getLatestFood() {
+        List<Food> foods = foodService.getLatestFoods();
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Get latest foods successfully")
+                .data(foods)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
 }

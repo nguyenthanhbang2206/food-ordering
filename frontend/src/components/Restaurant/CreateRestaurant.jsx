@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { createRestaurant, getMyRestaurant } from "../State/Restaurant/Action";
+import { uploadToCloudinary } from "../../utils/uploadToCloudinary";
 
 export const CreateRestaurant = () => {
   const [formData, setFormData] = useState({
@@ -53,59 +54,38 @@ export const CreateRestaurant = () => {
       }));
     }
   };
-
   const uploadImages = async () => {
     if (imageFiles.length === 0) {
       alert("Please select images to upload.");
       return [];
     }
-
-    const form = new FormData();
-    imageFiles.forEach((file) => {
-      form.append("files", file);
-    });
-    form.append("folder", "restaurants");
-
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/v1/files",
-        form,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      return response.data.data;
+      const urls = [];
+      for (const file of imageFiles) {
+        const url = await uploadToCloudinary(file, "image");
+        if (url) urls.push(url);
+      }
+      return urls;
     } catch (error) {
-      alert(
-        `Failed to upload images: ${
-          error.response?.data?.message || error.message
-        }`
-      );
+      alert("Failed to upload images to Cloudinary.");
       return [];
     }
   };
+
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     setImageFiles((prev) => [...prev, ...files]);
-
     const previewUrls = files.map((file) => URL.createObjectURL(file));
     setPreviewImages((prev) => [...prev, ...previewUrls]);
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const uploadedImages = await uploadImages();
     if (uploadedImages.length === 0) return;
-
     const restaurantData = {
       ...formData,
       images: uploadedImages,
     };
-
     try {
       await dispatch(createRestaurant(restaurantData));
       setSnackbar({
@@ -308,7 +288,6 @@ export const CreateRestaurant = () => {
                   />
                   <button
                     onClick={() => {
-                      // Xóa ảnh khỏi danh sách previewImages và imageFiles
                       setPreviewImages((prev) =>
                         prev.filter((_, i) => i !== index)
                       );
@@ -335,16 +314,6 @@ export const CreateRestaurant = () => {
               onChange={handleImageUpload}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm"
             />
-            <div className="flex flex-wrap gap-4 mt-4">
-              {formData.images.map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`Preview ${index}`}
-                  className="w-24 h-24 object-cover rounded-lg shadow-md"
-                />
-              ))}
-            </div>
           </div>
 
           {/* Submit Button */}

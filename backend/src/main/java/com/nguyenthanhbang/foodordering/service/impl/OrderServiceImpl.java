@@ -5,10 +5,7 @@ import com.nguyenthanhbang.foodordering.dto.request.UpdateOrderRequest;
 import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
 import com.nguyenthanhbang.foodordering.enums.OrderStatus;
 import com.nguyenthanhbang.foodordering.model.*;
-import com.nguyenthanhbang.foodordering.repository.AddressRepository;
-import com.nguyenthanhbang.foodordering.repository.OrderItemRepository;
-import com.nguyenthanhbang.foodordering.repository.OrderRepository;
-import com.nguyenthanhbang.foodordering.repository.UserRepository;
+import com.nguyenthanhbang.foodordering.repository.*;
 import com.nguyenthanhbang.foodordering.service.CartService;
 import com.nguyenthanhbang.foodordering.service.OrderService;
 import com.nguyenthanhbang.foodordering.service.RestaurantService;
@@ -33,6 +30,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartService cartService;
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
+    private final FoodRepository foodRepository;
 
     @Override
     public Order createOrder(CreateOrderRequest request) {
@@ -91,6 +89,15 @@ public class OrderServiceImpl implements OrderService {
     public Order updateOrder(Long orderId, UpdateOrderRequest request) {
         Order order = this.getOrderByIdAndRestaurantId(orderId);
         order.setStatus(request.getStatus());
+        if(request.getStatus().equals(OrderStatus.DELIVERED)) {
+            List<OrderItem> orderItems = order.getOrderItems();
+            List<Food> foods = orderItems.stream().map(orderItem -> {
+                Food food = orderItem.getFood();
+                food.setSold(food.getSold() + orderItem.getQuantity());
+                return foodRepository.save(food);
+            }).collect(Collectors.toList());
+
+        }
         order = orderRepository.save(order);
         return order;
     }

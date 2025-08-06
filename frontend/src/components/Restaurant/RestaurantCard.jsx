@@ -14,8 +14,8 @@ export const RestaurantCard = ({
   isOpen,
   isFavorite,
   onFavouriteToggle,
-    averageRating,  
-  reviewCount,     
+  averageRating,
+  reviewCount,
 }) => {
   const navigate = useNavigate();
   const handleCardClick = () => {
@@ -31,11 +31,7 @@ export const RestaurantCard = ({
       onClick={handleCardClick}
     >
       <div className="w-[300px] h-[200px] rounded-lg overflow-hidden relative">
-        <img
-          className="w-full h-full object-cover"
-          src={`http://localhost:8080/images/restaurants/${image}`}
-          alt={name}
-        />
+        <img className="w-full h-full object-cover" src={image} alt={name} />
         <Chip
           color={isOpen ? "success" : "error"}
           label={isOpen ? "Open" : "Closed"}

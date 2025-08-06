@@ -17,4 +17,6 @@ public interface FoodService {
     Food getFoodByIdAndRestaurantId(Long foodId, Long restaurantId);
     void deleteFood(Long foodId);
     Food updateAvailability(Long foodId);
+    List<Food> getLatestFoods();
+    List<Food> getPopularFoods();
 }

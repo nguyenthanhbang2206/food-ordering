@@ -3,6 +3,7 @@ package com.nguyenthanhbang.foodordering.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "addresses")
@@ -11,10 +12,9 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class Address {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Where(clause = "active = true")
+public class Address extends BaseEntity{
+
 
     private String street;
     private String ward;

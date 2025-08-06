@@ -48,7 +48,7 @@ export const MenuCard = ({ food }) => {
           <div className="flex items-center justify-between w-full bg-white">
             <div className="flex items-center space-x-4">
               <img
-                src={`http://localhost:8080/images/foods/${food.images[0]}`}
+                src={food.images[0]}
                 alt={food.name}
                 className="w-20 h-20 rounded-lg object-cover"
               />

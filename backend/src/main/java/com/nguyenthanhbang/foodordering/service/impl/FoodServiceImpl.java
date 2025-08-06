@@ -221,7 +221,7 @@ public class FoodServiceImpl implements FoodService {
     public void deleteFood(Long foodId) {
         Restaurant restaurant = restaurantService.getRestaurantOfUser();
         Food food = this.getFoodByIdAndRestaurantId(foodId, restaurant.getId());
-        food.setRestaurant(null);
+        food.setActive(false);
         foodRepository.save(food);
     }
 
@@ -231,5 +231,15 @@ public class FoodServiceImpl implements FoodService {
         Food food = this.getFoodByIdAndRestaurantId(foodId, restaurant.getId());
         food.setAvailable(!food.isAvailable());
         return foodRepository.save(food);
+    }
+
+    @Override
+    public List<Food> getLatestFoods() {
+        return foodRepository.findTop5ByOrderByCreatedDateDesc();
+    }
+
+    @Override
+    public List<Food> getPopularFoods() {
+        return foodRepository.findTop5ByOrderBySoldDesc();
     }
 }

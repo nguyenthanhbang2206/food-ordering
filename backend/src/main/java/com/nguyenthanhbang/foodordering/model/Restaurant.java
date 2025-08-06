@@ -3,21 +3,21 @@ package com.nguyenthanhbang.foodordering.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "restaurants")
+@Where(clause = "active = true")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
-public class Restaurant {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Restaurant extends BaseEntity{
+
     private String name;
     private String description;
     private String openingHours;

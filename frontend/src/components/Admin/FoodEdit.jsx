@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
+import { uploadToCloudinary } from "../../utils/uploadToCloudinary";
 
 const MenuProps = {
   PaperProps: {
@@ -85,128 +86,42 @@ export const FoodEdit = () => {
     };
   };
 
-  // const handleImageUpload = (e) => {
-  //   const files = Array.from(e.target.files);
-  //   setImageFiles((prev) => [...prev, ...files]);
-
-  //   const previewUrls = files.map((file) => URL.createObjectURL(file));
-  //   setPreviewImages((prev) => [...prev, ...previewUrls]);
-  // };
-
-  // const uploadImages = async () => {
-  //   if (imageFiles.length === 0) {
-  //     return formData.images; // Nếu không có ảnh mới, giữ nguyên ảnh cũ
-  //   }
-
-  //   const form = new FormData();
-  //   imageFiles.forEach((file) => {
-  //     form.append("files", file);
-  //   });
-  //   form.append("folder", "foods");
-
-  //   try {
-  //     const response = await axios.post(
-  //       "http://localhost:8080/api/v1/files",
-  //       form,
-  //       {
-  //         headers: {
-  //           "Content-Type": "multipart/form-data",
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //       }
-  //     );
-  //     return response.data.data; // Trả về danh sách URL ảnh đã upload
-  //   } catch (error) {
-  //     alert(
-  //       `Failed to upload images: ${
-  //         error.response?.data?.message || error.message
-  //       }`
-  //     );
-  //     return [];
-  //   }
-  // };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   const uploadedImages = await uploadImages();
-  //   const updatedFoodData = {
-  //     ...formData,
-  //     images: uploadedImages,
-  //   };
-  //   console.log("Updated Food Data:", updatedFoodData);
-  //   dispatch(updateFood(formData.id, updatedFoodData));
-  //   navigate("/admin/restaurant/food");
-  // };
-
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-
-    const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
-    setPreviewImages((prev) => [...prev, ...newPreviewUrls]);
-
     setImageFiles((prev) => [...prev, ...files]);
   };
 
   const uploadImages = async () => {
+    // Upload tất cả file lên Cloudinary, trả về mảng url
     if (imageFiles.length === 0) {
-      return formData.images; // Giữ nguyên ảnh cũ nếu không có ảnh mới
+      return formData.images; // Nếu không có ảnh mới, giữ nguyên ảnh cũ
     }
-
-    const form = new FormData();
-    imageFiles.forEach((file) => {
-      form.append("files", file);
-    });
-    form.append("folder", "foods");
-
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/api/v1/files",
-        form,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      const newUploadedImages = response.data.data;
-
-      // ✅ Ghép ảnh cũ (còn lại) và ảnh mới
-      return [...formData.images, ...newUploadedImages];
-    } catch (error) {
-      alert(
-        `Failed to upload images: ${
-          error.response?.data?.message || error.message
-        }`
-      );
-      return formData.images; // Nếu lỗi, giữ nguyên ảnh cũ
+    const urls = [];
+    for (const file of imageFiles) {
+      const url = await uploadToCloudinary(file, "image");
+      if (url) urls.push(url);
     }
+    // Ghép ảnh cũ (còn lại) và ảnh mới
+    return [...formData.images, ...urls];
   };
-
-  const handleDeleteOldImage = (filename) => {
+  const handleDeleteOldImage = (url) => {
     setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((img) => img !== filename),
+      images: prev.images.filter((img) => img !== url),
     }));
   };
 
   const handleDeleteNewImage = (index) => {
-    setPreviewImages((prev) => prev.filter((_, i) => i !== index));
     setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const uploadedImages = await uploadImages();
     const updatedFoodData = {
       ...formData,
       images: uploadedImages,
     };
-    console.log("Updated Food Data:", updatedFoodData);
-
     dispatch(updateFood(formData.id, updatedFoodData));
     navigate("/admin/restaurant/food");
   };
@@ -346,11 +261,10 @@ export const FoodEdit = () => {
         </div>
 
         <div className="flex gap-4">
-          {/* Hiển thị ảnh cũ từ server */}
           {formData.images.map((image, index) => (
             <div key={`old-${index}`} className="relative">
               <img
-                src={`http://localhost:8080/images/foods/${image}`}
+                src={image}
                 alt={`Old Preview ${index}`}
                 className="w-24 h-24 object-cover rounded-lg shadow-md"
               />
@@ -363,7 +277,6 @@ export const FoodEdit = () => {
               </button>
             </div>
           ))}
-
           {/* Hiển thị ảnh mới upload (dùng URL.createObjectURL) */}
           {imageFiles.map((file, index) => (
             <div key={`new-${index}`} className="relative">

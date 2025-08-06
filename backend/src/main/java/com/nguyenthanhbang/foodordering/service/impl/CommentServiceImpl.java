@@ -11,6 +11,7 @@ import com.nguyenthanhbang.foodordering.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class CommentServiceImpl implements CommentService {
         User user = userService.getUserLogin();
         Restaurant restaurant = restaurantService.getRestaurantById(request.getRestaurantId());
         Comment comment = new Comment();
-        comment.setCreatedAt(LocalDateTime.now());
+        comment.setCreatedDate(Instant.now());
         comment.setContent(request.getContent());
         comment.setRestaurant(restaurant);
         comment.setUser(user);
@@ -34,6 +35,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<Comment> getCommentByRestaurantId(Long restaurantId) {
-        return commentRepository.findByRestaurantIdOrderByCreatedAtDesc(restaurantId);
+        return commentRepository.findByRestaurantIdOrderByCreatedDateDesc(restaurantId);
     }
 }

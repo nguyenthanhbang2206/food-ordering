@@ -16,4 +16,6 @@ public interface FoodRepository extends JpaRepository<Food, Long> , JpaSpecifica
     Page<Food> findAll(Specification<Food> specification,Pageable pageable);
     List<Food> findByIngredientsId(Long ingredientsId);
     long countByRestaurantId(Long restaurantId);
+    List<Food> findTop5ByOrderByCreatedDateDesc();
+    List<Food> findTop5ByOrderBySoldDesc();
 }

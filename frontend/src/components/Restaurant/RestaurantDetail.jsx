@@ -207,7 +207,7 @@ export const RestaurantDetail = () => {
           <img
             src={
               restaurant?.images && restaurant.images.length > 0
-                ? `http://localhost:8080/images/restaurants/${restaurant.images[0]}`
+                ? restaurant.images[0]
                 : "/default-restaurant.jpg"
             }
             alt={restaurant?.name}

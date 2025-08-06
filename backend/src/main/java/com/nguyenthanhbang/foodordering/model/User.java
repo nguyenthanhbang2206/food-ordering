@@ -5,21 +5,21 @@ import com.nguyenthanhbang.foodordering.enums.Gender;
 import com.nguyenthanhbang.foodordering.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
+@Where(clause = "active = true")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
 @Setter
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class User extends BaseEntity{
+
     private String email;
     @JsonIgnore
     private String password;

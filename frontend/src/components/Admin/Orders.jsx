@@ -187,7 +187,7 @@ export const Orders = () => {
                     </div>
                     <div>
                       <img
-                        src={`http://localhost:8080/images/foods/${item.food.images[0]}`}
+                        src={item.food.images[0]}
                         alt={item.food.name}
                         className="w-20 h-20 object-cover rounded mt-1"
                       />

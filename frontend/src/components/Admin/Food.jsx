@@ -21,6 +21,7 @@ import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import { updateAvailability } from "../State/Restaurant/Action";
+import { uploadToCloudinary } from "../../utils/uploadToCloudinary";
 
 const modalStyle = {
   position: "absolute",
@@ -112,40 +113,59 @@ export const Food = () => {
     setPreviewImages((prev) => [...prev, ...previewUrls]);
   };
 
+  // const uploadImages = async () => {
+  //   if (imageFiles.length === 0) {
+  //     alert("Please select images to upload.");
+  //     return [];
+  //   }
+
+  //   const form = new FormData();
+  //   imageFiles.forEach((file) => {
+  //     form.append("files", file);
+  //   });
+  //   form.append("folder", "foods");
+
+  //   try {
+  //     const response = await axios.post(
+  //       "http://localhost:8080/api/v1/files",
+  //       form,
+  //       {
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       }
+  //     );
+  //     return response.data.data;
+  //   } catch (error) {
+  //     alert(
+  //       `Failed to upload images: ${
+  //         error.response?.data?.message || error.message
+  //       }`
+  //     );
+  //     return [];
+  //   }
+  // };
+
   const uploadImages = async () => {
     if (imageFiles.length === 0) {
       alert("Please select images to upload.");
       return [];
     }
-
-    const form = new FormData();
-    imageFiles.forEach((file) => {
-      form.append("files", file);
-    });
-    form.append("folder", "foods");
-
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/v1/files",
-        form,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      return response.data.data;
+      // Upload từng ảnh lên Cloudinary, trả về mảng url
+      const urls = [];
+      for (const file of imageFiles) {
+        const url = await uploadToCloudinary(file, "image");
+        if (url) urls.push(url);
+      }
+      console.log("urls: ", urls);
+      return urls;
     } catch (error) {
-      alert(
-        `Failed to upload images: ${
-          error.response?.data?.message || error.message
-        }`
-      );
+      alert("Failed to upload images to Cloudinary.");
       return [];
     }
   };
-
   const handleAddFood = async (e) => {
     e.preventDefault();
 
@@ -439,7 +459,7 @@ export const Food = () => {
                 <tr key={food.id} className="hover:bg-gray-100">
                   <td className="px-4 py-2 border-b text-sm text-gray-700">
                     <img
-                      src={`http://localhost:8080/images/foods/${food.images[0]}`}
+                      src={food.images[0]}
                       alt={food.name}
                       className="w-16 h-16 object-cover rounded"
                     />
@@ -565,10 +585,9 @@ export const Food = () => {
               <div className="flex gap-4 mt-4">
                 {selectedFood.images.map((image, index) => (
                   <img
-                    key={index}
-                    src={`http://localhost:8080/images/foods/${image}`}
-                    alt={`Food Image ${index}`}
-                    className="w-24 h-24 object-cover rounded-lg shadow-md"
+                    src={image}
+                    alt={selectedFood.name}
+                    className="w-16 h-16 object-cover rounded"
                   />
                 ))}
               </div>

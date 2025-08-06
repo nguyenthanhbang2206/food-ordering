@@ -5,7 +5,7 @@ export const CartItem = ({ item, onIncrease, onDecrease, onDelete }) => {
     <div className="flex items-center justify-between border-b pb-4">
       <div className="flex items-center space-x-4">
         <img
-          src={`http://localhost:8080/images/foods/${item.food.images[0]}`}
+          src={item.food.images[0]}
           alt={item.food.name}
           className="w-16 h-16 rounded-lg object-cover"
         />

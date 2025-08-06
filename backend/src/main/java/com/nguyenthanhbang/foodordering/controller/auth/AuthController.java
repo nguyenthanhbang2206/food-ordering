@@ -2,14 +2,18 @@ package com.nguyenthanhbang.foodordering.controller.auth;
 
 import com.nguyenthanhbang.foodordering.dto.request.CreateUserRequest;
 import com.nguyenthanhbang.foodordering.dto.request.LoginRequest;
+import com.nguyenthanhbang.foodordering.dto.request.ResetPasswordRequest;
+import com.nguyenthanhbang.foodordering.dto.request.UpdatePasswordRequest;
 import com.nguyenthanhbang.foodordering.dto.response.ApiResponse;
 import com.nguyenthanhbang.foodordering.dto.response.AuthenticationResponse;
 import com.nguyenthanhbang.foodordering.model.InvalidToken;
 import com.nguyenthanhbang.foodordering.model.User;
 import com.nguyenthanhbang.foodordering.repository.InvalidTokenRepository;
 import com.nguyenthanhbang.foodordering.repository.UserRepository;
+import com.nguyenthanhbang.foodordering.service.EmailService;
 import com.nguyenthanhbang.foodordering.service.UserService;
 import com.nguyenthanhbang.foodordering.util.SecurityUtil;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +39,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final SecurityUtil securityUtil;
     private final UserService userService;
+    private final EmailService emailService;
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthenticationResponse>> login(@RequestBody LoginRequest request) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
@@ -138,6 +143,26 @@ public class AuthController {
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.CREATED.value())
                 .message("Register Successful")
+                .data(savedUser)
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(@RequestBody ResetPasswordRequest request) throws MessagingException {
+        emailService.sendTokenResetPassword(request);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.CREATED.value())
+                .message("Send reset password token to email Successful")
+                .data(null)
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    }
+    @PutMapping("/reset-password")
+    public ResponseEntity<ApiResponse<User>> updatePassword(@RequestBody UpdatePasswordRequest request) {
+        User savedUser = userService.updatePassword(request);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.CREATED.value())
+                .message("Update password Successful")
                 .data(savedUser)
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);

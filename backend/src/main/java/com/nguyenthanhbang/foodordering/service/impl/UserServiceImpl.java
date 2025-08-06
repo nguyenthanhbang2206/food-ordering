@@ -1,8 +1,11 @@
 package com.nguyenthanhbang.foodordering.service.impl;
 
 import com.nguyenthanhbang.foodordering.dto.request.CreateUserRequest;
+import com.nguyenthanhbang.foodordering.dto.request.UpdatePasswordRequest;
 import com.nguyenthanhbang.foodordering.dto.request.UpdateUserRequest;
+import com.nguyenthanhbang.foodordering.model.ResetPasswordToken;
 import com.nguyenthanhbang.foodordering.model.User;
+import com.nguyenthanhbang.foodordering.repository.ResetPasswordTokenRepository;
 import com.nguyenthanhbang.foodordering.repository.UserRepository;
 import com.nguyenthanhbang.foodordering.service.UserService;
 import com.nguyenthanhbang.foodordering.util.SecurityUtil;
@@ -12,12 +15,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ResetPasswordTokenRepository resetPasswordTokenRepository;
 
     @Override
     public void updateTokenOfUser(String email, String refreshToken) {
@@ -76,6 +82,18 @@ public class UserServiceImpl implements UserService {
         user.setGender(request.getGender());
         user = userRepository.save(user);
         return user;
+    }
+
+    @Override
+    public User updatePassword(UpdatePasswordRequest request) {
+        ResetPasswordToken resetPasswordToken = resetPasswordTokenRepository.findByToken(request.getToken()).orElseThrow(() -> new EntityNotFoundException("Invalid token"));
+        if(!resetPasswordToken.getExpiryDate().isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Invalid token");
+        }
+        User user = resetPasswordToken.getUser();
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        resetPasswordTokenRepository.delete(resetPasswordToken);
+        return userRepository.save(user);
     }
 
 }

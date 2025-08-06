@@ -70,7 +70,6 @@ export const Login = () => {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-
           {/* Password Field */}
           <div>
             <label
@@ -89,7 +88,14 @@ export const Login = () => {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-
+          <div className="mt-2 text-center">
+            <button
+              onClick={() => navigate("/forgot-password")}
+              className="text-blue-500 hover:underline focus:outline-none text-sm"
+            >
+              Quên mật khẩu?
+            </button>
+          </div>
           {/* Submit Button */}
           <button
             type="submit"

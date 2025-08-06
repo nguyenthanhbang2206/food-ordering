@@ -10,7 +10,8 @@ import { Register } from "../components/Auth/Register";
 import { Login } from "../components/Auth/Login";
 import { PrivateRoute } from "../components/PrivateRoute";
 import SearchPage from "../components/Home/SearchPage";
-
+import { ForgotPassword } from "../components/Auth/ForgotPassword";
+import { ResetPassword } from "../components/Auth/ResetPassword";
 export const CustomerRoutes = () => {
   return (
     <div>
@@ -34,6 +35,8 @@ export const CustomerRoutes = () => {
         />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route
           path="/restaurant/:id"
           element={

@@ -2,6 +2,7 @@ package com.nguyenthanhbang.foodordering.service;
 
 import com.nguyenthanhbang.foodordering.dto.request.FoodCriteria;
 import com.nguyenthanhbang.foodordering.dto.request.FoodRequest;
+import com.nguyenthanhbang.foodordering.dto.response.FoodStatistic;
 import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
 import com.nguyenthanhbang.foodordering.model.Food;
 import org.springframework.data.domain.Pageable;
@@ -19,4 +20,5 @@ public interface FoodService {
     Food updateAvailability(Long foodId);
     List<Food> getLatestFoods();
     List<Food> getPopularFoods();
+    List<FoodStatistic> getFoodStatistic(Long restaurantId);
 }

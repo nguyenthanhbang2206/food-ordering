@@ -30,6 +30,16 @@ public class AdminOrderController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+    @GetMapping("/restaurants/orders/recently")
+    public ResponseEntity<ApiResponse<List<Order>>> getRecentOrder() {
+        List<Order> response = orderService.getRecentOrders();
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Get recent orders successfully")
+                .data(response)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
     @PutMapping("/restaurants/orders/{orderId}")
     public ResponseEntity<ApiResponse<Order>> updateOrder(@PathVariable Long orderId,@Valid @RequestBody UpdateOrderRequest request)  {
         Order order = orderService.updateOrder(orderId,request);

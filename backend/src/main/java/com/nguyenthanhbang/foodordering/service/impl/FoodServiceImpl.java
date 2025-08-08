@@ -2,6 +2,7 @@ package com.nguyenthanhbang.foodordering.service.impl;
 
 import com.nguyenthanhbang.foodordering.dto.request.FoodCriteria;
 import com.nguyenthanhbang.foodordering.dto.request.FoodRequest;
+import com.nguyenthanhbang.foodordering.dto.response.FoodStatistic;
 import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
 import com.nguyenthanhbang.foodordering.model.Category;
 import com.nguyenthanhbang.foodordering.model.Food;
@@ -21,6 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -241,5 +243,19 @@ public class FoodServiceImpl implements FoodService {
     @Override
     public List<Food> getPopularFoods() {
         return foodRepository.findTop5ByOrderBySoldDesc();
+    }
+
+    @Override
+    public List<FoodStatistic> getFoodStatistic(Long restaurantId) {
+        List<Food> foods = foodRepository.findTop5ByRestaurantId(restaurantId);
+        List<FoodStatistic> foodStatistics = foods.stream().map(food -> toFoodStatistic(food)).collect(Collectors.toList());
+        return foodStatistics;
+    }
+
+    private FoodStatistic toFoodStatistic(Food food) {
+        FoodStatistic foodStatistic = new FoodStatistic();
+        foodStatistic.setName(food.getName());
+        foodStatistic.setSold(food.getSold());
+        return foodStatistic;
     }
 }

@@ -2,7 +2,6 @@ package com.nguyenthanhbang.foodordering.service.impl;
 
 import com.nguyenthanhbang.foodordering.dto.request.RestaurantRequest;
 import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
-import com.nguyenthanhbang.foodordering.dto.response.Statistics;
 import com.nguyenthanhbang.foodordering.model.Address;
 import com.nguyenthanhbang.foodordering.model.Restaurant;
 import com.nguyenthanhbang.foodordering.model.User;
@@ -33,17 +32,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantRepository.search(keyword);
     }
 
-    @Override
-    public Statistics getRestaurantStatistics() {
-        Restaurant restaurant = this.getRestaurantOfUser();
-        long totalFoods = foodRepository.countByRestaurantId(restaurant.getId());
-        long totalOrders = orderRepository.countByRestaurantId(restaurant.getId());
-        Statistics statistics = Statistics.builder()
-                .totalFoods(totalFoods)
-                .totalOrders(totalOrders)
-                .build();
-        return statistics;
-    }
+
 
 
     @Override

@@ -4,10 +4,9 @@ import lombok.*;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Statistics {
-    private long totalOrders;
-    private long totalFoods;
+public class RevenueByMonth {
+    private long month;
+    private long revenue;
 }

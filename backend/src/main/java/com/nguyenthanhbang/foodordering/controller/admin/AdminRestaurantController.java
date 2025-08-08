@@ -2,7 +2,6 @@ package com.nguyenthanhbang.foodordering.controller.admin;
 
 import com.nguyenthanhbang.foodordering.dto.request.RestaurantRequest;
 import com.nguyenthanhbang.foodordering.dto.response.ApiResponse;
-import com.nguyenthanhbang.foodordering.dto.response.Statistics;
 import com.nguyenthanhbang.foodordering.model.Restaurant;
 import com.nguyenthanhbang.foodordering.service.RestaurantService;
 import jakarta.validation.Valid;
@@ -67,14 +66,5 @@ public class AdminRestaurantController {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
-    @GetMapping("/restaurants/statistics")
-    public ResponseEntity<ApiResponse<Statistics>> getRestaurantStatistics()  {
-        Statistics statistics = restaurantService.getRestaurantStatistics();
-        ApiResponse apiResponse = ApiResponse.builder()
-                .status(HttpStatus.OK.value())
-                .message("Get statistics success")
-                .data(statistics)
-                .build();
-        return ResponseEntity.ok(apiResponse);
-    }
+
 }

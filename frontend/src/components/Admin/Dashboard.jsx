@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import {
   Card,
   CardContent,
@@ -6,7 +7,6 @@ import {
   Grid,
   Divider,
   Button,
-  Avatar,
   Table,
   TableBody,
   TableCell,
@@ -14,20 +14,20 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Skeleton,
+  Box,
+  useTheme,
 } from "@mui/material";
-import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import FastfoodIcon from "@mui/icons-material/Fastfood";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import PeopleIcon from "@mui/icons-material/People";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import {
   PieChart,
   Pie,
   Cell,
-  Tooltip,
+  Tooltip as ReTooltip,
   ResponsiveContainer,
   Legend,
   Bar,
@@ -40,380 +40,421 @@ import {
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 
-// Giả dữ liệu thống kê
-const stats = {
-  restaurant: {
-    name: "Pizza House",
-    owner: "Nguyễn Thanh Bằng",
-    address: "123 Main St, District 1, HCMC",
-    phone: "0123 456 789",
-    email: "pizza@house.com",
-    image: "/default-restaurant.jpg",
-    openingHours: "08:00 - 22:00",
-    open: true,
-  },
-  totalFoods: 42,
-  totalOrders: 320,
-  totalRevenue: 12500,
-  totalReviews: 88,
-  averageRating: 4.6,
-  totalCustomers: 210,
-  todayOrders: 12,
-  todayRevenue: 480,
+// ------- Mock data (fallback) -------
+const MOCK_STATS = {
+  totalFoods: 3,
+  totalOrders: 6,
+  totalRevenue: 90,
+  totalReviews: 0,
+  averageRating: 0.0,
+  todayOrders: 0,
+  todayRevenue: null,
   orderStatus: [
-    { name: "Pending", value: 8 },
-    { name: "Processing", value: 3 },
-    { name: "Completed", value: 295 },
-    { name: "Cancelled", value: 14 },
+    { name: "PENDING", value: 4 },
+    { name: "DELIVERED", value: 2 },
   ],
   topFoods: [
-    { name: "Pizza", orders: 80 },
-    { name: "Burger", orders: 65 },
-    { name: "Sushi", orders: 50 },
-    { name: "Pho", orders: 40 },
-    { name: "Salad", orders: 30 },
+    { name: "banh mỳ", sold: 1 },
+    { name: "Cơm Gà", sold: 2 },
+    { name: "best seller", sold: 11 },
   ],
-  revenueByMonth: [
-    { month: "Jan", revenue: 800 },
-    { month: "Feb", revenue: 1200 },
-    { month: "Mar", revenue: 1500 },
-    { month: "Apr", revenue: 1100 },
-    { month: "May", revenue: 1700 },
-    { month: "Jun", revenue: 2000 },
-    { month: "Jul", revenue: 2200 },
-    { month: "Aug", revenue: 1800 },
-    { month: "Sep", revenue: 1600 },
-    { month: "Oct", revenue: 2100 },
-    { month: "Nov", revenue: 2300 },
-    { month: "Dec", revenue: 2500 },
-  ],
-  recentOrders: [
-    {
-      id: 101,
-      customer: "Nguyễn Văn A",
-      food: "Pizza",
-      total: 15,
-      status: "Completed",
-      date: "2025-08-01 12:30",
-    },
-    {
-      id: 102,
-      customer: "Trần Thị B",
-      food: "Burger",
-      total: 10,
-      status: "Pending",
-      date: "2025-08-02 13:10",
-    },
-    {
-      id: 103,
-      customer: "Lê Văn C",
-      food: "Sushi",
-      total: 20,
-      status: "Completed",
-      date: "2025-08-03 14:00",
-    },
-    {
-      id: 104,
-      customer: "Phạm Thị D",
-      food: "Pho",
-      total: 8,
-      status: "Processing",
-      date: "2025-08-03 15:20",
-    },
-    {
-      id: 105,
-      customer: "Ngô Văn E",
-      food: "Salad",
-      total: 7,
-      status: "Cancelled",
-      date: "2025-08-04 16:00",
-    },
-  ],
+  revenueByMonth: [{ month: 8, revenue: 450 }],
+  recentOrders: [],
 };
 
-const COLORS = ["#5A20CB", "#F9A826", "#00C49F", "#FF444A"];
+const CHART_COLORS = ["#5A20CB", "#F9A826", "#00C49F", "#FF444A"];
+const formatCurrency = (value) =>
+  typeof value === "number"
+    ? value.toLocaleString(undefined, { minimumFractionDigits: 0 })
+    : "0";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
+  const theme = useTheme();
+
+  const [stats, setStats] = React.useState(null);
+  const [recentOrders, setRecentOrders] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [loadingOrders, setLoadingOrders] = React.useState(true);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get("http://localhost:8080/api/v1/dashboard", {
+          headers: { Authorization: `Bearer ${token}` },
+          timeout: 4000,
+        });
+        if (mounted) {
+          // Map API response to expected structure
+          const d = res.data.data;
+          setStats({
+            totalFoods: d.totalFoods,
+            totalOrders: d.totalOrders,
+            totalRevenue: d.totalRevenue,
+            totalReviews: d.totalReviews,
+            averageRating: d.averageRating,
+            todayOrders: d.todayOrders,
+            todayRevenue: d.todayRevenue,
+            orderStatus: (d.orderStatus || []).reduce((acc, curr) => {
+              // Gộp các trạng thái trùng tên
+              const found = acc.find((item) => item.name === curr.name);
+              if (found) found.value += curr.value;
+              else acc.push({ ...curr });
+              return acc;
+            }, []),
+            topFoods: (d.topFoods || []).map((f) => ({
+              name: f.name,
+              sold: f.sold,
+            })),
+            revenueByMonth: (d.revenueByMonth || []).map((r) => ({
+              month: typeof r.month === "number" ? `Tháng ${r.month}` : r.month,
+              revenue: r.revenue,
+            })),
+            recentOrders: d.recentOrders || [],
+          });
+        }
+      } catch (err) {
+        if (mounted) {
+          setError("Không thể kết nối tới server — hiển thị dữ liệu mẫu.");
+          setTimeout(() => {
+            if (mounted) setStats(MOCK_STATS);
+          }, 600);
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchData();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const orderStatus = stats?.orderStatus || MOCK_STATS.orderStatus;
+  const topFoods = stats?.topFoods || MOCK_STATS.topFoods;
+  const revenueByMonth = stats?.revenueByMonth || MOCK_STATS.revenueByMonth;
+
+  const handleTopFoodClick = (data) => {
+    if (!data) return;
+    navigate(`/admin/restaurant/foods?q=${encodeURIComponent(data.name)}`);
+  };
+
+  const handleOrderStatusClick = (entry) => {
+    if (!entry) return;
+    navigate(
+      `/admin/restaurant/orders?status=${encodeURIComponent(entry.name)}`
+    );
+  };
+  React.useEffect(() => {
+    let mounted = true;
+    const fetchRecentOrders = async () => {
+      setLoadingOrders(true);
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(
+          "http://localhost:8080/api/v1/admin/restaurants/orders/recently",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            timeout: 4000,
+          }
+        );
+        if (mounted) {
+          setRecentOrders(
+            (res.data.data || []).map((order) => ({
+              id: order.id,
+              customer:
+                order.customer?.fullName || order.customer?.email || "N/A",
+              food:
+                order.orderItems && order.orderItems.length > 0
+                  ? order.orderItems
+                      .map((item) => item.foodName || item.food?.name)
+                      .join(", ")
+                  : "",
+              total: order.totalPrice,
+              status: order.status,
+              date: order.createdDate
+                ? new Date(order.createdDate).toLocaleString()
+                : "",
+            }))
+          );
+        }
+      } catch {
+        if (mounted) setRecentOrders([]);
+      } finally {
+        if (mounted) setLoadingOrders(false);
+      }
+    };
+    fetchRecentOrders();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+  const statusColor = (status) =>
+    status === "Completed"
+      ? "text-green-600"
+      : status === "Pending" || status === "PENDING"
+      ? "text-yellow-600"
+      : status === "Processing"
+      ? "text-blue-600"
+      : status === "Delivered" || status === "DELIVERED"
+      ? "text-green-700"
+      : "text-red-600";
+  const chartData = topFoods.map((item, index) => ({
+    ...item,
+    label: `${item.name} (${index + 1})`,
+  }));
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#E6E6FA] to-white p-6">
       <div className="max-w-screen-xl mx-auto">
-        <h1 className="text-4xl font-bold text-[#5A20CB] mb-6">
+        <h1 className="text-4xl font-bold text-[#5A20CB] mb-4">
           Restaurant Dashboard
         </h1>
-        <Divider className="mb-8" />
-
-        {/* Thông tin nhà hàng */}
-        <Card className="mb-8 shadow-lg">
-          <CardContent className="flex flex-col md:flex-row items-center gap-6">
-            <Avatar
-              src={stats.restaurant.image}
-              alt={stats.restaurant.name}
-              sx={{ width: 100, height: 100 }}
-            />
-            <div className="flex-1">
-              <Typography variant="h5" className="font-bold mb-1">
-                {stats.restaurant.name}
-              </Typography>
-              <Typography variant="body1" className="mb-1">
-                <strong>Owner:</strong> {stats.restaurant.owner}
-              </Typography>
-              <Typography variant="body1" className="mb-1 flex items-center">
-                <LocationOnIcon className="mr-1" />
-                {stats.restaurant.address}
-              </Typography>
-              <Typography variant="body1" className="mb-1">
-                <strong>Phone:</strong> {stats.restaurant.phone}
-              </Typography>
-              <Typography variant="body1" className="mb-1">
-                <strong>Email:</strong> {stats.restaurant.email}
-              </Typography>
-              <Typography variant="body1" className="mb-1">
-                <strong>Opening Hours:</strong> {stats.restaurant.openingHours}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Status:</strong>{" "}
-                <span
-                  className={
-                    stats.restaurant.open ? "text-green-600" : "text-red-600"
-                  }
-                >
-                  {stats.restaurant.open ? "Open" : "Closed"}
-                </span>
-              </Typography>
-            </div>
-            <div className="flex flex-col gap-2">
+        <Divider className="mb-6" />
+        {error && (
+          <Box mb={2}>
+            <Typography variant="body2" color="error">
+              {error}
+            </Typography>
+          </Box>
+        )}
+        {/* Quick actions */}
+        <Card className="mb-6 shadow-sm">
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Quick Actions
+            </Typography>
+            <div className="flex flex-wrap gap-3">
               <Button
-                variant="contained"
-                color="primary"
-                onClick={() => navigate("/admin/restaurant/edit")}
+                variant="outlined"
+                startIcon={<FastfoodIcon />}
+                onClick={() => navigate("/admin/restaurant/foods")}
               >
-                Edit Info
+                Manage Foods
               </Button>
               <Button
                 variant="outlined"
-                color="secondary"
-                onClick={() => navigate("/admin/restaurant/foods/add")}
-                startIcon={<AddCircleIcon />}
+                startIcon={<ShoppingCartIcon />}
+                onClick={() => navigate("/admin/restaurant/orders")}
               >
-                Add Food
+                Manage Orders
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<RateReviewIcon />}
+                onClick={() => navigate("/admin/restaurant/reviews")}
+              >
+                View Reviews
               </Button>
             </div>
           </CardContent>
         </Card>
-
-        {/* Quick Actions */}
-        <div className="flex flex-wrap gap-4 mb-8">
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddCircleIcon />}
-            onClick={() => navigate("/admin/restaurant/foods/add")}
-          >
-            Add New Food
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<RestaurantMenuIcon />}
-            onClick={() => navigate("/admin/restaurant/foods")}
-          >
-            Manage Foods
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<ShoppingCartIcon />}
-            onClick={() => navigate("/admin/restaurant/orders")}
-          >
-            Manage Orders
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<RateReviewIcon />}
-            onClick={() => navigate("/admin/restaurant/reviews")}
-          >
-            View Reviews
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<PeopleIcon />}
-            onClick={() => navigate("/admin/restaurant/customers")}
-          >
-            Customers
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<BarChartIcon />}
-            onClick={() => navigate("/admin/restaurant/statistics")}
-          >
-            Statistics
-          </Button>
-        </div>
-
-        {/* Statistics Cards */}
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={3}>
-            <Card className="shadow-lg">
-              <CardContent>
-                <Typography variant="h6" color="primary" gutterBottom>
-                  <FastfoodIcon className="mr-2" /> Total Foods
-                </Typography>
-                <Typography variant="h4" className="font-bold">
-                  {stats.totalFoods}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Card className="shadow-lg">
-              <CardContent>
-                <Typography variant="h6" color="primary" gutterBottom>
-                  <ShoppingCartIcon className="mr-2" /> Total Orders
-                </Typography>
-                <Typography variant="h4" className="font-bold">
-                  {stats.totalOrders}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Today: {stats.todayOrders}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Card className="shadow-lg">
-              <CardContent>
-                <Typography variant="h6" color="primary" gutterBottom>
-                  <BarChartIcon className="mr-2" /> Revenue
-                </Typography>
-                <Typography variant="h4" className="font-bold text-green-600">
-                  ${stats.totalRevenue?.toLocaleString() || 0}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Today: ${stats.todayRevenue?.toLocaleString() || 0}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Card className="shadow-lg">
-              <CardContent>
-                <Typography variant="h6" color="primary" gutterBottom>
-                  <RateReviewIcon className="mr-2" /> Reviews
-                </Typography>
-                <Typography variant="h4" className="font-bold">
-                  {stats.totalReviews}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Avg. Rating: {stats.averageRating?.toFixed(1) || 0}/5
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+        {/* Stats grid */}
+        <Grid container spacing={3}>
+          {[
+            {
+              title: "Total Foods",
+              icon: <FastfoodIcon />,
+              value: loading
+                ? null
+                : stats?.totalFoods ?? MOCK_STATS.totalFoods,
+            },
+            {
+              title: "Total Orders",
+              icon: <ShoppingCartIcon />,
+              value: loading
+                ? null
+                : stats?.totalOrders ?? MOCK_STATS.totalOrders,
+              sub: loading
+                ? null
+                : `Today: ${stats?.todayOrders ?? MOCK_STATS.todayOrders}`,
+            },
+            {
+              title: "Revenue",
+              icon: <BarChartIcon />,
+              value:
+                loading || stats?.totalRevenue == null
+                  ? null
+                  : `$${formatCurrency(stats.totalRevenue)}`,
+              sub:
+                loading || stats?.todayRevenue == null
+                  ? null
+                  : `Today: $${formatCurrency(stats.todayRevenue)}`,
+            },
+            {
+              title: "Reviews",
+              icon: <RateReviewIcon />,
+              value: loading
+                ? null
+                : stats?.totalReviews ?? MOCK_STATS.totalReviews,
+              sub: loading
+                ? null
+                : `Avg: ${(
+                    stats?.averageRating ?? MOCK_STATS.averageRating
+                  ).toFixed(1)}/5`,
+            },
+          ].map((card, idx) => (
+            <Grid item xs={12} sm={6} md={3} key={idx}>
+              <Card className="shadow">
+                <CardContent>
+                  <Typography variant="h6" color="textPrimary" gutterBottom>
+                    <span className="align-middle mr-2">{card.icon}</span>{" "}
+                    {card.title}
+                  </Typography>
+                  {loading ? (
+                    <>
+                      <Skeleton width="60%" height={34} />
+                      <Skeleton width="40%" />
+                    </>
+                  ) : (
+                    <>
+                      <Typography variant="h4" className="font-bold">
+                        {card.value ?? "—"}
+                      </Typography>
+                      {card.sub && (
+                        <Typography variant="body2" color="textSecondary">
+                          {card.sub}
+                        </Typography>
+                      )}
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
-
-        {/* Charts & Top Foods */}
-        <Grid container spacing={4} className="mt-4">
-          {/* Pie Chart for Order Status */}
-          <Grid item xs={12} md={4}>
-            <Card className="shadow-lg">
+        {/* Charts: 2 chart nằm ngang, 1 chart nằm riêng 1 hàng */}
+        <Grid container spacing={3} className="mt-4" justifyContent="center">
+          {/* Order Status & Top Foods trên cùng 1 hàng */}
+          <Grid item xs={12} md={6} lg={6}>
+            <Card className="shadow-lg h-full flex flex-col">
               <CardContent>
-                <Typography variant="h6" color="primary" gutterBottom>
+                <Typography variant="h6" gutterBottom>
                   <BarChartIcon className="mr-2" /> Order Status
                 </Typography>
-                <ResponsiveContainer width="100%" height={220}>
-                  <PieChart>
-                    <Pie
-                      data={stats.orderStatus}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={70}
-                      fill="#8884d8"
-                      label
-                    >
-                      {stats.orderStatus.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div style={{ width: "100%", minWidth: 500, height: 360 }}>
+                  {loading ? (
+                    <Skeleton variant="rectangular" width="100%" height={340} />
+                  ) : (
+                    <ResponsiveContainer width="100%" height={340}>
+                      <PieChart>
+                        <Pie
+                          data={orderStatus}
+                          dataKey="value"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={120}
+                          label
+                          onClick={(e) => handleOrderStatusClick(e)}
+                        >
+                          {orderStatus.map((entry, i) => (
+                            <Cell
+                              key={i}
+                              fill={CHART_COLORS[i % CHART_COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <ReTooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+                {!loading && (
+                  <Typography
+                    variant="caption"
+                    className="block mt-2 text-gray-600"
+                  >
+                    Click a slice to view filtered orders.
+                  </Typography>
+                )}
               </CardContent>
             </Card>
           </Grid>
-          {/* Bar Chart for Top Foods */}
-          <Grid item xs={12} md={4}>
-            <Card className="shadow-lg">
+          <Grid item xs={12} md={6} lg={6}>
+            <Card className="shadow-lg h-full flex flex-col">
               <CardContent>
-                <Typography variant="h6" color="primary" gutterBottom>
+                <Typography variant="h6" gutterBottom>
                   <FastfoodIcon className="mr-2" /> Top Foods
                 </Typography>
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={stats.topFoods}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="orders" fill="#5A20CB" />
-                  </BarChart>
-                </ResponsiveContainer>
+                <div style={{ width: "100%", minWidth: 500, height: 360 }}>
+                  {loading ? (
+                    <Skeleton variant="rectangular" width="100%" height={340} />
+                  ) : (
+                    <ResponsiveContainer width="100%" height={340}>
+                      <BarChart
+                        data={topFoods}
+                        margin={{ left: 0, right: 0, top: 5, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <ReTooltip />
+                        <Bar
+                          dataKey="sold"
+                          onClick={(data) => handleTopFoodClick(data)}
+                        >
+                          {topFoods.map((entry, i) => (
+                            <Cell
+                              key={`cell-${i}`}
+                              fill={CHART_COLORS[i % CHART_COLORS.length]}
+                            />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+                {!loading && (
+                  <Typography
+                    variant="caption"
+                    className="block mt-2 text-gray-600"
+                  >
+                    Click a bar to view foods filtered by name.
+                  </Typography>
+                )}
               </CardContent>
             </Card>
           </Grid>
-          {/* Line Chart for Revenue by Month */}
-          <Grid item xs={12} md={4}>
-            <Card className="shadow-lg">
+          {/* Revenue by Month nằm riêng 1 hàng */}
+          <Grid item xs={12}>
+            <Card className="shadow-lg h-full flex flex-col mt-4">
               <CardContent>
-                <Typography variant="h6" color="primary" gutterBottom>
+                <Typography variant="h6" gutterBottom>
                   <BarChartIcon className="mr-2" /> Revenue by Month
                 </Typography>
-                <ResponsiveContainer width="100%" height={220}>
-                  <LineChart data={stats.revenueByMonth}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="#F9A826"
-                      strokeWidth={3}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div style={{ width: "100%", minWidth: 900, height: 400 }}>
+                  {loading ? (
+                    <Skeleton variant="rectangular" width="100%" height={380} />
+                  ) : (
+                    <ResponsiveContainer width="100%" height={380}>
+                      <LineChart data={revenueByMonth}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <ReTooltip />
+                        <Line
+                          type="monotone"
+                          dataKey="revenue"
+                          stroke={theme.palette.warning.main}
+                          strokeWidth={3}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
-
-        {/* Customers Card */}
-        <Grid container spacing={4} className="mt-4">
-          <Grid item xs={12} md={3}>
-            <Card className="shadow-lg">
-              <CardContent>
-                <Typography variant="h6" color="primary" gutterBottom>
-                  <PeopleIcon className="mr-2" /> Customers
-                </Typography>
-                <Typography variant="h4" className="font-bold">
-                  {stats.totalCustomers}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-
         {/* Recent Orders Table */}
-        <div className="mt-10">
+        <div className="mt-8">
           <Typography variant="h6" className="font-bold mb-4 text-[#5A20CB]">
             Recent Orders
           </Typography>
@@ -430,30 +471,47 @@ export const Dashboard = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {stats.recentOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell>{order.id}</TableCell>
-                    <TableCell>{order.customer}</TableCell>
-                    <TableCell>{order.food}</TableCell>
-                    <TableCell>{order.total}</TableCell>
-                    <TableCell>
-                      <span
-                        className={
-                          order.status === "Completed"
-                            ? "text-green-600 font-semibold"
-                            : order.status === "Pending"
-                            ? "text-yellow-600 font-semibold"
-                            : order.status === "Processing"
-                            ? "text-blue-600 font-semibold"
-                            : "text-red-600 font-semibold"
-                        }
-                      >
-                        {order.status}
-                      </span>
-                    </TableCell>
-                    <TableCell>{order.date}</TableCell>
-                  </TableRow>
-                ))}
+                {loadingOrders
+                  ? Array.from({ length: 5 }).map((_, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell>
+                          <Skeleton width="60px" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton width="120px" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton width="100px" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton width="60px" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton width="80px" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton width="140px" />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  : recentOrders.map((order) => (
+                      <TableRow key={order.id}>
+                        <TableCell>{order.id}</TableCell>
+                        <TableCell>{order.customer}</TableCell>
+                        <TableCell>{order.food}</TableCell>
+                        <TableCell>{formatCurrency(order.total)}</TableCell>
+                        <TableCell>
+                          <span
+                            className={`${statusColor(
+                              order.status
+                            )} font-semibold`}
+                          >
+                            {order.status}
+                          </span>
+                        </TableCell>
+                        <TableCell>{order.date}</TableCell>
+                      </TableRow>
+                    ))}
               </TableBody>
             </Table>
           </TableContainer>
@@ -462,3 +520,5 @@ export const Dashboard = () => {
     </div>
   );
 };
+
+export default Dashboard;

@@ -2,7 +2,9 @@ package com.nguyenthanhbang.foodordering.service.impl;
 
 import com.nguyenthanhbang.foodordering.dto.request.CreateOrderRequest;
 import com.nguyenthanhbang.foodordering.dto.request.UpdateOrderRequest;
+import com.nguyenthanhbang.foodordering.dto.response.OrderStatistic;
 import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
+import com.nguyenthanhbang.foodordering.dto.response.RevenueByMonth;
 import com.nguyenthanhbang.foodordering.enums.OrderStatus;
 import com.nguyenthanhbang.foodordering.model.*;
 import com.nguyenthanhbang.foodordering.repository.*;
@@ -16,6 +18,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
     private final FoodRepository foodRepository;
+    private static final ZoneId ZONE = ZoneId.of("Asia/Bangkok");
 
     @Override
     public Order createOrder(CreateOrderRequest request) {
@@ -155,6 +162,68 @@ public class OrderServiceImpl implements OrderService {
     public boolean fromOneRestaurant(List<Food> foods, Long restaurantId) {
         boolean isValid = foods.stream().allMatch(food ->  food.getRestaurant().getId().equals(restaurantId));
         return isValid;
+    }
+
+    @Override
+    public Long countOrdersToday(Long restaurantId) {
+        LocalDate today = LocalDate.now();
+        Instant startDay = today.atStartOfDay(ZONE).toInstant();
+        Instant nextDay = today.plusDays(1).atStartOfDay(ZONE).toInstant();
+        return orderRepository.countOrdersToday(startDay, nextDay, restaurantId);
+    }
+
+    @Override
+    public Long revenueToday(Long restaurantId) {
+        LocalDate today = LocalDate.now();
+        Instant startDay = today.atStartOfDay(ZONE).toInstant();
+        Instant nextDay = today.plusDays(1).atStartOfDay(ZONE).toInstant();
+        return orderRepository.revenueToday(startDay, nextDay, restaurantId);
+    }
+
+    @Override
+    public List<OrderStatistic> countOrderByStatus(Long restaurantId) {
+        List<Order> orders = orderRepository.findByRestaurantId(restaurantId);
+        List<OrderStatistic> orderStatistics = new ArrayList<>();
+        Long pending = orderRepository.countByRestaurantIdAndStatus(restaurantId, OrderStatus.PENDING);
+        Long processing = orderRepository.countByRestaurantIdAndStatus(restaurantId, OrderStatus.PROCESSING);
+        Long delivered = orderRepository.countByRestaurantIdAndStatus(restaurantId, OrderStatus.DELIVERED);
+        Long cancelled = orderRepository.countByRestaurantIdAndStatus(restaurantId, OrderStatus.CANCELLED);
+        if(pending != null && pending != 0){
+            OrderStatistic orderStatistic = new OrderStatistic();
+            orderStatistic.setName("PENDING");
+            orderStatistic.setValue(pending);
+            orderStatistics.add(orderStatistic);
+        }
+        if(processing != null && processing != 0){
+            OrderStatistic orderStatistic = new OrderStatistic();
+            orderStatistic.setName("PROCESSING");
+            orderStatistic.setValue(processing);
+            orderStatistics.add(orderStatistic);
+        }
+        if(delivered != null && delivered != 0){
+            OrderStatistic orderStatistic = new OrderStatistic();
+            orderStatistic.setName("DELIVERED");
+            orderStatistic.setValue(delivered);
+            orderStatistics.add(orderStatistic);
+        }
+        if(cancelled != null && cancelled != 0){
+            OrderStatistic orderStatistic = new OrderStatistic();
+            orderStatistic.setName("CANCELLED");
+            orderStatistic.setValue(cancelled);
+            orderStatistics.add(orderStatistic);
+        }
+        return orderStatistics;
+    }
+
+    @Override
+    public List<RevenueByMonth> getRevenueByMonth(Long restaurantId) {
+        return orderRepository.revenueByMonth(restaurantId);
+    }
+
+    @Override
+    public List<Order> getRecentOrders() {
+        Restaurant restaurant = restaurantService.getRestaurantOfUser();
+        return orderRepository.findTop5ByRestaurantIdOrderByCreatedDateDesc(restaurant.getId());
     }
 
 

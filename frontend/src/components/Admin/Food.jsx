@@ -47,6 +47,25 @@ const MenuProps = {
 };
 
 export const Food = () => {
+  const [uploading, setUploading] = useState(false);
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    setUploading(true);
+
+    const urls = [];
+    for (const file of files) {
+      // Gọi hàm uploadToCloudinary trả về url (bạn đã có sẵn hàm này)
+      const url = await uploadToCloudinary(file, "image");
+      if (url) urls.push(url);
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      images: [...prev.images, ...urls],
+    }));
+    setPreviewImages((prev) => [...prev, ...urls]);
+    setUploading(false);
+  };
   const dispatch = useDispatch();
   const { foods, loading, error, ingredients, categories, pagination } =
     useSelector((state) => state.restaurant);
@@ -105,14 +124,6 @@ export const Food = () => {
     };
   };
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    setImageFiles((prev) => [...prev, ...files]);
-
-    const previewUrls = files.map((file) => URL.createObjectURL(file));
-    setPreviewImages((prev) => [...prev, ...previewUrls]);
-  };
-
   // const uploadImages = async () => {
   //   if (imageFiles.length === 0) {
   //     alert("Please select images to upload.");
@@ -168,32 +179,16 @@ export const Food = () => {
   };
   const handleAddFood = async (e) => {
     e.preventDefault();
-
-    const uploadedImages = await uploadImages();
-    if (uploadedImages.length === 0) return;
-
-    const foodData = {
-      ...formData,
-      images: uploadedImages,
-    };
-
-    console.log("Food Data:", foodData);
-    dispatch(createFood(foodData));
-    setFormData({
-      id: "",
-      name: "",
-      description: "",
-      price: "",
-      cuisine: "",
-      vegetarian: false,
-      spicy: false,
-      images: [],
-      foodCategoryId: "",
-      ingredients: [],
-    });
-    setImageFiles([]);
-    setPreviewImages([]);
-    setShowForm(false);
+    if (uploading) {
+      alert("Image is uploading, please wait!");
+      return;
+    }
+    if (!formData.images.length) {
+      alert("Please select and upload images first!");
+      return;
+    }
+    dispatch(createFood(formData));
+    // ...reset form như cũ
   };
   const navigate = useNavigate();
 
@@ -238,7 +233,7 @@ export const Food = () => {
           }}
           className="w-full sm:w-auto flex-col sm:flex-row gap-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
-          Add Food
+          {uploading ? "Uploading image..." : "Add Food"}
         </button>
       </div>
 

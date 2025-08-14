@@ -11,6 +11,7 @@ export const uploadToCloudinary = async (file, fileType = "image") => {
       {
         method: "POST",
         body: data,
+        
       }
     );
     const fileData = await res.json();

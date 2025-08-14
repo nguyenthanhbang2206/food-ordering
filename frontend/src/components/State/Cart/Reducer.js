@@ -38,7 +38,7 @@ const initialState = {
 
 const cartReducer = (state = initialState, action) => {
   switch (action.type) {
-     case GET_ORDER_BY_ID_REQUEST:
+    case GET_ORDER_BY_ID_REQUEST:
       return {
         ...state,
         loading: true,
@@ -66,7 +66,9 @@ const cartReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        orders: action.payload, // Lưu danh sách đơn hàng vào state
+        error: null,
+        orders: action.payload.items,
+        pagination: action.payload.pagination,
       };
     case GET_ORDER_BY_USER_LOGIN_FAILURE:
       return {

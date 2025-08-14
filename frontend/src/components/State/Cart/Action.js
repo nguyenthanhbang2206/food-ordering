@@ -159,22 +159,23 @@ export const placeOrder =
   };
 
 // Get orders by user
-export const getOrderByUserLogin = () => async (dispatch) => {
-  dispatch({ type: GET_ORDER_BY_USER_LOGIN_REQUEST });
-  try {
-    const response = await api.get("/orders");
-    dispatch({
-      type: GET_ORDER_BY_USER_LOGIN_SUCCESS,
-      payload: response.data.data.items,
-    });
-  } catch (error) {
-    dispatch({
-      type: GET_ORDER_BY_USER_LOGIN_FAILURE,
-      payload: error.response?.data?.message || "Failed to fetch orders",
-    });
-  }
-};
-
+export const getOrderByUserLogin =
+  (page = 0, size = 5) =>
+  async (dispatch) => {
+    dispatch({ type: GET_ORDER_BY_USER_LOGIN_REQUEST });
+    try {
+      const response = await api.get(`/orders?page=${page}&size=${size}`);
+      dispatch({
+        type: GET_ORDER_BY_USER_LOGIN_SUCCESS,
+        payload: response.data.data, // Trả về cả pagination và items
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_ORDER_BY_USER_LOGIN_FAILURE,
+        payload: error.response?.data?.message || "Failed to fetch orders",
+      });
+    }
+  };
 // Get order by ID
 export const getOrderById = (orderId) => async (dispatch) => {
   dispatch({ type: GET_ORDER_BY_ID_REQUEST });

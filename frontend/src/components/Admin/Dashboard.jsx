@@ -150,6 +150,7 @@ export const Dashboard = () => {
       `/admin/restaurant/orders?status=${encodeURIComponent(entry.name)}`
     );
   };
+
   React.useEffect(() => {
     let mounted = true;
     const fetchRecentOrders = async () => {
@@ -194,6 +195,7 @@ export const Dashboard = () => {
       mounted = false;
     };
   }, []);
+
   const statusColor = (status) =>
     status === "Completed"
       ? "text-green-600"
@@ -204,10 +206,29 @@ export const Dashboard = () => {
       : status === "Delivered" || status === "DELIVERED"
       ? "text-green-700"
       : "text-red-600";
-  const chartData = topFoods.map((item, index) => ({
+
+  // Fix: Make chartData unique for each bar (even with duplicate names)
+  const chartData = topFoods.map((item, idx) => ({
     ...item,
-    label: `${item.name} (${index + 1})`,
+    label: `${item.name} (${idx + 1})`, // unique label for each bar
+    _originalName: item.name, // keep original name for tooltip
   }));
+
+  // Custom tooltip to show correct name and sold value
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const { _originalName, sold } = payload[0].payload;
+      return (
+        <div className="bg-white p-2 rounded shadow text-sm border border-gray-200">
+          <div>
+            <strong>{_originalName}</strong>
+          </div>
+          <div>Sold: {sold}</div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#E6E6FA] to-white p-6">
@@ -329,130 +350,129 @@ export const Dashboard = () => {
           ))}
         </Grid>
         {/* Charts: 2 chart nằm ngang, 1 chart nằm riêng 1 hàng */}
-        <Grid container spacing={3} className="mt-4" justifyContent="center">
-          {/* Order Status & Top Foods trên cùng 1 hàng */}
-          <Grid item xs={12} md={6} lg={6}>
-            <Card className="shadow-lg h-full flex flex-col">
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  <BarChartIcon className="mr-2" /> Order Status
-                </Typography>
-                <div style={{ width: "100%", minWidth: 500, height: 360 }}>
-                  {loading ? (
-                    <Skeleton variant="rectangular" width="100%" height={340} />
-                  ) : (
-                    <ResponsiveContainer width="100%" height={340}>
-                      <PieChart>
-                        <Pie
-                          data={orderStatus}
-                          dataKey="value"
-                          nameKey="name"
-                          cx="50%"
-                          cy="50%"
-                          outerRadius={120}
-                          label
-                          onClick={(e) => handleOrderStatusClick(e)}
-                        >
-                          {orderStatus.map((entry, i) => (
-                            <Cell
-                              key={i}
-                              fill={CHART_COLORS[i % CHART_COLORS.length]}
-                            />
-                          ))}
-                        </Pie>
-                        <ReTooltip />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  )}
-                </div>
-                {!loading && (
-                  <Typography
-                    variant="caption"
-                    className="block mt-2 text-gray-600"
-                  >
-                    Click a slice to view filtered orders.
-                  </Typography>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={6} lg={6}>
-            <Card className="shadow-lg h-full flex flex-col">
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  <FastfoodIcon className="mr-2" /> Top Foods
-                </Typography>
-                <div style={{ width: "100%", minWidth: 500, height: 360 }}>
-                  {loading ? (
-                    <Skeleton variant="rectangular" width="100%" height={340} />
-                  ) : (
-                    <ResponsiveContainer width="100%" height={340}>
-                      <BarChart
-                        data={topFoods}
-                        margin={{ left: 0, right: 0, top: 5, bottom: 5 }}
+        {/* Order Status & Top Foods trên cùng 1 hàng */}
+        <Grid item xs={12}>
+          <Card className="shadow-lg h-full flex flex-col mt-4">
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                <BarChartIcon className="mr-2" /> Order Status
+              </Typography>
+              <div style={{ width: "100%", minWidth: 500, height: 360 }}>
+                {loading ? (
+                  <Skeleton variant="rectangular" width="100%" height={340} />
+                ) : (
+                  <ResponsiveContainer width="100%" height={340}>
+                    <PieChart>
+                      <Pie
+                        data={orderStatus}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={120}
+                        label
+                        onClick={(e) => handleOrderStatusClick(e)}
                       >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <ReTooltip />
-                        <Bar
-                          dataKey="sold"
-                          onClick={(data) => handleTopFoodClick(data)}
-                        >
-                          {topFoods.map((entry, i) => (
-                            <Cell
-                              key={`cell-${i}`}
-                              fill={CHART_COLORS[i % CHART_COLORS.length]}
-                            />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  )}
-                </div>
-                {!loading && (
-                  <Typography
-                    variant="caption"
-                    className="block mt-2 text-gray-600"
-                  >
-                    Click a bar to view foods filtered by name.
-                  </Typography>
+                        {orderStatus.map((entry, i) => (
+                          <Cell
+                            key={i}
+                            fill={CHART_COLORS[i % CHART_COLORS.length]}
+                          />
+                        ))}
+                      </Pie>
+                      <ReTooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
                 )}
-              </CardContent>
-            </Card>
-          </Grid>
-          {/* Revenue by Month nằm riêng 1 hàng */}
-          <Grid item xs={12}>
-            <Card className="shadow-lg h-full flex flex-col mt-4">
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  <BarChartIcon className="mr-2" /> Revenue by Month
+              </div>
+              {!loading && (
+                <Typography
+                  variant="caption"
+                  className="block mt-2 text-gray-600"
+                >
+                  Click a slice to view filtered orders.
                 </Typography>
-                <div style={{ width: "100%", minWidth: 900, height: 400 }}>
-                  {loading ? (
-                    <Skeleton variant="rectangular" width="100%" height={380} />
-                  ) : (
-                    <ResponsiveContainer width="100%" height={380}>
-                      <LineChart data={revenueByMonth}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <ReTooltip />
-                        <Line
-                          type="monotone"
-                          dataKey="revenue"
-                          stroke={theme.palette.warning.main}
-                          strokeWidth={3}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </Grid>
+              )}
+            </CardContent>
+          </Card>{" "}
         </Grid>
+        <Grid item xs={12}>
+          <Card className="shadow-lg h-full flex flex-col mt-4">
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                <FastfoodIcon className="mr-2" /> Top Foods
+              </Typography>
+              <div style={{ width: "100%", minWidth: 500, height: 360 }}>
+                {loading ? (
+                  <Skeleton variant="rectangular" width="100%" height={340} />
+                ) : (
+                  <ResponsiveContainer width="100%" height={340}>
+                    <BarChart
+                      data={chartData}
+                      margin={{ left: 0, right: 0, top: 5, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="label" />
+                      <YAxis />
+                      <ReTooltip content={<CustomTooltip />} />
+                      <Bar
+                        dataKey="sold"
+                        onClick={(data) => handleTopFoodClick(data)}
+                      >
+                        {chartData.map((entry, i) => (
+                          <Cell
+                            key={`cell-${i}`}
+                            fill={CHART_COLORS[i % CHART_COLORS.length]}
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+              {!loading && (
+                <Typography
+                  variant="caption"
+                  className="block mt-2 text-gray-600"
+                >
+                  Click a bar to view foods filtered by name.
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+        {/* Revenue by Month nằm riêng 1 hàng */}
+        <Grid item xs={12}>
+          <Card className="shadow-lg h-full flex flex-col mt-4">
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                <BarChartIcon className="mr-2" /> Revenue by Month
+              </Typography>
+              <div style={{ width: "100%", minWidth: 900, height: 400 }}>
+                {loading ? (
+                  <Skeleton variant="rectangular" width="100%" height={380} />
+                ) : (
+                  <ResponsiveContainer width="100%" height={380}>
+                    <LineChart data={revenueByMonth}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <ReTooltip />
+                      <Line
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke={theme.palette.warning.main}
+                        strokeWidth={3}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </Grid>
+
         {/* Recent Orders Table */}
         <div className="mt-8">
           <Typography variant="h6" className="font-bold mb-4 text-[#5A20CB]">

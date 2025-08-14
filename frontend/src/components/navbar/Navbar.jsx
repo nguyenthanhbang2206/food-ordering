@@ -49,6 +49,14 @@ export const Navbar = () => {
     }
   };
 
+  const handleOrdersClick = () => {
+    navigate("/myProfile/orders");
+  };
+
+  const handleFavouritesClick = () => {
+    navigate("/myProfile/favorites");
+  };
+
   return (
     <div className="px-5 z-50 py-[.8rem] bg-[#5A20CB] lg:px-20 flex justify-between">
       {/* Logo */}
@@ -98,6 +106,27 @@ export const Navbar = () => {
             </Paper>
           )}
         </div>
+
+        <Button
+          variant="contained"
+          color="success"
+          size="small"
+          onClick={handleOrdersClick}
+          className="!bg-green-500 hover:!bg-green-600 text-white font-semibold"
+          sx={{ minWidth: 0, px: 2, py: 1, borderRadius: 2 }}
+        >
+          Orders
+        </Button>
+        <Button
+          variant="contained"
+          color="warning"
+          size="small"
+          onClick={handleFavouritesClick}
+          className="!bg-yellow-400 hover:!bg-yellow-500 text-white font-semibold"
+          sx={{ minWidth: 0, px: 2, py: 1, borderRadius: 2 }}
+        >
+          Favourites
+        </Button>
 
         {/* Nếu user là RESTAURANT_OWNER thì hiện nút Admin */}
         {auth.user?.role === "RESTAURANT_OWNER" && (

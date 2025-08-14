@@ -24,6 +24,9 @@ export const Cart = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // NEW: State for selected cart items
+  const [selectedItems, setSelectedItems] = useState([]);
+
   useEffect(() => {
     dispatch(getAllCartItems());
     fetchUserAddresses();
@@ -55,11 +58,11 @@ export const Cart = () => {
     }
   };
 
+  // NEW: Total price for selected items only
   const totalPrice = Array.isArray(cartItems)
-    ? cartItems.reduce(
-        (total, item) => total + item.food.price * item.quantity,
-        0
-      )
+    ? cartItems
+        .filter((item) => selectedItems.includes(item.id))
+        .reduce((total, item) => total + item.food.price * item.quantity, 0)
     : 0;
 
   const handleOpenAddressModal = () => {
@@ -69,6 +72,7 @@ export const Cart = () => {
   const handleCloseAddressModal = () => {
     setIsModalOpen(false);
   };
+
   const groupCartItemsByRestaurant = (cartItems) => {
     const groups = {};
     cartItems.forEach((item) => {
@@ -81,23 +85,36 @@ export const Cart = () => {
     return groups;
   };
 
-  const handlePlaceOrder = async () => {
+  // NEW: Checkout only selected items
+  const handleCheckout = async () => {
     if (!selectedAddress) {
       alert("Please select a delivery address.");
       return;
     }
-
-    if (!Array.isArray(cartItems) || cartItems.length === 0) {
-      alert("Your cart is empty.");
+    if (!Array.isArray(cartItems) || selectedItems.length === 0) {
+      alert("Please select items to checkout.");
       return;
     }
-    const grouped = groupCartItemsByRestaurant(cartItems);
+    const selectedCartItems = cartItems.filter((item) =>
+      selectedItems.includes(item.id)
+    );
+    const grouped = groupCartItemsByRestaurant(selectedCartItems);
 
     try {
       for (const restaurantId in grouped) {
-        await dispatch(placeOrder(selectedAddress, Number(restaurantId)));
+        await dispatch(
+          placeOrder(
+            selectedAddress,
+            Number(restaurantId),
+            grouped[restaurantId]
+          )
+        );
       }
-      await dispatch(deleteCart());
+      // Xóa các cartItem đã checkout
+      for (const id of selectedItems) {
+        await dispatch(deleteCartItem(id));
+      }
+      setSelectedItems([]);
       navigate("/");
     } catch (error) {
       alert("Failed to place order for some restaurants.");
@@ -124,17 +141,24 @@ export const Cart = () => {
         district: values.district,
         city: values.city,
       };
-      if (!Array.isArray(cartItems) || cartItems.length === 0) {
-        alert("Your cart is empty.");
+      if (!Array.isArray(cartItems) || selectedItems.length === 0) {
+        alert("Please select items to checkout.");
         return;
       }
-      // Gom cartItems theo restaurantId
-      const grouped = groupCartItemsByRestaurant(cartItems);
+      const selectedCartItems = cartItems.filter((item) =>
+        selectedItems.includes(item.id)
+      );
+      const grouped = groupCartItemsByRestaurant(selectedCartItems);
       try {
         for (const restaurantId in grouped) {
-          await dispatch(placeOrder(newAddress, Number(restaurantId)));
+          await dispatch(
+            placeOrder(newAddress, Number(restaurantId), grouped[restaurantId])
+          );
         }
-        await dispatch(deleteCart());
+        for (const id of selectedItems) {
+          await dispatch(deleteCartItem(id));
+        }
+        setSelectedItems([]);
         navigate("/");
       } catch (error) {
         console.error("Failed to place order:", error);
@@ -145,6 +169,33 @@ export const Cart = () => {
 
   const handleDelete = (id) => {
     dispatch(deleteCartItem(id));
+    setSelectedItems((prev) => prev.filter((itemId) => itemId !== id));
+  };
+
+  // NEW: Handle select/deselect cart item
+  const handleSelectItem = (id) => {
+    setSelectedItems((prev) =>
+      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+    );
+  };
+
+  // NEW: Select all items
+  const handleSelectAll = () => {
+    if (Array.isArray(cartItems) && selectedItems.length !== cartItems.length) {
+      setSelectedItems(cartItems.map((item) => item.id));
+    } else {
+      setSelectedItems([]);
+    }
+  };
+  const handleGoToCheckout = () => {
+    if (!selectedItems.length) {
+      alert("Please select items to checkout.");
+      return;
+    }
+    const selectedCartItems = cartItems.filter((item) =>
+      selectedItems.includes(item.id)
+    );
+    navigate("/checkout", { state: { selectedCartItems } });
   };
 
   return (
@@ -158,16 +209,34 @@ export const Cart = () => {
             </span>{" "}
             Your Cart
           </h2>
+          <div className="mb-2 flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={
+                Array.isArray(cartItems) &&
+                cartItems.length > 0 &&
+                selectedItems.length === cartItems.length
+              }
+              onChange={handleSelectAll}
+            />
+            <span className="text-sm">Select All</span>
+          </div>
           <div className="space-y-4">
             {Array.isArray(cartItems) && cartItems.length > 0 ? (
               cartItems.map((item) => (
-                <CartItem
-                  key={item.id}
-                  item={item}
-                  onDelete={handleDelete}
-                  onIncrease={() => handleIncrease(item.id, item.quantity)}
-                  onDecrease={() => handleDecrease(item.id, item.quantity)}
-                />
+                <div key={item.id} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.includes(item.id)}
+                    onChange={() => handleSelectItem(item.id)}
+                  />
+                  <CartItem
+                    item={item}
+                    onDelete={handleDelete}
+                    onIncrease={() => handleIncrease(item.id, item.quantity)}
+                    onDecrease={() => handleDecrease(item.id, item.quantity)}
+                  />
+                </div>
               ))
             ) : (
               <p className="text-gray-500 italic">Your cart is empty.</p>
@@ -181,102 +250,18 @@ export const Cart = () => {
           </div>
         </main>
 
-        {/* Address and Place Order Section */}
+        {/* Place Order Section */}
         <aside className="lg:w-1/3 w-full bg-white shadow-xl rounded-2xl p-6 flex flex-col">
-          <h2 className="text-2xl font-bold mb-6 text-[#5A20CB] flex items-center gap-2">
-            <span role="img" aria-label="address">
-              🏠
-            </span>{" "}
-            Delivery Address
-          </h2>
-          <div className="space-y-4">
-            {addresses.map((address) => (
-              <div
-                key={address.id}
-                className={`p-3 border rounded-lg cursor-pointer transition-all ${
-                  selectedAddress?.id === address.id
-                    ? "border-[#5A20CB] bg-[#E6E6FA]"
-                    : "border-gray-200 bg-gray-50"
-                } hover:border-[#5A20CB]`}
-                onClick={() => setSelectedAddress(address)}
-              >
-                <p className="font-medium text-gray-700">
-                  {`${address.street}, ${address.ward}, ${address.district}, ${address.city}`}
-                </p>
-              </div>
-            ))}
-          </div>
+          {/* ...existing code... */}
           <Button
-            onClick={handleOpenAddressModal}
-            className="mt-6 w-full !bg-[#5A20CB] !text-white py-2 rounded-lg hover:!bg-[#431a9e] font-semibold shadow"
-          >
-            + Add New Address
-          </Button>
-          <Button
-            onClick={handlePlaceOrder}
+            onClick={handleGoToCheckout}
             className="mt-4 w-full !bg-green-500 !text-white py-2 rounded-lg hover:!bg-green-600 font-semibold shadow"
+            disabled={selectedItems.length === 0}
           >
-            Place Order
+            Checkout Selected
           </Button>
         </aside>
       </div>
-
-      {/* Modal for Adding New Address */}
-      <Modal open={isModalOpen} onClose={handleCloseAddressModal}>
-        <div className="bg-white p-8 rounded-2xl shadow-2xl w-[90%] max-w-md mx-auto mt-20">
-          <h2 className="text-2xl font-bold mb-6 text-[#5A20CB] text-center">
-            Add New Address
-          </h2>
-          <form onSubmit={formik.handleSubmit} className="space-y-5">
-            <TextField
-              fullWidth
-              label="City"
-              name="city"
-              value={formik.values.city}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.city && Boolean(formik.errors.city)}
-              helperText={formik.touched.city && formik.errors.city}
-            />
-            <TextField
-              fullWidth
-              label="District"
-              name="district"
-              value={formik.values.district}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.district && Boolean(formik.errors.district)}
-              helperText={formik.touched.district && formik.errors.district}
-            />
-            <TextField
-              fullWidth
-              label="Ward"
-              name="ward"
-              value={formik.values.ward}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.ward && Boolean(formik.errors.ward)}
-              helperText={formik.touched.ward && formik.errors.ward}
-            />
-            <TextField
-              fullWidth
-              label="Street"
-              name="street"
-              value={formik.values.street}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.street && Boolean(formik.errors.street)}
-              helperText={formik.touched.street && formik.errors.street}
-            />
-            <Button
-              type="submit"
-              className="w-full !bg-green-500 !text-white py-2 rounded-lg hover:!bg-green-600 font-semibold shadow"
-            >
-              Place order
-            </Button>
-          </form>
-        </div>
-      </Modal>
     </>
   );
 };

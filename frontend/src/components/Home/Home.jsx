@@ -11,11 +11,11 @@ import {
 import { isPresentInFavorites } from "../../config/api";
 import axios from "axios";
 import { addCartItemToCart } from "../State/Cart/Action";
+import { useNavigate } from "react-router-dom";
 export const Home = () => {
   const [popularFoods, setPopularFoods] = useState([]);
   const [latestFoods, setLatestFoods] = useState([]);
   const [foodLoading, setFoodLoading] = useState(false);
-
   const dispatch = useDispatch();
   const { restaurants, loading, error, favouriteRestaurants } = useSelector(
     (state) => state.restaurant
@@ -95,12 +95,6 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* Top Meals */}
-      <section className="flex flex-col items-center justify-center">
-        <p className="text-4xl font-bold text-center mt-10">Top Meals</p>
-        <MultiCarousel />
-      </section>
-
       {/* Popular Foods */}
       <section className="max-w-screen-xl mx-auto px-4 mt-12">
         <h2 className="text-2xl font-bold text-[#5A20CB] mb-4">
@@ -149,7 +143,7 @@ export const Home = () => {
       </section>
       {/* Latest Foods */}
       <section className="max-w-screen-xl mx-auto px-4 mt-12">
-        <h2 className="text-2xl font-bold text-[#5A20CB] mb-4">Latest Foods</h2>
+        <h2 className="text-2xl font-bold text-[#5A20CB] mb-4">Newest Foods</h2>
         {foodLoading ? (
           <p>Loading...</p>
         ) : latestFoods.length === 0 ? (

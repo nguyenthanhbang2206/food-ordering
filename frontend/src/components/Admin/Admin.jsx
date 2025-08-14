@@ -1,6 +1,6 @@
 import React from "react";
 import { Sidebar } from "./Sidebar";
-import { Outlet, Routes, Route } from "react-router-dom";
+import { Outlet, Routes, Route, Navigate } from "react-router-dom";
 import { Dashboard } from "./Dashboard";
 import { Orders } from "./Orders";
 import { Ingredients } from "./Ingredients";
@@ -17,6 +17,7 @@ export const Admin = () => {
       {/* Main Content */}
       <div className="flex-1 p-6 bg-gray-100 overflow-y-auto">
         <Routes>
+          <Route path="/" element={<Navigate to={"dashboard"} />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="orders" element={<Orders />} />
           <Route path="ingredients" element={<Ingredients />} />

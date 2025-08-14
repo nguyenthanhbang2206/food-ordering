@@ -12,6 +12,8 @@ import { PrivateRoute } from "../components/PrivateRoute";
 import SearchPage from "../components/Home/SearchPage";
 import { ForgotPassword } from "../components/Auth/ForgotPassword";
 import { ResetPassword } from "../components/Auth/ResetPassword";
+import { Checkout } from "../components/Cart/Checkout";
+import { ThankYou } from "../components/Cart/ThankYou";
 export const CustomerRoutes = () => {
   return (
     <div>
@@ -42,6 +44,22 @@ export const CustomerRoutes = () => {
           element={
             <PrivateRoute>
               <RestaurantDetail />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <PrivateRoute>
+              <Checkout></Checkout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/thank-you"
+          element={
+            <PrivateRoute>
+              <ThankYou></ThankYou>
             </PrivateRoute>
           }
         />

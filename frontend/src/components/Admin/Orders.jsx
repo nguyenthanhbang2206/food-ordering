@@ -69,6 +69,9 @@ export const Orders = () => {
                 Status
               </th>
               <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+                Created Date
+              </th>
+              <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
                 Action
               </th>
             </tr>
@@ -109,6 +112,11 @@ export const Orders = () => {
                     >
                       Update
                     </button>
+                  </td>
+                  <td className="px-4 py-2 border-b text-sm text-gray-700">
+                    {order.createdDate
+                      ? new Date(order.createdDate).toLocaleString()
+                      : "N/A"}
                   </td>
                   <td className="px-4 py-2 border-b text-sm text-gray-700">
                     <button

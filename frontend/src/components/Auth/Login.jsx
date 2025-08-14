@@ -90,6 +90,7 @@ export const Login = () => {
           </div>
           <div className="mt-2 text-center">
             <button
+              type="button"
               onClick={() => navigate("/forgot-password")}
               className="text-blue-500 hover:underline focus:outline-none text-sm"
             >

@@ -29,8 +29,5 @@ build/
 ### VS Code ###
 .vscode/
 *.cmd
-mvnw
-.mvn
 *.gitattributes
-mvnw
 *.env

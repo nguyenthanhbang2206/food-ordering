@@ -23,6 +23,6 @@ public class Comment extends BaseEntity{
     @ManyToOne
     private User user;
 
-    @Column(columnDefinition = "MEDIUMTEXT")
+    @Column(columnDefinition = "TEXT")
     private String content;
 }

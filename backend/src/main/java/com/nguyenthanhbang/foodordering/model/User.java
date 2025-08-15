@@ -25,7 +25,7 @@ public class User extends BaseEntity{
     private String password;
     private String fullName;
     private String avatar;
-    @Column(columnDefinition = "MEDIUMTEXT")
+    @Column(columnDefinition = "TEXT")
     private String refreshToken;
     @Enumerated(EnumType.STRING)
     private Gender gender;

@@ -25,6 +25,8 @@ public class EmailServiceImpl implements EmailService {
     private final ResetPasswordTokenRepository resetPasswordTokenRepository;
     @Value("${spring.mail.username}")
     private String from;
+    @Value("${app.frontend.url")
+    private String frontendUrl;
     private final JavaMailSender mailSender;
     @Override
     public void sendTokenResetPassword(ResetPasswordRequest request) throws MessagingException {
@@ -43,7 +45,7 @@ public class EmailServiceImpl implements EmailService {
            helper.setFrom(from);
            helper.setTo(request.getEmail());
            helper.setSubject("Đổi mật khẩu");
-           String link = "http://localhost:3000/reset-password?token=" + token;
+           String link = frontendUrl + "/reset-password?token=" + token;
            helper.setText("Bấm vào link sau: " + link + " để đổi mật khẩu");
            mailSender.send(mimeMessage);
        }catch (MessagingException e){

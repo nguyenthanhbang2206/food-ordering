@@ -34,6 +34,8 @@ import java.util.Arrays;
 public class SecurityConfiguration {
     @Value("${jwt.base64-secret}")
     private String jwtKey;
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -61,7 +63,7 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList(frontendUrl));
         configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "x-no-retry"));
         configuration.setAllowCredentials(true);

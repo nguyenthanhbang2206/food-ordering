@@ -104,6 +104,7 @@ com\nguyenthanhbang\foodordering\controller\user\ReviewController.class
 com\nguyenthanhbang\foodordering\controller\user\CommentController.class
 com\nguyenthanhbang\foodordering\validator\EmailValidator.class
 com\nguyenthanhbang\foodordering\repository\FoodRepository.class
+com\nguyenthanhbang\foodordering\controller\user\HelloController.class
 com\nguyenthanhbang\foodordering\FoodorderingApplication.class
 com\nguyenthanhbang\foodordering\model\Restaurant$RestaurantBuilder.class
 com\nguyenthanhbang\foodordering\model\Ingredient$IngredientBuilder.class

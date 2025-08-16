@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.nguyenthanhbang.foodordering.FoodorderingApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.156 s -- in com.nguyenthanhbang.foodordering.FoodorderingApplicationTests

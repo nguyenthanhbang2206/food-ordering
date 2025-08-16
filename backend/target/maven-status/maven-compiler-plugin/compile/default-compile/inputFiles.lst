@@ -86,6 +86,7 @@ D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\controller\user\RestaurantController.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\model\BaseEntity.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\config\JpaAuditingConfig.java
+D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\controller\user\HelloController.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\impl\FoodServiceImpl.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\config\CustomUserDetailsService.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\dto\response\OrderStatistic.java

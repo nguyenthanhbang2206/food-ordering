@@ -48,15 +48,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public double getAverageRating(Long restaurantId) {
         Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
-        double averageRating = 0.0d;
-        List<Review> reviews = restaurant.getReviews();
-        if(reviews.isEmpty() || reviews == null) {
-            return 0.0;
-        }
-        for (Review review : reviews) {
-            averageRating += review.getRating();
-        }
-        return averageRating / reviews.size();
+        return reviewRepository.getAverageRatingByRestaurantId(restaurantId);
     }
 
     @Override

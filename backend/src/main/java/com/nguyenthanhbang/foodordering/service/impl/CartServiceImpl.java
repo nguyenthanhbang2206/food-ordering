@@ -137,6 +137,9 @@ public class CartServiceImpl implements CartService {
     @Override
     public List<CartItem> getCartItems() {
         Cart cart = this.getCartByUserLogin();
+        if(cart == null){
+            throw new EntityNotFoundException("Cart not found");
+        }
         return cartItemRepository.findByCart_Id(cart.getId());
     }
 

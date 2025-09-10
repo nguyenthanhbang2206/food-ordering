@@ -35,6 +35,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<Comment> getCommentByRestaurantId(Long restaurantId) {
+        Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
         return commentRepository.findByRestaurantIdOrderByCreatedDateDesc(restaurantId);
     }
 }

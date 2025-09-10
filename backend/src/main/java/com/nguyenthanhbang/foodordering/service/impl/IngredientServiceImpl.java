@@ -53,6 +53,10 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     public Ingredient updateIngredient(Long ingredientId, IngredientRequest request) {
         Ingredient ingredient = this.getIngredientByIdAndRestaurantId(ingredientId);
+        Ingredient isExistsName = ingredientRepository.findByName(request.getName());
+        if(isExistsName != null){
+            throw new EntityExistsException("Ingredient already exists");
+        }
         ingredient.setName(request.getName());
         return ingredientRepository.save(ingredient);
     }

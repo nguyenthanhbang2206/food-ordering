@@ -4,8 +4,10 @@ import com.nguyenthanhbang.foodordering.enums.Gender;
 import com.nguyenthanhbang.foodordering.enums.Role;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class UpdateUserRequest {
     @NotBlank(message = "FullName must not be blank")
     private String fullName;

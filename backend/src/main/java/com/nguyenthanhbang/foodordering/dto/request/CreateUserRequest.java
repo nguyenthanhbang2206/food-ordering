@@ -6,8 +6,10 @@ import com.nguyenthanhbang.foodordering.validator.ValidEmail;
 import com.nguyenthanhbang.foodordering.validator.ValidRegister;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @ValidRegister
 public class CreateUserRequest {
     @ValidEmail(checkExists = true)

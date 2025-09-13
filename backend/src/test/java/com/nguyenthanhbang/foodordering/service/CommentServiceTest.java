@@ -89,7 +89,7 @@ public class CommentServiceTest {
         Long restaurantId = 999L;
         request.setRestaurantId(restaurantId);
         Mockito.when(restaurantService.getRestaurantById(restaurantId)).thenThrow(new EntityNotFoundException("Restaurant with ID = " + restaurantId + " not found"));
-        EntityNotFoundException ex = Assertions.assertThrows(EntityNotFoundException.class, ()->commentService.createComment(request));
+        EntityNotFoundException ex = Assertions.assertThrows(EntityNotFoundException.class, ()->commentService.getCommentByRestaurantId(restaurantId));
         Assertions.assertEquals("Restaurant with ID = " + restaurantId + " not found", ex.getMessage());
         Mockito.verify(commentRepository, Mockito.never()).findByRestaurantIdOrderByCreatedDateDesc(restaurantId);
     }

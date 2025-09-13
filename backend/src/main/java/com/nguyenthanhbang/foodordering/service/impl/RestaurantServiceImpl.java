@@ -33,8 +33,6 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
 
-
-
     @Override
     public Restaurant createRestaurant(RestaurantRequest request){
         User user = userService.getUserLogin();

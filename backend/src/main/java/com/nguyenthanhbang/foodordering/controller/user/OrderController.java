@@ -7,6 +7,7 @@ import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
 import com.nguyenthanhbang.foodordering.model.CartItem;
 import com.nguyenthanhbang.foodordering.model.Order;
 import com.nguyenthanhbang.foodordering.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +23,7 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     @PostMapping("/orders")
-    public ResponseEntity<ApiResponse<Order>> placeOrder(@RequestBody CreateOrderRequest request) {
+    public ResponseEntity<ApiResponse<Order>> placeOrder(@Valid @RequestBody CreateOrderRequest request) {
         Order order = orderService.createOrder(request);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.CREATED.value())

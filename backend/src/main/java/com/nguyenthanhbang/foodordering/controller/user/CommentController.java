@@ -4,6 +4,7 @@ import com.nguyenthanhbang.foodordering.dto.request.CommentRequest;
 import com.nguyenthanhbang.foodordering.dto.response.ApiResponse;
 import com.nguyenthanhbang.foodordering.model.Comment;
 import com.nguyenthanhbang.foodordering.service.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class CommentController {
     private final CommentService commentService;
     private final SimpMessagingTemplate messagingTemplate;
     @PostMapping("/comments")
-    public ResponseEntity<ApiResponse<Comment>> createComment(@RequestBody CommentRequest request) {
+    public ResponseEntity<ApiResponse<Comment>> createComment(@Valid @RequestBody CommentRequest request) {
         Comment comment = commentService.createComment(request);
         messagingTemplate.convertAndSend("/topic/restaurants/" + request.getRestaurantId(), comment);
         ApiResponse apiResponse = ApiResponse.builder()

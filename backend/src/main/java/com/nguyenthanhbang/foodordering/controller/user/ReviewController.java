@@ -7,6 +7,7 @@ import com.nguyenthanhbang.foodordering.dto.response.ReviewStats;
 import com.nguyenthanhbang.foodordering.model.Comment;
 import com.nguyenthanhbang.foodordering.model.Review;
 import com.nguyenthanhbang.foodordering.service.ReviewService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ import java.util.Map;
 public class ReviewController {
     private final ReviewService reviewService;
     @PostMapping("/reviews")
-    public ResponseEntity<ApiResponse<Review>> rating(@RequestBody ReviewRequest request) {
+    public ResponseEntity<ApiResponse<Review>> rating( @RequestBody ReviewRequest request) {
         Review review = reviewService.rating(request);
         ApiResponse apiResponse = ApiResponse.builder()
                 .status(HttpStatus.CREATED.value())

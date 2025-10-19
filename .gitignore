@@ -31,4 +31,3 @@ build/
 *.cmd
 *.gitattributes
 *.env
-target

@@ -8,7 +8,7 @@ import {
   getAllRestaurant,
   getFavouriteRestaurants,
 } from "../State/Restaurant/Action";
-import { isPresentInFavorites } from "../../config/api";
+import { API_URL, isPresentInFavorites } from "../../config/api";
 import axios from "axios";
 import { addCartItemToCart } from "../State/Cart/Action";
 import { useNavigate } from "react-router-dom";
@@ -31,14 +31,11 @@ export const Home = () => {
     setFoodLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(
-        "http://localhost:8080/api/v1/foods/popular",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await axios.get(`${API_URL}/api/v1/foods/popular`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setPopularFoods(res.data.data || []);
     } catch (err) {
       setPopularFoods([]);
@@ -50,7 +47,7 @@ export const Home = () => {
     setFoodLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:8080/api/v1/foods/latest", {
+      const res = await axios.get(`${API_URL}/api/v1/foods/latest`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -115,7 +112,7 @@ export const Home = () => {
                   src={
                     food.images[0]?.startsWith("http")
                       ? food.images[0]
-                      : `http://localhost:8080/images/foods/${food.images[0]}`
+                      : `${API_URL}/images/foods/${food.images[0]}`
                   }
                   alt={food.name}
                   className="w-32 h-32 object-cover rounded mb-2"
@@ -159,7 +156,7 @@ export const Home = () => {
                   src={
                     food.images[0]?.startsWith("http")
                       ? food.images[0]
-                      : `http://localhost:8080/images/foods/${food.images[0]}`
+                      : `${API_URL}/images/foods/${food.images[0]}`
                   }
                   alt={food.name}
                   className="w-32 h-32 object-cover rounded mb-2"

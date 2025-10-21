@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { placeOrder, deleteCartItem } from "../State/Cart/Action";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
-
+const API_URL = process.env.REACT_APP_API_URL;
 export const Checkout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ export const Checkout = () => {
   const fetchUserAddresses = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/v1/users/profile",
+        `${API_URL}/api/v1/users/profile`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

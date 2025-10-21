@@ -24,6 +24,7 @@ import { CompatClient, Stomp } from "@stomp/stompjs";
 import { useRef } from "react";
 import StarIcon from "@mui/icons-material/Star";
 import Rating from "@mui/material/Rating";
+const API_URL = process.env.REACT_APP_API_URL;
 export const RestaurantDetail = () => {
   const [comments, setComments] = useState([]);
   const [commentContent, setCommentContent] = useState("");
@@ -55,7 +56,7 @@ export const RestaurantDetail = () => {
     if (!restaurantId) return;
 
     // Kết nối websocket
-    const socket = new SockJS("http://localhost:8080/ws");
+    const socket = new SockJS(`${API_URL}/ws`);
     const stompClient = Stomp.over(socket);
     stompClientRef.current = stompClient;
 
@@ -90,7 +91,7 @@ export const RestaurantDetail = () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        `http://localhost:8080/api/v1/restaurants/${restaurantId}/comments`,
+        `${API_URL}/api/v1/restaurants/${restaurantId}/comments`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -109,7 +110,7 @@ export const RestaurantDetail = () => {
     if (!commentContent.trim()) return;
     try {
       await axios.post(
-        "http://localhost:8080/api/v1/comments",
+        `${API_URL}/api/v1/comments`,
         {
           restaurantId: restaurantId,
           content: commentContent,
@@ -164,7 +165,7 @@ export const RestaurantDetail = () => {
   const fetchMyReview = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8080/api/v1/restaurants/${restaurantId}/my-review`,
+        `${API_URL}/api/v1/restaurants/${restaurantId}/my-review`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -180,7 +181,7 @@ export const RestaurantDetail = () => {
     setRatingLoading(true);
     try {
       await axios.post(
-        `http://localhost:8080/api/v1/reviews`,
+        `${API_URL}/api/v1/reviews`,
         {
           restaurantId: restaurantId,
           rating: newValue,

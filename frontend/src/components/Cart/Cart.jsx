@@ -23,7 +23,7 @@ export const Cart = () => {
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const API_URL = process.env.REACT_APP_API_URL;
   // NEW: State for selected cart items
   const [selectedItems, setSelectedItems] = useState([]);
 
@@ -34,14 +34,11 @@ export const Cart = () => {
 
   const fetchUserAddresses = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8080/api/v1/users/profile",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await axios.get(`${API_URL}/api/v1/users/profile`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       setAddresses(response.data.data.deliveryAddresses || []);
     } catch (error) {
       console.error("Failed to fetch user addresses:", error);

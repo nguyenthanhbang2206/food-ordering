@@ -61,7 +61,7 @@ const MOCK_STATS = {
   revenueByMonth: [{ month: 8, revenue: 450 }],
   recentOrders: [],
 };
-
+const API_URL = process.env.REACT_APP_API_URL;
 const CHART_COLORS = ["#5A20CB", "#F9A826", "#00C49F", "#FF444A"];
 const formatCurrency = (value) =>
   typeof value === "number"
@@ -85,7 +85,7 @@ export const Dashboard = () => {
       setError(null);
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:8080/api/v1/dashboard", {
+        const res = await axios.get(`${API_URL}/api/v1/dashboard`, {
           headers: { Authorization: `Bearer ${token}` },
           timeout: 4000,
         });
@@ -158,7 +158,7 @@ export const Dashboard = () => {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.get(
-          "http://localhost:8080/api/v1/admin/restaurants/orders/recently",
+          `${API_URL}/api/v1/admin/restaurants/orders/recently`,
           {
             headers: { Authorization: `Bearer ${token}` },
             timeout: 4000,

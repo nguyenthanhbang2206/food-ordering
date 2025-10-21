@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-
+const API_URL = process.env.REACT_APP_API_URL;
 export const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [snackbar, setSnackbar] = useState({
@@ -14,7 +14,7 @@ export const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8080/api/v1/auth/forgot-password", {
+      await axios.post(`${API_URL}/api/v1/auth/forgot-password`, {
         email,
       });
       setSnackbar({

@@ -3,7 +3,7 @@ import axios from "axios";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-
+const API_URL = process.env.REACT_APP_API_URL;
 export const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export const ResetPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put("http://localhost:8080/api/v1/auth/reset-password", {
+      await axios.put(`${API_URL}/api/v1/auth/reset-password`, {
         token,
         newPassword,
       });

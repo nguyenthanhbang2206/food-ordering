@@ -1,6 +1,6 @@
 import axios from "axios";
-
-export const API_URL = "http://localhost:8080/api/v1";
+const API_URLS = process.env.REACT_APP_API_URL;
+export const API_URL = `${API_URLS}/api/v1`;
 
 const api = axios.create({
   baseURL: API_URL,
@@ -34,7 +34,7 @@ export function setOnUnauthorizedCallback(callback) {
 // Hàm decode base64 payload của JWT để lấy exp
 export function getTokenExpiration(token) {
   try {
-    const payload = token.split('.')[1];
+    const payload = token.split(".")[1];
     const decoded = JSON.parse(atob(payload));
     return decoded.exp; // thời gian hết hạn tính bằng giây (Unix timestamp)
   } catch {

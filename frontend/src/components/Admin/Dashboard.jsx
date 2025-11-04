@@ -62,7 +62,7 @@ const MOCK_STATS = {
   recentOrders: [],
 };
 const API_URL = process.env.REACT_APP_API_URL;
-const CHART_COLORS = ["#5A20CB", "#F9A826", "#00C49F", "#FF444A"];
+const CHART_COLORS = ["#2563EB", "#F9A826", "#00C49F", "#FF444A"];
 const formatCurrency = (value) =>
   typeof value === "number"
     ? value.toLocaleString(undefined, { minimumFractionDigits: 0 })
@@ -144,12 +144,6 @@ export const Dashboard = () => {
     navigate(`/admin/restaurant/foods?q=${encodeURIComponent(data.name)}`);
   };
 
-  const handleOrderStatusClick = (entry) => {
-    if (!entry) return;
-    navigate(
-      `/admin/restaurant/orders?status=${encodeURIComponent(entry.name)}`
-    );
-  };
 
   React.useEffect(() => {
     let mounted = true;
@@ -233,7 +227,7 @@ export const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#E6E6FA] to-white p-6">
       <div className="max-w-screen-xl mx-auto">
-        <h1 className="text-4xl font-bold text-[#5A20CB] mb-4">
+        <h1 className="text-4xl font-bold text-[#2563EB] mb-4">
           Restaurant Dashboard
         </h1>
         <Divider className="mb-6" />
@@ -254,7 +248,7 @@ export const Dashboard = () => {
               <Button
                 variant="outlined"
                 startIcon={<FastfoodIcon />}
-                onClick={() => navigate("/admin/restaurant/foods")}
+                onClick={() => navigate("/admin/restaurant/food")}
               >
                 Manage Foods
               </Button>
@@ -264,13 +258,6 @@ export const Dashboard = () => {
                 onClick={() => navigate("/admin/restaurant/orders")}
               >
                 Manage Orders
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<RateReviewIcon />}
-                onClick={() => navigate("/admin/restaurant/reviews")}
-              >
-                View Reviews
               </Button>
             </div>
           </CardContent>
@@ -301,11 +288,11 @@ export const Dashboard = () => {
               value:
                 loading || stats?.totalRevenue == null
                   ? null
-                  : `$${formatCurrency(stats.totalRevenue)}`,
+                  : `${formatCurrency(stats.totalRevenue)}đ`,
               sub:
                 loading || stats?.todayRevenue == null
                   ? null
-                  : `Today: $${formatCurrency(stats.todayRevenue)}`,
+                  : `Today: ${formatCurrency(stats.todayRevenue)}đ`,
             },
             {
               title: "Reviews",
@@ -371,7 +358,6 @@ export const Dashboard = () => {
                         cy="50%"
                         outerRadius={120}
                         label
-                        onClick={(e) => handleOrderStatusClick(e)}
                       >
                         {orderStatus.map((entry, i) => (
                           <Cell
@@ -475,7 +461,7 @@ export const Dashboard = () => {
 
         {/* Recent Orders Table */}
         <div className="mt-8">
-          <Typography variant="h6" className="font-bold mb-4 text-[#5A20CB]">
+          <Typography variant="h6" className="font-bold mb-4 text-[#2563EB]">
             Recent Orders
           </Typography>
           <TableContainer component={Paper}>
@@ -485,7 +471,7 @@ export const Dashboard = () => {
                   <TableCell>Order ID</TableCell>
                   <TableCell>Customer</TableCell>
                   <TableCell>Food</TableCell>
-                  <TableCell>Total ($)</TableCell>
+                  <TableCell>Total (đ)</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Date</TableCell>
                 </TableRow>

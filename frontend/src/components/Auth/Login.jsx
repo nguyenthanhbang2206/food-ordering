@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { login } from "../State/Auth/Action";
+import { login, resetAuthError } from "../State/Auth/Action";
 import { useEffect } from "react";
 
 import Snackbar from "@mui/material/Snackbar";
@@ -14,7 +14,10 @@ export const Login = () => {
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  useEffect(() => {
+    dispatch(resetAuthError());
+    // eslint-disable-next-line
+  }, []);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -44,6 +47,8 @@ export const Login = () => {
   };
 
   const handleRegister = () => {
+    dispatch(resetAuthError());
+
     navigate("/register"); // Điều hướng đến trang đăng ký
   };
 

@@ -20,7 +20,8 @@ import {
 import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
 import { uploadToCloudinary } from "../../utils/uploadToCloudinary";
-
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 const MenuProps = {
   PaperProps: {
     style: {
@@ -50,6 +51,12 @@ export const FoodEdit = () => {
     cuisine: food.cuisine,
     vegetarian: food.vegetarian,
     spicy: food.spicy,
+  });
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
   });
 
   const [imageFiles, setImageFiles] = useState([]);
@@ -117,13 +124,26 @@ export const FoodEdit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const uploadedImages = await uploadImages();
-    const updatedFoodData = {
-      ...formData,
-      images: uploadedImages,
-    };
-    dispatch(updateFood(formData.id, updatedFoodData));
-    navigate("/admin/restaurant/food");
+    try {
+      const uploadedImages = await uploadImages();
+      const updatedFoodData = {
+        ...formData,
+        images: uploadedImages,
+      };
+      await dispatch(updateFood(formData.id, updatedFoodData));
+      setSnackbar({
+        open: true,
+        message: "Cập nhật món ăn thành công!",
+        severity: "success",
+      });
+      setTimeout(() => navigate("/admin/restaurant/food"), 1000);
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: "Cập nhật món ăn thất bại!",
+        severity: "error",
+      });
+    }
   };
 
   return (
@@ -313,6 +333,20 @@ export const FoodEdit = () => {
           </button>
         </div>
       </form>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

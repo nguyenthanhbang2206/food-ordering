@@ -22,7 +22,28 @@ import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import { updateAvailability } from "../State/Restaurant/Action";
 import { uploadToCloudinary } from "../../utils/uploadToCloudinary";
-
+const CUISINE_OPTIONS = [
+  "Việt Nam",
+  "Trung Quốc",
+  "Nhật Bản",
+  "Hàn Quốc",
+  "Thái Lan",
+  "Ấn Độ",
+  "Pháp",
+  "Ý",
+  "Tây Ban Nha",
+  "Mexico",
+  "Mỹ",
+  "Brazil",
+  "Thổ Nhĩ Kỳ",
+  "Hy Lạp",
+  "Đức",
+  "Nga",
+  "Anh",
+  "Indonesia",
+  "Malaysia",
+  "Singapore",
+];
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -124,39 +145,6 @@ export const Food = () => {
     };
   };
 
-  // const uploadImages = async () => {
-  //   if (imageFiles.length === 0) {
-  //     alert("Please select images to upload.");
-  //     return [];
-  //   }
-
-  //   const form = new FormData();
-  //   imageFiles.forEach((file) => {
-  //     form.append("files", file);
-  //   });
-  //   form.append("folder", "foods");
-
-  //   try {
-  //     const response = await axios.post(
-  //       "http://localhost:8080/api/v1/files",
-  //       form,
-  //       {
-  //         headers: {
-  //           "Content-Type": "multipart/form-data",
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //       }
-  //     );
-  //     return response.data.data;
-  //   } catch (error) {
-  //     alert(
-  //       `Failed to upload images: ${
-  //         error.response?.data?.message || error.message
-  //       }`
-  //     );
-  //     return [];
-  //   }
-  // };
 
   const uploadImages = async () => {
     if (imageFiles.length === 0) {
@@ -188,6 +176,21 @@ export const Food = () => {
       return;
     }
     dispatch(createFood(formData));
+    setFormData({
+      id: "",
+      name: "",
+      description: "",
+      price: "",
+      cuisine: "",
+      vegetarian: false,
+      spicy: false,
+      images: [],
+      foodCategoryId: "",
+      ingredients: [],
+    });
+    setPreviewImages([]);
+    setImageFiles([]);
+    setShowForm(false);
     // ...reset form như cũ
   };
   const navigate = useNavigate();
@@ -274,15 +277,20 @@ export const Food = () => {
               required
               className="px-4 py-2 border border-gray-300 rounded-lg"
             />
-            <input
-              type="text"
+            <select
               name="cuisine"
               value={formData.cuisine}
               onChange={handleInputChange}
-              placeholder="Cuisine"
               required
               className="px-4 py-2 border border-gray-300 rounded-lg"
-            />
+            >
+              <option value="">Select Cuisine</option>
+              {CUISINE_OPTIONS.map((cuisine) => (
+                <option key={cuisine} value={cuisine}>
+                  {cuisine}
+                </option>
+              ))}
+            </select>
             <label className="flex items-center">
               <input
                 type="checkbox"
@@ -463,7 +471,7 @@ export const Food = () => {
                     {food.name}
                   </td>
                   <td className="px-4 py-2 border-b text-sm text-gray-700">
-                    ${food.price.toFixed(2)}
+                    đ{food.price.toFixed(2)}
                   </td>
                   <td className="px-4 py-2 border-b text-sm text-gray-700">
                     {categories.find((cat) => cat.id === food.foodCategory.id)
@@ -555,7 +563,7 @@ export const Food = () => {
                 <strong>Description:</strong> {selectedFood.description}
               </p>
               <p>
-                <strong>Price:</strong> ${selectedFood.price.toFixed(2)}
+                <strong>Price:</strong> đ {selectedFood.price.toFixed(2)}
               </p>
               <p>
                 <strong>Cuisine:</strong> {selectedFood.cuisine}

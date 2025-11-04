@@ -25,6 +25,28 @@ import { useRef } from "react";
 import StarIcon from "@mui/icons-material/Star";
 import Rating from "@mui/material/Rating";
 const API_URL = process.env.REACT_APP_API_URL;
+const CUISINE_OPTIONS = [
+  "Việt Nam",
+  "Trung Quốc",
+  "Nhật Bản",
+  "Hàn Quốc",
+  "Thái Lan",
+  "Ấn Độ",
+  "Pháp",
+  "Ý",
+  "Tây Ban Nha",
+  "Mexico",
+  "Mỹ",
+  "Brazil",
+  "Thổ Nhĩ Kỳ",
+  "Hy Lạp",
+  "Đức",
+  "Nga",
+  "Anh",
+  "Indonesia",
+  "Malaysia",
+  "Singapore",
+];
 export const RestaurantDetail = () => {
   const [comments, setComments] = useState([]);
   const [commentContent, setCommentContent] = useState("");
@@ -247,7 +269,7 @@ export const RestaurantDetail = () => {
               icon={<StarIcon fontSize="inherit" />}
               emptyIcon={<StarIcon fontSize="inherit" />}
             />
-            <span className="text-[#5A20CB] font-semibold">
+            <span className="text-[#2563EB] font-semibold">
               {restaurant?.averageRating?.toFixed(1) || 0}/5
             </span>
           </div>
@@ -266,57 +288,45 @@ export const RestaurantDetail = () => {
 
       {/* Main Content Section */}
       <section className="w-full max-w-screen-xl mx-auto px-4 mt-10">
-        <Grid container spacing={6}>
+        {/* Sử dụng flex để filter và foods nằm cùng dòng, giống AllFoods */}
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Filter Section */}
-          <Grid item xs={12} lg={4}>
+          <div className="w-full lg:w-1/3">
             <div className="flex flex-col space-y-8 bg-white rounded-2xl shadow-lg p-6">
+              {/* ...các filter giữ nguyên như cũ... */}
               {/* Filter by Cuisine */}
               <div>
                 <Typography
                   variant="h5"
                   gutterBottom
-                  className="font-bold text-[#5A20CB]"
+                  className="font-bold text-[#2563EB]"
                 >
                   Filter by Cuisine
                 </Typography>
-                <FormControl component="fieldset">
-                  <RadioGroup
-                    onChange={(e) =>
-                      handleFilterChange("cuisine", e.target.value)
-                    }
-                    name="cuisine"
-                    value={filters.cuisine}
-                  >
-                    <FormControlLabel
-                      value=""
-                      control={<Radio />}
-                      label="All"
-                    />
-                    <FormControlLabel
-                      value="vietnamese"
-                      control={<Radio />}
-                      label="Vietnamese"
-                    />
-                    <FormControlLabel
-                      value="italian"
-                      control={<Radio />}
-                      label="Italian"
-                    />
-                    <FormControlLabel
-                      value="chinese"
-                      control={<Radio />}
-                      label="Chinese"
-                    />
-                  </RadioGroup>
-                </FormControl>
+                <label className="block mb-2 text-gray-700 font-medium">
+                  Cuisine
+                </label>
+                <select
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-[#2563EB] bg-white"
+                  value={filters.cuisine}
+                  onChange={(e) =>
+                    handleFilterChange("cuisine", e.target.value)
+                  }
+                >
+                  <option value="">All</option>
+                  {CUISINE_OPTIONS.map((cuisine) => (
+                    <option key={cuisine} value={cuisine}>
+                      {cuisine}
+                    </option>
+                  ))}
+                </select>
               </div>
-
-              {/* Filter by Vegetarian */}
+              {/* ...các filter khác giữ nguyên... */}
               <div>
                 <Typography
                   variant="h5"
                   gutterBottom
-                  className="font-bold text-[#5A20CB]"
+                  className="font-bold text-[#2563EB]"
                 >
                   Filter by Vegetarian
                 </Typography>
@@ -346,13 +356,11 @@ export const RestaurantDetail = () => {
                   </RadioGroup>
                 </FormControl>
               </div>
-
-              {/* Filter by Spicy */}
               <div>
                 <Typography
                   variant="h5"
                   gutterBottom
-                  className="font-bold text-[#5A20CB]"
+                  className="font-bold text-[#2563EB]"
                 >
                   Filter by Spicy
                 </Typography>
@@ -382,13 +390,11 @@ export const RestaurantDetail = () => {
                   </RadioGroup>
                 </FormControl>
               </div>
-
-              {/* Filter by Category */}
               <div>
                 <Typography
                   variant="h5"
                   gutterBottom
-                  className="font-bold text-[#5A20CB]"
+                  className="font-bold text-[#2563EB]"
                 >
                   Filter by Category
                 </Typography>
@@ -416,12 +422,11 @@ export const RestaurantDetail = () => {
                   </RadioGroup>
                 </FormControl>
               </div>
-              {/* Sort by Price */}
               <div>
                 <Typography
                   variant="h5"
                   gutterBottom
-                  className="font-bold text-[#5A20CB]"
+                  className="font-bold text-[#2563EB]"
                 >
                   Sort by Price
                 </Typography>
@@ -445,45 +450,52 @@ export const RestaurantDetail = () => {
                 </FormControl>
               </div>
             </div>
-          </Grid>
-
+          </div>
           {/* Foods Section */}
-          <Grid item xs={12} lg={8}>
-            <div className="grid grid-cols-1 gap-6">
-              {loading && <p>Loading...</p>}
-              {!loading &&
-                foods.map((food) => <MenuCard key={food.id} food={food} />)}
-            </div>
+          <div className="w-full lg:w-2/3">
+            {loading ? (
+              <div className="flex justify-center items-center min-h-[200px]">
+                <p>Loading...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {foods.map((food) => (
+                  <MenuCard key={food.id} food={food} />
+                ))}
+              </div>
+            )}
             <div className="flex flex-col sm:flex-row items-center justify-between mt-8 gap-2">
               <div>
                 <button
-                  className="px-4 py-2 rounded bg-[#5A20CB] text-white font-semibold mr-2 shadow hover:bg-[#431a9e] transition"
+                  className="px-4 py-2 rounded bg-[#2563EB] text-white font-semibold mr-2 shadow hover:bg-[#431a9e] transition"
                   onClick={() => handlePageChange(page - 1)}
-                  disabled={page === 0}
+                  disabled={page === 1}
                 >
                   Previous
                 </button>
                 <button
-                  className="px-4 py-2 rounded bg-[#5A20CB] text-white font-semibold shadow hover:bg-[#431a9e] transition"
+                  className="px-4 py-2 rounded bg-[#2563EB] text-white font-semibold shadow hover:bg-[#431a9e] transition"
                   onClick={() => handlePageChange(page + 1)}
                   disabled={pagination && page >= pagination.totalPages}
                 >
                   Next
                 </button>
               </div>
-              <div className="text-[#5A20CB] font-semibold">
-                Page {page} / {pagination ? pagination.totalPages : 1}
+              <div className="text-[#2563EB] font-semibold">
+                Page {pagination ? pagination.page : page} /{" "}
+                {pagination ? pagination.totalPages : 1}
               </div>
             </div>
-          </Grid>
-        </Grid>
+          </div>
+        </div>
       </section>
+      {/* ...comments section giữ nguyên... */}
       <section className="w-full max-w-screen-md mx-auto px-4 mt-12 mb-16">
-        <h2 className="text-2xl font-bold text-[#5A20CB] mb-4">Comments</h2>
+        <h2 className="text-2xl font-bold text-[#2563EB] mb-4">Comments</h2>
         <form onSubmit={handleCommentSubmit} className="flex gap-3 mb-6">
           <input
             type="text"
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-[#5A20CB]"
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-[#2563EB]"
             placeholder="Write your comment..."
             value={commentContent}
             onChange={(e) => setCommentContent(e.target.value)}
@@ -491,7 +503,7 @@ export const RestaurantDetail = () => {
           />
           <button
             type="submit"
-            className="bg-[#5A20CB] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#431a9e] transition"
+            className="bg-[#2563EB] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#431a9e] transition"
             disabled={commentLoading || !commentContent.trim()}
           >
             Post
@@ -506,7 +518,7 @@ export const RestaurantDetail = () => {
             comments.map((c) => (
               <div key={c.id} className="bg-white rounded-xl shadow p-4">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-[#5A20CB]">
+                  <span className="font-semibold text-[#2563EB]">
                     {c.user?.fullName || "User"}
                   </span>
                   <span className="text-xs text-gray-400">

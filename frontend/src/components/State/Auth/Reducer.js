@@ -12,6 +12,7 @@ import {
   UPDATE_USER_PROFILE_REQUEST,
   UPDATE_USER_PROFILE_SUCCESS,
   UPDATE_USER_PROFILE_FAILURE,
+  RESET_AUTH_ERROR,
 } from "./ActionType";
 
 const initialState = {
@@ -23,8 +24,11 @@ const initialState = {
   success: null,
 };
 
+
 const authReducer = (state = initialState, action) => {
   switch (action.type) {
+    case RESET_AUTH_ERROR:
+      return { ...state, error: null };
     // Xử lý các yêu cầu
     case LOGIN_REQUEST:
     case REGISTER_REQUEST:

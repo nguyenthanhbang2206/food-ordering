@@ -11,7 +11,7 @@ export const CartItem = ({ item, onIncrease, onDecrease, onDelete }) => {
         />
         <div>
           <p className="font-semibold">{item.food.name}</p>
-          <p className="text-gray-500">Price: ${item.food.price}</p>
+          <p className="text-gray-500">Price: {item.food.price} đ</p>
           <div className="flex items-center space-x-2 mt-2">
             {onDecrease && (
               <button
@@ -44,7 +44,7 @@ export const CartItem = ({ item, onIncrease, onDecrease, onDelete }) => {
         </div>
       </div>
       <p className="font-bold text-green-600">
-        ${(item.food.price * item.quantity).toFixed(2)}
+        {(item.food.price * item.quantity)} đ
       </p>
     </div>
   );

@@ -16,6 +16,7 @@ import {
   UPDATE_USER_PROFILE_REQUEST,
   UPDATE_USER_PROFILE_SUCCESS,
   UPDATE_USER_PROFILE_FAILURE,
+  RESET_AUTH_ERROR,
 } from "./ActionType";
 import api from "../../../config/api";
 
@@ -42,6 +43,7 @@ export const register =
       dispatch({ type: REGISTER_FAILURE, payload: errorMessage });
     }
   };
+  export const resetAuthError = () => ({ type: RESET_AUTH_ERROR });
 export const login =
   ({ userData, navigate }) =>
   async (dispatch) => {

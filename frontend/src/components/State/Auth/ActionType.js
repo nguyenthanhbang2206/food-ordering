@@ -16,4 +16,5 @@ export const UPDATE_USER_PROFILE_FAILURE = "UPDATE_USER_FAILURE";
 
 export const LOGOUT = "LOGOUT";
 
+export const RESET_AUTH_ERROR = "RESET_AUTH_ERROR";
 

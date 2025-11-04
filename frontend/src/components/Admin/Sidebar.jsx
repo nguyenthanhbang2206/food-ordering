@@ -8,21 +8,41 @@ import FastfoodIcon from "@mui/icons-material/Fastfood";
 import InfoIcon from "@mui/icons-material/Info";
 import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
-import PersonIcon from "@mui/icons-material/Person"; 
+import PersonIcon from "@mui/icons-material/Person";
 
 export const Sidebar = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   const menuItems = [
-    { title: "Dashboard", path: "/admin/restaurant/dashboard", icon: <DashboardIcon /> },
-    { title: "Orders", path: "/admin/restaurant/orders", icon: <ListAltIcon /> },
-    { title: "Ingredients", path: "/admin/restaurant/ingredients", icon: <RestaurantMenuIcon /> },
-    { title: "Food Categories", path: "/admin/restaurant/food-categories", icon: <CategoryIcon /> },
+    {
+      title: "Dashboard",
+      path: "/admin/restaurant/dashboard",
+      icon: <DashboardIcon />,
+    },
+    {
+      title: "Orders",
+      path: "/admin/restaurant/orders",
+      icon: <ListAltIcon />,
+    },
+    {
+      title: "Ingredients",
+      path: "/admin/restaurant/ingredients",
+      icon: <RestaurantMenuIcon />,
+    },
+    {
+      title: "Food Categories",
+      path: "/admin/restaurant/food-categories",
+      icon: <CategoryIcon />,
+    },
     { title: "Food", path: "/admin/restaurant/food", icon: <FastfoodIcon /> },
-    { title: "Restaurant Details", path: "/admin/restaurant/details", icon: <InfoIcon /> },
+    {
+      title: "Restaurant Details",
+      path: "/admin/restaurant/details",
+      icon: <InfoIcon />,
+    },
     { title: "Homepage", path: "/", icon: <HomeIcon /> },
-        { title: "Profile", path: "/myProfile", icon:  <PersonIcon /> },
+    { title: "Profile", path: "/myProfile", icon: <PersonIcon /> },
     { title: "Logout", path: "/logout", icon: <LogoutIcon /> },
   ];
 
@@ -41,7 +61,7 @@ export const Sidebar = () => {
     <>
       {/* Nút mở sidebar trên mobile */}
       <button
-        className="fixed top-4 left-4 z-50 bg-[#5A20CB] text-white p-2 rounded shadow sm:hidden"
+        className="fixed top-4 left-4 z-50 bg-[#2563EB] text-white p-2 rounded shadow sm:hidden"
         onClick={() => setOpen(true)}
         aria-label="Open sidebar"
       >
@@ -57,7 +77,7 @@ export const Sidebar = () => {
       {/* Sidebar */}
       <div
         className={`
-          fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-[#5A20CB] to-[#2d1068] text-white flex flex-col z-50
+          fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-[#2563EB] to-[#2d1068] text-white flex flex-col z-50
           transform transition-transform duration-200
           ${open ? "translate-x-0" : "-translate-x-full"}
           sm:relative sm:translate-x-0 sm:flex
@@ -97,7 +117,6 @@ export const Sidebar = () => {
             </li>
           ))}
         </ul>
-        
       </div>
     </>
   );

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { register } from "../State/Auth/Action";
+import { register, resetAuthError } from "../State/Auth/Action";
 import { useEffect } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
@@ -17,8 +17,15 @@ export const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { error, success } = useSelector((state) => state.auth); // Lấy error và success từ Redux store
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  useEffect(() => {
+    dispatch(resetAuthError());
+    // eslint-disable-next-line
+  }, []);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -35,13 +42,15 @@ export const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Register Data:", formData);
-    dispatch(register({ userData: formData, navigate })); 
+    dispatch(register({ userData: formData, navigate }));
   };
 
   const handleLogin = () => {
     navigate("/login"); // Điều hướng đến trang đăng nhập
   };
   const handleCloseSnackbar = () => {
+    dispatch(resetAuthError());
+
     setSnackbar({ ...snackbar, open: false });
   };
 
@@ -176,7 +185,11 @@ export const Register = () => {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>

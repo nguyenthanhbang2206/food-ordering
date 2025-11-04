@@ -6,7 +6,7 @@ export const ThankYou = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#E6E6FA] to-white">
       <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
-        <h1 className="text-3xl font-bold text-[#5A20CB] mb-4">Thank You!</h1>
+        <h1 className="text-3xl font-bold text-[#2563EB] mb-4">Thank You!</h1>
         <p className="text-lg mb-6">
           Your order has been placed successfully.
           <br />

@@ -14,6 +14,7 @@ public interface FoodService {
     Food updateFood(Long foodId, FoodRequest request);
     PaginationResponse getFoodsByRestaurant(Pageable pageable);
     PaginationResponse getAllFoods(Long restaurantId,Pageable pageable, FoodCriteria foodCriteria);
+    PaginationResponse getAllFoods(Pageable pageable, FoodCriteria foodCriteria);
     Food getFoodById(Long foodId);
     Food getFoodByIdAndRestaurantId(Long foodId, Long restaurantId);
     void deleteFood(Long foodId);

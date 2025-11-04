@@ -5,6 +5,8 @@ import {
   updateOrderStatus,
 } from "../State/Restaurant/Action";
 import { getOrderById } from "../State/Cart/Action";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 const ORDER_STATUSES = ["PENDING", "PROCESSING", "DELIVERED", "CANCELLED"];
 export const Orders = () => {
   const dispatch = useDispatch();
@@ -15,7 +17,11 @@ export const Orders = () => {
   const [size] = useState(5);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [statusMap, setStatusMap] = useState({}); // { [orderId]: status }
-
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   useEffect(() => {
     dispatch(getOrderByRestaurant(page, size));
   }, [dispatch, page, size]);
@@ -41,10 +47,23 @@ export const Orders = () => {
   };
 
   // Gọi API cập nhật trạng thái ở bảng
-  const handleUpdateStatus = (orderId) => {
+  const handleUpdateStatus = async (orderId) => {
     const newStatus = statusMap[orderId];
     if (!newStatus) return;
-    dispatch(updateOrderStatus(orderId, newStatus));
+    try {
+      await dispatch(updateOrderStatus(orderId, newStatus));
+      setSnackbar({
+        open: true,
+        message: "Cập nhật món ăn thành công!",
+        severity: "success",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Cập nhật món ăn thất bại!",
+        severity: "error",
+      });
+    }
   };
 
   return (
@@ -87,7 +106,7 @@ export const Orders = () => {
                     {order.customer?.fullName || "N/A"}
                   </td>
                   <td className="px-4 py-2 border-b text-sm text-gray-700">
-                    ${order.totalPrice?.toLocaleString()}
+                    {order.totalPrice?.toLocaleString()} đ
                   </td>
                   <td className="px-4 py-2 border-b text-sm text-gray-700">
                     <select
@@ -168,8 +187,8 @@ export const Orders = () => {
             {selectedOrder.totalItems}
           </p>
           <p>
-            <span className="font-semibold">Total Price:</span> $
-            {selectedOrder.totalPrice}
+            <span className="font-semibold">Total Price:</span>
+            {selectedOrder.totalPrice} đ
           </p>
           <div className="mt-2">
             <span className="font-semibold">Delivery Address:</span>
@@ -190,8 +209,8 @@ export const Orders = () => {
                       {item.food.description}
                     </div>
                     <div>
-                      Quantity: {item.quantity} | Price: ${item.food.price} |
-                      Total: ${item.totalPrice}
+                      Quantity: {item.quantity} | Price: {item.food.price} đ|
+                      Total: {item.totalPrice} đ
                     </div>
                     <div>
                       <img
@@ -212,6 +231,20 @@ export const Orders = () => {
           </button>
         </div>
       )}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

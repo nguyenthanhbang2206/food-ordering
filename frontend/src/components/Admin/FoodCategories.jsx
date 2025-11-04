@@ -6,10 +6,19 @@ import {
   updateCategory,
   deleteCategory,
 } from "../State/Restaurant/Action";
-
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 export const FoodCategories = () => {
   const dispatch = useDispatch();
-  const { categories, loading, error } = useSelector((state) => state.restaurant);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const { categories, loading, error } = useSelector(
+    (state) => state.restaurant
+  );
 
   const [formData, setFormData] = useState({ id: "", name: "" });
   const [isEditing, setIsEditing] = useState(false);
@@ -24,21 +33,60 @@ export const FoodCategories = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddCategory = (e) => {
+  const handleAddCategory = async (e) => {
     e.preventDefault();
-    dispatch(createCategoryOfRestaurant({ name: formData.name }));
-    setFormData({ id: "", name: "" });
+    try {
+      await dispatch(createCategoryOfRestaurant({ name: formData.name }));
+      setFormData({ id: "", name: "" });
+      setSnackbar({
+        open: true,
+        message: "Thành công!",
+        severity: "success",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Lỗi!",
+        severity: "error",
+      });
+    }
   };
 
-  const handleUpdateCategory = (e) => {
+  const handleUpdateCategory = async (e) => {
     e.preventDefault();
-    dispatch(updateCategory(formData.id, { name: formData.name }));
-    setFormData({ id: "", name: "" });
-    setIsEditing(false);
+    try {
+      dispatch(updateCategory(formData.id, { name: formData.name }));
+      setFormData({ id: "", name: "" });
+      setIsEditing(false);
+      setSnackbar({
+        open: true,
+        message: "Thành công!",
+        severity: "success",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Lỗi!",
+        severity: "error",
+      });
+    }
   };
 
-  const handleDeleteCategory = (id) => {
-    dispatch(deleteCategory(id));
+  const handleDeleteCategory = async (id) => {
+    try {
+      await dispatch(deleteCategory(id));
+      setSnackbar({
+        open: true,
+        message: "Thành công!",
+        severity: "success",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Lỗi!",
+        severity: "error",
+      });
+    }
   };
 
   const handleEditClick = (category) => {
@@ -74,7 +122,9 @@ export const FoodCategories = () => {
           <button
             type="submit"
             className={`w-full sm:w-auto flex-col sm:flex-row px-4 py-2 text-white rounded-lg ${
-              isEditing ? "bg-yellow-500 hover:bg-yellow-600" : "bg-blue-500 hover:bg-blue-600"
+              isEditing
+                ? "bg-yellow-500 hover:bg-yellow-600"
+                : "bg-blue-500 hover:bg-blue-600"
             }`}
           >
             {isEditing ? "Update" : "Add"}
@@ -95,51 +145,65 @@ export const FoodCategories = () => {
       </form>
 
       {/* Hiển thị bảng danh sách danh mục */}
-      {!loading  && (
+      {!loading && (
         <div className="overflow-x-auto">
-        <table className="text-xs sm:text-sm min-w-full bg-white border border-gray-200">
-          <thead>
-            <tr>
-              <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
-                ID
-              </th>
-              <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
-                Name
-              </th>
-              <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((category) => (
-              <tr key={category.id} className="hover:bg-gray-100">
-                <td className="px-4 py-2 border-b text-sm text-gray-700">
-                  {category.id}
-                </td>
-                <td className="px-4 py-2 border-b text-sm text-gray-700">
-                  {category.name}
-                </td>
-                <td className="px-4 py-2 border-b text-sm text-gray-700">
-                  <button
-                    onClick={() => handleEditClick(category)}
-                    className="w-full sm:w-auto px-3 py-1 mr-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
-                  >
-                    Update
-                  </button>
-                  <button
-                    onClick={() => handleDeleteCategory(category.id)}
-                    className="w-full sm:w-auto px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                </td>
+          <table className="text-xs sm:text-sm min-w-full bg-white border border-gray-200">
+            <thead>
+              <tr>
+                <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+                  ID
+                </th>
+                <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+                  Name
+                </th>
+                <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {categories.map((category) => (
+                <tr key={category.id} className="hover:bg-gray-100">
+                  <td className="px-4 py-2 border-b text-sm text-gray-700">
+                    {category.id}
+                  </td>
+                  <td className="px-4 py-2 border-b text-sm text-gray-700">
+                    {category.name}
+                  </td>
+                  <td className="px-4 py-2 border-b text-sm text-gray-700">
+                    <button
+                      onClick={() => handleEditClick(category)}
+                      className="w-full sm:w-auto px-3 py-1 mr-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+                    >
+                      Update
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCategory(category.id)}
+                      className="w-full sm:w-auto px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

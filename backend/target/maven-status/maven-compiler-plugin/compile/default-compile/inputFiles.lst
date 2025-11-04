@@ -2,12 +2,14 @@ D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\dto\request\LoginRequest.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\repository\CommentRepository.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\impl\DashboardServiceImpl.java
+D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\dto\request\ChatRequest.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\model\User.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\repository\FoodRepository.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\model\Restaurant.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\dto\response\ApiResponse.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\impl\OrderServiceImpl.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\DashboardService.java
+D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\controller\user\FoodRecommendationController.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\model\Category.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\dto\response\ErrorDetails.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\model\Address.java
@@ -20,6 +22,7 @@ D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\controller\user\UserController.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\FoodorderingApplication.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\util\SecurityUtil.java
+D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\AIService.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\repository\CategoryRepository.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\repository\ReviewRepository.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\dto\request\CreateUserRequest.java
@@ -27,6 +30,7 @@ D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\impl\AuthServiceImpl.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\impl\EmailServiceImpl.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\dto\request\ResetPasswordRequest.java
+D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\config\AIConfig.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\dto\response\PaginationResponse.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\model\CartItem.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\enums\OrderStatus.java
@@ -41,7 +45,9 @@ D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\CategoryService.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\impl\RestaurantServiceImpl.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\config\JwtFilter.java
+D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\FoodRecommendationService.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\controller\user\CommentController.java
+D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\controller\user\AIController.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\repository\CartItemRepository.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\controller\admin\AdminCategoryController.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\validator\RegisterValidator.java
@@ -80,11 +86,13 @@ D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\controller\user\FoodController.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\validator\StrongPasswordValidator.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\model\ResetPasswordToken.java
+D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\impl\FoodRecommendationServiceImpl.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\model\Food.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\dto\response\AuthenticationResponse.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\dto\request\UpdatePasswordRequest.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\controller\user\RestaurantController.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\model\BaseEntity.java
+D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\impl\AIChatServiceImpl.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\config\JpaAuditingConfig.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\controller\user\HelloController.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\impl\FoodServiceImpl.java
@@ -103,6 +111,7 @@ D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\ReviewService.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\impl\CartServiceImpl.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\dto\request\UpdateCartItemRequest.java
+D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\dto\response\ChatResponse.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\service\CommentService.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\config\SecurityConfiguration.java
 D:\Projects\foodordering\backend\src\main\java\com\nguyenthanhbang\foodordering\dto\request\CategoryRequest.java

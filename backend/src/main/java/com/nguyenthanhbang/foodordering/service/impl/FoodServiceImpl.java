@@ -191,9 +191,48 @@ public class FoodServiceImpl implements FoodService {
         }
         return combinedSpec;
     }
+    private Specification<Food> makeSpecs(FoodCriteria foodCriteria) {
+        Specification combinedSpec = Specification.where(null);
+        if(foodCriteria.getSpicy() != null) {
+            combinedSpec = combinedSpec.and(bySpicy(foodCriteria.getSpicy()));
+        }
+        if(foodCriteria.getVegetarian() != null) {
+            combinedSpec = combinedSpec.and(byVegetarian(foodCriteria.getVegetarian()));
+        }
+        if(foodCriteria.getAvailable() != null) {
+            combinedSpec = combinedSpec.and(byAvailable(foodCriteria.getAvailable()));
+        }
+        if(foodCriteria.getCuisine() != null) {
+            combinedSpec = combinedSpec.and(hasCuisine(foodCriteria.getCuisine()));
+        }
+        if(foodCriteria.getCategory() != null) {
+            combinedSpec = combinedSpec.and(hasCategory(foodCriteria.getCategory()));
+        }
+        if(foodCriteria.getPrices() != null) {
+            combinedSpec = combinedSpec.and(matchPrice(foodCriteria.getPrices()));
+        }
+
+        return combinedSpec;
+    }
     @Override
     public PaginationResponse getAllFoods(Long restaurantId, Pageable pageable, FoodCriteria foodCriteria) {
         Page<Food> foodPage = foodRepository.findAll(makeSpecs(restaurantId,foodCriteria), pageable);
+        PaginationResponse.Pagination pagination = PaginationResponse.Pagination.builder()
+                .page(pageable.getPageNumber() + 1)
+                .size(pageable.getPageSize())
+                .totalPages(foodPage.getTotalPages())
+                .totalItems(foodPage.getTotalElements())
+                .build();
+        PaginationResponse response = PaginationResponse.builder()
+                .pagination(pagination)
+                .items(foodPage.getContent())
+                .build();
+        return response;
+    }
+
+    @Override
+    public PaginationResponse getAllFoods(Pageable pageable, FoodCriteria foodCriteria) {
+        Page<Food> foodPage = foodRepository.findAll(makeSpecs(foodCriteria), pageable);
         PaginationResponse.Pagination pagination = PaginationResponse.Pagination.builder()
                 .page(pageable.getPageNumber() + 1)
                 .size(pageable.getPageSize())

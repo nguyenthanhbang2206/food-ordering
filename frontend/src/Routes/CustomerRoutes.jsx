@@ -14,6 +14,9 @@ import { ForgotPassword } from "../components/Auth/ForgotPassword";
 import { ResetPassword } from "../components/Auth/ResetPassword";
 import { Checkout } from "../components/Cart/Checkout";
 import { ThankYou } from "../components/Cart/ThankYou";
+import { FoodDetail } from "../components/Home/FoodDetail";
+import { AIChat } from "../components/AI/AIChat";
+import { AllFoods } from "../components/Food/AllFoods";
 export const CustomerRoutes = () => {
   return (
     <div>
@@ -64,10 +67,34 @@ export const CustomerRoutes = () => {
           }
         />
         <Route
+          path="/food/:foodId"
+          element={
+            <PrivateRoute>
+              <FoodDetail></FoodDetail>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/ai/chat"
+          element={
+            <PrivateRoute>
+              <AIChat></AIChat>
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/cart"
           element={
             <PrivateRoute>
               <Cart />
+            </PrivateRoute>
+          }
+        />
+         <Route
+          path="/foods"
+          element={
+            <PrivateRoute>
+              <AllFoods />
             </PrivateRoute>
           }
         />

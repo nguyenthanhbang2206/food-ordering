@@ -58,4 +58,16 @@ public class FoodController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+    @GetMapping("/foods")
+    public ResponseEntity<ApiResponse<PaginationResponse>> getAllFoods(Pageable pageable, FoodCriteria foodCriteria){
+        PaginationResponse paginationResponse = foodService.getAllFoods(pageable, foodCriteria);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Get all foods successfully")
+                .data(paginationResponse)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+    
+
 }

@@ -12,7 +12,11 @@ import { getCartByUserLogin } from "../State/Cart/Action";
 import { Button, InputBase, Paper } from "@mui/material";
 import { searchRestaurants } from "../State/Restaurant/Action";
 
+
+
 export const Navbar = () => {
+ const [menuOpen, setMenuOpen] = useState(false);
+
   const { auth } = useSelector((store) => store);
   const { cart } = useSelector((store) => store.cart);
   const navigate = useNavigate();
@@ -58,7 +62,7 @@ export const Navbar = () => {
   };
 
   return (
-    <div className="px-5 z-50 py-[.8rem] bg-[#5A20CB] lg:px-20 flex justify-between">
+    <div className="px-5 z-50 py-[.8rem] bg-[#2563EB] lg:px-20 flex justify-between items-center relative">
       {/* Logo */}
       <div className="lg:mr-10 cursor-pointer flex items-center space-x-4">
         <li
@@ -69,10 +73,32 @@ export const Navbar = () => {
         </li>
       </div>
 
+      {/* Hamburger menu icon on mobile */}
+      <div className="lg:hidden">
+        <button
+          className="text-white focus:outline-none"
+          onClick={() => setMenuOpen((prev) => !prev)}
+        >
+          <svg width="32" height="32" fill="none" viewBox="0 0 24 24">
+            <rect y="4" width="24" height="2" rx="1" fill="currentColor" />
+            <rect y="11" width="24" height="2" rx="1" fill="currentColor" />
+            <rect y="18" width="24" height="2" rx="1" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
+
       {/* Navbar Actions */}
-      <div className="flex items-center space-x-2 lg:space-x-10">
+       {auth.user && (
+      <div
+        className={`
+          flex-col lg:flex-row flex items-center space-y-4 lg:space-y-0 space-x-0 lg:space-x-6
+          absolute lg:static top-full left-0 w-full lg:w-auto bg-[#2563EB] lg:bg-transparent
+          transition-all duration-300 z-40
+          ${menuOpen ? "flex" : "hidden lg:flex"}
+        `}
+      >
         {/* Search Icon & Input */}
-        <div>
+        <div className="mb-2 lg:mb-0">
           <IconButton onClick={() => setShowSearch((prev) => !prev)}>
             <SearchIcon sx={{ fontSize: 30, color: "white" }} />
           </IconButton>
@@ -112,36 +138,45 @@ export const Navbar = () => {
           color="success"
           size="small"
           onClick={handleOrdersClick}
-          className="!bg-green-500 hover:!bg-green-600 text-white font-semibold"
+          className="!bg-green-500 hover:!bg-green-600 text-white font-semibold w-full lg:w-auto"
           sx={{ minWidth: 0, px: 2, py: 1, borderRadius: 2 }}
         >
           Orders
         </Button>
         <Button
           variant="contained"
+          color="primary"
+          size="small"
+          onClick={() => navigate("/foods")}
+          className="!bg-[#2563EB] hover:!bg-[#431a9e] text-white font-semibold w-full lg:w-auto"
+          sx={{ minWidth: 0, px: 2, py: 1, borderRadius: 2 }}
+        >
+          All Foods
+        </Button>
+        <Button
+          variant="contained"
           color="warning"
           size="small"
           onClick={handleFavouritesClick}
-          className="!bg-yellow-400 hover:!bg-yellow-500 text-white font-semibold"
+          className="!bg-yellow-400 hover:!bg-yellow-500 text-white font-semibold w-full lg:w-auto"
           sx={{ minWidth: 0, px: 2, py: 1, borderRadius: 2 }}
         >
           Favourites
         </Button>
 
-        {/* Nếu user là RESTAURANT_OWNER thì hiện nút Admin */}
         {auth.user?.role === "RESTAURANT_OWNER" && (
           <Button
             variant="contained"
             color="secondary"
             size="small"
             onClick={handleAdminClick}
-            className="!bg-yellow-500 hover:!bg-yellow-600 text-white font-semibold"
+            className="!bg-yellow-500 hover:!bg-yellow-600 text-white font-semibold w-full lg:w-auto"
             sx={{ minWidth: 0, px: 2, py: 1, borderRadius: 2 }}
           >
             Admin
           </Button>
         )}
-        {/* User Avatar or Login Icon */}
+
         <div>
           {auth.user ? (
             <Avatar
@@ -164,19 +199,18 @@ export const Navbar = () => {
           )}
         </div>
 
-        {/* Shopping Cart Icon */}
         <div>
           <IconButton>
             <Badge
               onClick={handleCartClick}
-              badgeContent={auth.user ? cart?.sum || 0 : 0} // Nếu chưa đăng nhập thì luôn là 0
+              badgeContent={auth.user ? cart?.sum || 0 : 0}
               color="primary"
             >
               <ShoppingCartIcon sx={{ fontSize: 30, color: "white" }} />
             </Badge>
           </IconButton>
         </div>
-      </div>
+      </div>)}
     </div>
   );
 };

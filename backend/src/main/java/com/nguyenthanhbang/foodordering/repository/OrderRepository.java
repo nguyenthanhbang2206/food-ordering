@@ -35,4 +35,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT NEW com.nguyenthanhbang.foodordering.dto.response.RevenueByMonth(MONTH(o.createdDate), SUM(o.totalPrice)) FROM Order o WHERE o.restaurant.id = :restaurantId AND o.status = 'DELIVERED' GROUP BY MONTH(o.createdDate) ORDER BY MONTH(o.createdDate)")
     List<RevenueByMonth> revenueByMonth(@Param("restaurantId") Long restaurantId);
     List<Order> findTop5ByRestaurantIdOrderByCreatedDateDesc(Long restaurantId);
+    List<Order> findByCustomerId(Long customerId);
 }

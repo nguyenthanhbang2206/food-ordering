@@ -15,6 +15,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export const Cart = () => {
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { cartItems, loading, error } = useSelector((state) => state.cart);
@@ -200,7 +201,7 @@ export const Cart = () => {
       <div className="flex flex-col lg:flex-row gap-8 p-6 bg-gradient-to-b from-[#E6E6FA] to-white min-h-screen">
         {/* Cart Items Section */}
         <main className="lg:w-2/3 w-full bg-white shadow-xl rounded-2xl p-6">
-          <h2 className="text-2xl font-bold mb-6 text-[#5A20CB] flex items-center gap-2">
+          <h2 className="text-2xl font-bold mb-6 text-[#2563EB] flex items-center gap-2">
             <span role="img" aria-label="cart">
               🛒
             </span>{" "}
@@ -241,8 +242,7 @@ export const Cart = () => {
           </div>
           <div className="mt-8 text-left border-t pt-4">
             <p className="text-xl font-bold">
-              Total:{" "}
-              <span className="text-green-600">${totalPrice.toFixed(2)}</span>
+              Total: <span className="text-green-600">{totalPrice} đ</span>
             </p>
           </div>
         </main>

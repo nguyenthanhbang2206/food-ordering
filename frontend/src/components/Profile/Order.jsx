@@ -59,7 +59,7 @@ export const Order = () => {
                   </td>
                   <td className="py-2 px-4 capitalize">{order.status}</td>
                   <td className="py-2 px-4 text-green-600 font-semibold">
-                    ${order.totalPrice?.toLocaleString()}
+                    {order.totalPrice?.toLocaleString()} đ
                   </td>
                   <td className="py-2 px-4">
                     <button
@@ -116,8 +116,8 @@ export const Order = () => {
             {order.totalItems}
           </p>
           <p>
-            <span className="font-semibold">Total Price:</span> $
-            {order.totalPrice}
+            <span className="font-semibold">Total Price:</span>
+            {order.totalPrice} đ
           </p>
           <div className="mt-2">
             <span className="font-semibold">Delivery Address:</span>
@@ -136,8 +136,8 @@ export const Order = () => {
                     {item.food.description}
                   </div>
                   <div>
-                    Quantity: {item.quantity} | Price: ${item.food.price} |
-                    Total: ${item.totalPrice}
+                    Quantity: {item.quantity} | Price: {item.food.price} đ |
+                    Total: {item.totalPrice} đ
                   </div>
                   <div>
                     <img

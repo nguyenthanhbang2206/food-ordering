@@ -12,6 +12,7 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,14 +63,11 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     @Override
+    @Transactional
     public void deleteIngredientById(Long ingredientId) {
         Ingredient ingredient = this.getIngredientByIdAndRestaurantId(ingredientId);
-        List<Food> foods = foodRepository.findByIngredientsId(ingredientId);
-        for(Food food : foods) {
-            food.getIngredients().remove(ingredient);
-            foodRepository.save(food);
-        }
-        ingredientRepository.deleteById(ingredientId);
+        ingredient.setActive(false);
+        ingredientRepository.save(ingredient);
     }
 
 }

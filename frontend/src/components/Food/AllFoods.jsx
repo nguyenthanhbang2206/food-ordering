@@ -235,38 +235,7 @@ export const AllFoods = () => {
                 </FormControl>
               </div>
               {/* Filter by Category */}
-              <div>
-                <Typography
-                  variant="h5"
-                  gutterBottom
-                  className="font-bold text-[#2563EB]"
-                >
-                  Filter by Category
-                </Typography>
-                <FormControl component="fieldset">
-                  <RadioGroup
-                    onChange={(e) =>
-                      handleFilterChange("category", e.target.value)
-                    }
-                    name="category"
-                    value={filters.category}
-                  >
-                    <FormControlLabel
-                      value=""
-                      control={<Radio />}
-                      label="All"
-                    />
-                    {categories.map((category) => (
-                      <FormControlLabel
-                        key={category.id}
-                        value={category.name}
-                        control={<Radio />}
-                        label={category.name}
-                      />
-                    ))}
-                  </RadioGroup>
-                </FormControl>
-              </div>
+             
               {/* Sort by Price */}
               <div>
                 <Typography

@@ -1,34 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+
 const API_URL = process.env.REACT_APP_API_URL;
 export const ForgotPassword = () => {
   const [email, setEmail] = useState("");
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await axios.post(`${API_URL}/api/v1/auth/forgot-password`, {
-        email,
-      });
-      setSnackbar({
-        open: true,
-        message: "Vui lòng kiểm tra email để đặt lại mật khẩu.",
-        severity: "success",
-      });
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: error.response?.data?.message || "Gửi email thất bại.",
-        severity: "error",
-      });
-    }
+
+    axios.post(`${API_URL}/api/v1/auth/forgot-password`, {
+      email,
+    });
   };
 
   return (
@@ -61,16 +43,6 @@ export const ForgotPassword = () => {
           </button>
         </form>
       </div>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </div>
   );
 };

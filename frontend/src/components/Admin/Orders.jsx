@@ -5,8 +5,7 @@ import {
   updateOrderStatus,
 } from "../State/Restaurant/Action";
 import { getOrderById } from "../State/Cart/Action";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+
 const ORDER_STATUSES = ["PENDING", "PROCESSING", "DELIVERED", "CANCELLED"];
 export const Orders = () => {
   const dispatch = useDispatch();
@@ -17,11 +16,7 @@ export const Orders = () => {
   const [size] = useState(5);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [statusMap, setStatusMap] = useState({}); // { [orderId]: status }
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+
   useEffect(() => {
     dispatch(getOrderByRestaurant(page, size));
   }, [dispatch, page, size]);
@@ -47,23 +42,10 @@ export const Orders = () => {
   };
 
   // Gọi API cập nhật trạng thái ở bảng
-  const handleUpdateStatus = async (orderId) => {
+  const handleUpdateStatus = (orderId) => {
     const newStatus = statusMap[orderId];
     if (!newStatus) return;
-    try {
-      await dispatch(updateOrderStatus(orderId, newStatus));
-      setSnackbar({
-        open: true,
-        message: "Cập nhật món ăn thành công!",
-        severity: "success",
-      });
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: "Cập nhật món ăn thất bại!",
-        severity: "error",
-      });
-    }
+    dispatch(updateOrderStatus(orderId, newStatus));
   };
 
   return (
@@ -231,20 +213,6 @@ export const Orders = () => {
           </button>
         </div>
       )}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </div>
   );
 };

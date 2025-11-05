@@ -1,40 +1,23 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+
 const API_URL = process.env.REACT_APP_API_URL;
 export const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get("token");
   const [newPassword, setNewPassword] = useState("");
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+ 
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await axios.put(`${API_URL}/api/v1/auth/reset-password`, {
-        token,
-        newPassword,
-      });
-      setSnackbar({
-        open: true,
-        message: "Đổi mật khẩu thành công!",
-        severity: "success",
-      });
-      setTimeout(() => navigate("/login"), 2000);
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: error.response?.data?.message || "Đổi mật khẩu thất bại.",
-        severity: "error",
-      });
-    }
+    axios.put(`${API_URL}/api/v1/auth/reset-password`, {
+      token,
+      newPassword,
+    });
+
+    navigate("/login");
   };
 
   return (
@@ -69,16 +52,7 @@ export const ResetPassword = () => {
           </button>
         </form>
       </div>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+     
     </div>
   );
 };

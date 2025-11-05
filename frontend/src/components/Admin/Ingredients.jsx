@@ -6,15 +6,11 @@ import {
   updateIngredient,
   deleteIngredient,
 } from "../State/Restaurant/Action";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+
+// ...existing imports...
+
 export const Ingredients = () => {
   const dispatch = useDispatch();
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
 
   const { ingredients, loading, error } = useSelector(
     (state) => state.restaurant
@@ -33,64 +29,25 @@ export const Ingredients = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddIngredient = async (e) => {
+  const handleAddIngredient = (e) => {
     e.preventDefault();
-    try {
-      await dispatch(createIngredient({ name: formData.name }));
-      setFormData({ id: "", name: "" });
-      setSnackbar({
-        open: true,
-        message: "Thêm nguyên liệu thành công!",
-        severity: "success",
-      });
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: "Thêm nguyên liệu thất bại!",
-        severity: "error",
-      });
-    }
+    dispatch(createIngredient({ name: formData.name }));
+    setFormData({ id: "", name: "" });
   };
 
-  const handleUpdateIngredient = async (e) => {
+  const handleUpdateIngredient = (e) => {
     e.preventDefault();
-    try {
-      await dispatch(updateIngredient(formData.id, { name: formData.name }));
-      setFormData({ id: "", name: "" });
-      setIsEditing(false);
-      setSnackbar({
-        open: true,
-        message: "Cập nhật nguyên liệu thành công!",
-        severity: "success",
-      });
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: "Cập nhật nguyên liệu thất bại!",
-        severity: "error",
-      });
-    }
+    dispatch(updateIngredient(formData.id, { name: formData.name }));
+    setFormData({ id: "", name: "" });
+    setIsEditing(false);
   };
 
-  const handleDeleteIngredient = async (id) => {
-    try {
-      await dispatch(deleteIngredient(id));
-      setSnackbar({
-        open: true,
-        message: "Xóa thành công!",
-        severity: "success",
-      });
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: "Lỗi!",
-        severity: "error",
-      });
-    }
+  const handleDeleteIngredient = (id) => {
+    dispatch(deleteIngredient(id));
   };
 
   const handleEditClick = (ingredient) => {
-    setFormData(ingredient);
+    setFormData({ id: ingredient.id, name: ingredient.name });
     setIsEditing(true);
   };
 
@@ -100,8 +57,6 @@ export const Ingredients = () => {
 
       {/* Hiển thị trạng thái loading */}
       {loading && <p>Loading...</p>}
-
-     
 
       {/* Form thêm hoặc cập nhật nguyên liệu */}
       <form
@@ -189,20 +144,6 @@ export const Ingredients = () => {
           </table>
         </div>
       )}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </div>
   );
 };

@@ -6,16 +6,10 @@ import {
   updateCategory,
   deleteCategory,
 } from "../State/Restaurant/Action";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+
 export const FoodCategories = () => {
   const dispatch = useDispatch();
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-
+ 
   const { categories, loading, error } = useSelector(
     (state) => state.restaurant
   );
@@ -33,60 +27,21 @@ export const FoodCategories = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddCategory = async (e) => {
+  const handleAddCategory = (e) => {
     e.preventDefault();
-    try {
-      await dispatch(createCategoryOfRestaurant({ name: formData.name }));
-      setFormData({ id: "", name: "" });
-      setSnackbar({
-        open: true,
-        message: "Thành công!",
-        severity: "success",
-      });
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: "Lỗi!",
-        severity: "error",
-      });
-    }
+    dispatch(createCategoryOfRestaurant({ name: formData.name }));
+    setFormData({ id: "", name: "" });
   };
 
-  const handleUpdateCategory = async (e) => {
+  const handleUpdateCategory = (e) => {
     e.preventDefault();
-    try {
-      dispatch(updateCategory(formData.id, { name: formData.name }));
-      setFormData({ id: "", name: "" });
-      setIsEditing(false);
-      setSnackbar({
-        open: true,
-        message: "Thành công!",
-        severity: "success",
-      });
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: "Lỗi!",
-        severity: "error",
-      });
-    }
+    dispatch(updateCategory(formData.id, { name: formData.name }));
+    setFormData({ id: "", name: "" });
+    setIsEditing(false);
   };
 
-  const handleDeleteCategory = async (id) => {
-    try {
-      await dispatch(deleteCategory(id));
-      setSnackbar({
-        open: true,
-        message: "Thành công!",
-        severity: "success",
-      });
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: "Lỗi!",
-        severity: "error",
-      });
-    }
+  const handleDeleteCategory = (id) => {
+    dispatch(deleteCategory(id));
   };
 
   const handleEditClick = (category) => {
@@ -190,20 +145,7 @@ export const FoodCategories = () => {
           </table>
         </div>
       )}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+     
     </div>
   );
 };

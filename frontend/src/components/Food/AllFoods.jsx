@@ -53,10 +53,16 @@ export const AllFoods = () => {
   const [loading, setLoading] = useState(false);
 
   // Lấy danh sách category toàn hệ thống
+  // ...existing code...
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/v1/categories`);
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${API_URL}/api/v1/categories`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setCategories(res.data.data || []);
       } catch {
         setCategories([]);
@@ -64,6 +70,7 @@ export const AllFoods = () => {
     };
     fetchCategories();
   }, []);
+  // ...existing code...
 
   useEffect(() => {
     fetchFoods();

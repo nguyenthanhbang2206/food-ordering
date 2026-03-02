@@ -5,6 +5,7 @@ import com.nguyenthanhbang.foodordering.dto.request.UpdateOrderRequest;
 import com.nguyenthanhbang.foodordering.dto.response.OrderStatistic;
 import com.nguyenthanhbang.foodordering.dto.response.PaginationResponse;
 import com.nguyenthanhbang.foodordering.dto.response.RevenueByMonth;
+import com.nguyenthanhbang.foodordering.enums.OrderPaymentStatus;
 import com.nguyenthanhbang.foodordering.enums.OrderStatus;
 import com.nguyenthanhbang.foodordering.model.*;
 import com.nguyenthanhbang.foodordering.repository.*;
@@ -58,6 +59,7 @@ public class OrderServiceImpl implements OrderService {
         order.setRestaurant(restaurant);
         order.setStatus(OrderStatus.PENDING);
         order.setTotalItems(cartItems.size());
+        order.setPaymentStatus(OrderPaymentStatus.PENDING);
         Address address = request.getDeliveryAddress();
         Optional<Address> existingAddressOpt = user.getDeliveryAddresses().stream()
                 .filter(a -> a.getCity().equals(address.getCity()) &&

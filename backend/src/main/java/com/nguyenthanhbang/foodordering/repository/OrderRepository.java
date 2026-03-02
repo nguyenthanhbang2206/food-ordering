@@ -24,16 +24,17 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Long countOrdersToday(@Param("start") Instant start,
                           @Param("end") Instant end,
                           @Param("restaurantId") Long restaurantId);
-    @Query("SELECT SUM(o.totalPrice) FROM Order o WHERE o.restaurant.id = :restaurantId AND o.createdDate >= :start AND o.createdDate < :end AND o.status = 'DELIVERED'")
+    @Query("SELECT SUM(o.totalPrice) FROM Order o WHERE o.restaurant.id = :restaurantId AND o.createdDate >= :start AND o.createdDate < :end AND o.paymentStatus = 'PAID'")
     Long revenueToday(@Param("start") Instant start,
                           @Param("end") Instant end,
                           @Param("restaurantId") Long restaurantId);
-    @Query("SELECT SUM(o.totalPrice) FROM Order o WHERE o.restaurant.id = :restaurantId AND o.status = 'DELIVERED'")
+    @Query("SELECT SUM(o.totalPrice) FROM Order o WHERE o.restaurant.id = :restaurantId AND o.paymentStatus = 'PAID'")
     Long totalRevenueByRestaurantId(@Param("restaurantId") Long restaurantId);
     Long countByRestaurantIdAndStatus(Long restaurantId, OrderStatus status);
 
-    @Query("SELECT NEW com.nguyenthanhbang.foodordering.dto.response.RevenueByMonth(MONTH(o.createdDate), SUM(o.totalPrice)) FROM Order o WHERE o.restaurant.id = :restaurantId AND o.status = 'DELIVERED' GROUP BY MONTH(o.createdDate) ORDER BY MONTH(o.createdDate)")
+    @Query("SELECT NEW com.nguyenthanhbang.foodordering.dto.response.RevenueByMonth(MONTH(o.createdDate), SUM(o.totalPrice)) FROM Order o WHERE o.restaurant.id = :restaurantId AND o.paymentStatus = 'PAID' GROUP BY MONTH(o.createdDate) ORDER BY MONTH(o.createdDate)")
     List<RevenueByMonth> revenueByMonth(@Param("restaurantId") Long restaurantId);
     List<Order> findTop5ByRestaurantIdOrderByCreatedDateDesc(Long restaurantId);
     List<Order> findByCustomerId(Long customerId);
+    List<Order> findByIdIn(List<Long> ids);
 }

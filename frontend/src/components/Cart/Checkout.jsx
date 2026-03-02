@@ -67,7 +67,7 @@ export const Checkout = () => {
     try {
       for (const restaurantId in grouped) {
         await dispatch(
-          placeOrder(address, Number(restaurantId), grouped[restaurantId])
+          placeOrder(address, Number(restaurantId), grouped[restaurantId]),
         );
       }
       for (const item of selectedCartItems) {
@@ -76,6 +76,77 @@ export const Checkout = () => {
       navigate("/thank-you");
     } catch (error) {
       alert("Failed to place order.");
+    }
+  };
+
+  // Thanh toán VNPAY
+  const [vnpayLoading, setVnpayLoading] = useState(false);
+  const handleVNPayPayment = async () => {
+    if (!selectedAddress) {
+      alert("Please select a delivery address.");
+      return;
+    }
+
+    if (!selectedCartItems.length) {
+      alert("No items to checkout.");
+      return;
+    }
+
+    setVnpayLoading(true);
+
+    try {
+      const grouped = groupCartItemsByRestaurant(selectedCartItems);
+
+      const orderIds = [];
+
+      for (const restaurantId in grouped) {
+        const response = await axios.post(
+          `${API_URL}/api/v1/orders`,
+          {
+            deliveryAddress: selectedAddress,
+            restaurantId: Number(restaurantId),
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+
+        const createdOrderId = response.data.data?.id;
+        if (createdOrderId) {
+          orderIds.push(createdOrderId);
+        }
+      }
+
+      if (orderIds.length === 0) {
+        alert("Không tạo được order.");
+        setVnpayLoading(false);
+        return;
+      }
+
+      const res = await axios.post(
+        `${API_URL}/api/v1/payments/vnpay`,
+        orderIds,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+
+      const paymentUrl = res.data.paymentUrl;
+
+      if (paymentUrl) {
+        window.location.href = paymentUrl;
+      } else {
+        alert("Không lấy được link thanh toán VNPAY.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Thanh toán VNPAY thất bại.");
+    } finally {
+      setVnpayLoading(false);
     }
   };
 
@@ -146,7 +217,7 @@ export const Checkout = () => {
                 {selectedCartItems
                   .reduce(
                     (total, item) => total + item.food.price * item.quantity,
-                    0
+                    0,
                   )
                   .toFixed(2)}{" "}
                 đ
@@ -187,11 +258,16 @@ export const Checkout = () => {
             + Add New Address
           </Button>
           <Button
-            onClick={() => handlePlaceOrder(selectedAddress)}
-            className="mt-4 w-full !bg-green-500 !text-white py-2 rounded-lg hover:!bg-green-600 font-semibold shadow"
-            disabled={!selectedAddress || selectedCartItems.length === 0}
+            style={{ display: "none" }} // Ẩn nút Place Order cũ
+          />
+          <Button
+            onClick={handleVNPayPayment}
+            className="mt-2 w-full !bg-blue-500 !text-white py-2 rounded-lg hover:!bg-blue-600 font-semibold shadow"
+            disabled={
+              !selectedAddress || selectedCartItems.length === 0 || vnpayLoading
+            }
           >
-            Place Order
+            {vnpayLoading ? "Đang chuyển hướng VNPAY..." : "Thanh toán"}
           </Button>
         </aside>
       </div>
@@ -202,7 +278,82 @@ export const Checkout = () => {
           <h2 className="text-2xl font-bold mb-6 text-[#2563EB] text-center">
             Add New Address
           </h2>
-          <form onSubmit={formik.handleSubmit} className="space-y-5">
+          <form
+
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (vnpayLoading) return;
+
+              const newAddress = {
+                city: formik.values.city,
+                district: formik.values.district,
+                ward: formik.values.ward,
+                street: formik.values.street,
+              };
+
+              if (!selectedCartItems.length) {
+                alert("Your cart is empty.");
+                return;
+              }
+
+              try {
+                setVnpayLoading(true);
+
+                const grouped = groupCartItemsByRestaurant(selectedCartItems);
+                const orderIds = [];
+
+                // 🔥 Tạo nhiều order giống hệt handleVNPayPayment
+                for (const restaurantId in grouped) {
+                  const response = await axios.post(
+                    `${API_URL}/api/v1/orders`,
+                    {
+                      deliveryAddress: newAddress,
+                      restaurantId: Number(restaurantId),
+                    },
+                    {
+                      headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                      },
+                    },
+                  );
+
+                  const createdOrderId = response.data.data?.id;
+                  if (createdOrderId) {
+                    orderIds.push(createdOrderId);
+                  }
+                }
+
+                if (orderIds.length === 0) {
+                  alert("Không tạo được order.");
+                  setVnpayLoading(false);
+                  return;
+                }
+
+                // 🔥 Gọi API mới (gửi LIST orderIds)
+                const res = await axios.post(
+                  `${API_URL}/api/v1/payments/vnpay`,
+                  orderIds,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                  },
+                );
+
+                const paymentUrl = res.data.paymentUrl;
+
+                if (paymentUrl) {
+                  window.location.href = paymentUrl;
+                } else {
+                  alert("Không lấy được link thanh toán VNPAY.");
+                }
+              } catch (error) {
+                alert("Thanh toán VNPAY thất bại.");
+              } finally {
+                setVnpayLoading(false);
+              }
+            }}
+          >
             <TextField
               fullWidth
               label="City"
@@ -245,9 +396,10 @@ export const Checkout = () => {
             />
             <Button
               type="submit"
-              className="w-full !bg-green-500 !text-white py-2 rounded-lg hover:!bg-green-600 font-semibold shadow"
+              className="w-full !bg-blue-500 !text-white py-2 rounded-lg hover:!bg-blue-600 font-semibold shadow"
+              disabled={vnpayLoading}
             >
-              Place order
+              {vnpayLoading ? "Đang chuyển hướng VNPAY..." : "Thanh toán"}
             </Button>
           </form>
         </div>

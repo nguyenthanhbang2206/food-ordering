@@ -1,6 +1,7 @@
 package com.nguyenthanhbang.foodordering.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.nguyenthanhbang.foodordering.enums.OrderPaymentStatus;
 import com.nguyenthanhbang.foodordering.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,7 +28,8 @@ public class Order extends BaseEntity{
     private User customer;
     @ManyToOne
     private Address deliveryAddress;
-
+    @Enumerated(EnumType.STRING)
+    private OrderPaymentStatus paymentStatus;
     @ManyToOne
     @JsonIgnore
     private Restaurant restaurant;

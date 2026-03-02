@@ -17,6 +17,9 @@ import { ThankYou } from "../components/Cart/ThankYou";
 import { FoodDetail } from "../components/Home/FoodDetail";
 import { AIChat } from "../components/AI/AIChat";
 import { AllFoods } from "../components/Food/AllFoods";
+import PaymentSuccess from "../components/Cart/PaymentSucess";
+import PaymentFailed from "../components/Cart/PaymentFailed";
+
 export const CustomerRoutes = () => {
   return (
     <div>
@@ -90,7 +93,7 @@ export const CustomerRoutes = () => {
             </PrivateRoute>
           }
         />
-         <Route
+        <Route
           path="/foods"
           element={
             <PrivateRoute>
@@ -103,6 +106,22 @@ export const CustomerRoutes = () => {
           element={
             <PrivateRoute>
               <Profile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/payment-success"
+          element={
+            <PrivateRoute>
+              <PaymentSuccess></PaymentSuccess>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/payment-success"
+          element={
+            <PrivateRoute>
+              <PaymentFailed></PaymentFailed>
             </PrivateRoute>
           }
         />

@@ -10,7 +10,7 @@ const ORDER_STATUSES = ["PENDING", "PROCESSING", "DELIVERED", "CANCELLED"];
 export const Orders = () => {
   const dispatch = useDispatch();
   const { restaurantOrders, loading, error, pagination } = useSelector(
-    (state) => state.restaurant
+    (state) => state.restaurant,
   );
   const [page, setPage] = useState(1);
   const [size] = useState(5);
@@ -70,6 +70,9 @@ export const Orders = () => {
                 Status
               </th>
               <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
+                Payment
+              </th>
+              <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
                 Created Date
               </th>
               <th className="px-4 py-2 border-b text-left text-sm font-medium text-gray-600">
@@ -113,6 +116,17 @@ export const Orders = () => {
                     >
                       Update
                     </button>
+                  </td>
+                  <td className="px-4 py-2 border-b text-sm text-gray-700">
+                    <span
+                      className={
+                        order.paymentStatus === "PAID"
+                          ? "text-green-600 font-bold"
+                          : "text-yellow-600 font-bold"
+                      }
+                    >
+                      {order.paymentStatus === "PAID" ? "Paid" : "Pending"}
+                    </span>
                   </td>
                   <td className="px-4 py-2 border-b text-sm text-gray-700">
                     {order.createdDate
@@ -163,6 +177,18 @@ export const Orders = () => {
           <p>
             <span className="font-semibold">Status:</span>{" "}
             {selectedOrder.status}
+          </p>
+          <p>
+            <span className="font-semibold">Payment Status:</span>{" "}
+            <span
+              className={
+                selectedOrder.paymentStatus === "PAID"
+                  ? "text-green-600 font-bold"
+                  : "text-yellow-600 font-bold"
+              }
+            >
+              {selectedOrder.paymentStatus === "PAID" ? "Paid" : "Pending"}
+            </span>
           </p>
           <p>
             <span className="font-semibold">Total Items:</span>{" "}
